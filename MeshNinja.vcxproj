@@ -22,6 +22,7 @@
     <ClInclude Include="Sources\Common.h" />
     <ClInclude Include="Sources\ConvexPolygon.h" />
     <ClInclude Include="Sources\ConvexPolygonMesh.h" />
+    <ClInclude Include="Sources\MeshFileFormat.h" />
     <ClInclude Include="Sources\MeshSetOperation.h" />
     <ClInclude Include="Sources\Vector.h" />
     <ClInclude Include="Sources\Vertex.h" />
@@ -29,6 +30,7 @@
   <ItemGroup>
     <ClCompile Include="Sources\ConvexPolygon.cpp" />
     <ClCompile Include="Sources\ConvexPolygonMesh.cpp" />
+    <ClCompile Include="Sources\MeshFileFormat.cpp" />
     <ClCompile Include="Sources\MeshSetOperation.cpp" />
     <ClCompile Include="Sources\Vector.cpp" />
     <ClCompile Include="Sources\Vertex.cpp" />

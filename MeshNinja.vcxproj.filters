@@ -25,6 +25,9 @@
     <ClInclude Include="Sources\MeshSetOperation.h">
       <Filter>Sources</Filter>
     </ClInclude>
+    <ClInclude Include="Sources\MeshFileFormat.h">
+      <Filter>Sources</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sources\MeshSetOperation.cpp">
@@ -40,6 +43,9 @@
       <Filter>Sources</Filter>
     </ClCompile>
     <ClCompile Include="Sources\Vertex.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\MeshFileFormat.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
   </ItemGroup>
