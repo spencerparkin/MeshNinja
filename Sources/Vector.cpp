@@ -149,6 +149,11 @@ bool Vector::RotateAbout(const Vector& vector, double angle)
 	return true;
 }
 
+bool Vector::Intersect(const Line& line, const Plane& plane)
+{
+	return false;
+}
+
 namespace MeshNinja
 {
 	Vector operator+(const Vector& vectorA, const Vector& vectorB)

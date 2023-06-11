@@ -4,6 +4,9 @@
 
 namespace MeshNinja
 {
+	class Line;
+	class Plane;
+
 	class MESH_NINJA_API Vector
 	{
 	public:
@@ -26,6 +29,7 @@ namespace MeshNinja
 		bool ProjectOnto(const Vector& vector);
 		bool RejectFrom(const Vector& vector);
 		bool RotateAbout(const Vector& vector, double angle);
+		bool Intersect(const Line& line, const Plane& plane);
 
 		double x, y, z;
 	};
