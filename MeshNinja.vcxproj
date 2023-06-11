@@ -22,15 +22,19 @@
     <ClInclude Include="Sources\Common.h" />
     <ClInclude Include="Sources\ConvexPolygon.h" />
     <ClInclude Include="Sources\ConvexPolygonMesh.h" />
+    <ClInclude Include="Sources\Line.h" />
     <ClInclude Include="Sources\MeshFileFormat.h" />
     <ClInclude Include="Sources\MeshSetOperation.h" />
+    <ClInclude Include="Sources\Plane.h" />
     <ClInclude Include="Sources\Vector.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sources\ConvexPolygon.cpp" />
     <ClCompile Include="Sources\ConvexPolygonMesh.cpp" />
+    <ClCompile Include="Sources\Line.cpp" />
     <ClCompile Include="Sources\MeshFileFormat.cpp" />
     <ClCompile Include="Sources\MeshSetOperation.cpp" />
+    <ClCompile Include="Sources\Plane.cpp" />
     <ClCompile Include="Sources\Vector.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
