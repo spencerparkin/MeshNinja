@@ -1,11 +1,13 @@
 #pragma once
 
 #include "Common.h"
-#include "Vertex.h"
+#include "Vector.h"
 #include "ConvexPolygon.h"
 
 namespace MeshNinja
 {
+	// Each face is assumed to be a convex polygon.  If this is not the case, then
+	// we simply leave the results of all algorithms as undefined.
 	class MESH_NINJA_API ConvexPolygonMesh
 	{
 	public:
@@ -25,6 +27,6 @@ namespace MeshNinja
 		};
 
 		std::vector<Facet>* facetArray;
-		std::vector<Vertex>* vertexArray;
+		std::vector<Vector>* vertexArray;
 	};
 }

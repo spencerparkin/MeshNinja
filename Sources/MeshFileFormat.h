@@ -12,8 +12,8 @@ namespace MeshNinja
 		MeshFileFormat();
 		virtual ~MeshFileFormat();
 
-		virtual bool LoadMeshes(const std::string& filePath, std::vector<ConvexPolygonMesh*>& convexPolygonMeshArray) = 0;
-		virtual bool SaveMeshes(const std::string& filePath, const std::vector<ConvexPolygonMesh*>& convexPolygonMeshArray) = 0;
+		virtual bool LoadMesh(const std::string& filePath, ConvexPolygonMesh& mesh) = 0;
+		virtual bool SaveMesh(const std::string& filePath, const ConvexPolygonMesh& mesh) = 0;
 	};
 
 	class MESH_NINJA_API ObjFileFormat : public MeshFileFormat
@@ -22,7 +22,14 @@ namespace MeshNinja
 		ObjFileFormat();
 		virtual ~ObjFileFormat();
 
-		virtual bool LoadMeshes(const std::string& filePath, std::vector<ConvexPolygonMesh*>& convexPolygonMeshArray) override;
-		virtual bool SaveMeshes(const std::string& filePath, const std::vector<ConvexPolygonMesh*>& convexPolygonMeshArray) override;
+		virtual bool LoadMesh(const std::string& filePath, ConvexPolygonMesh& mesh) override;
+		virtual bool SaveMesh(const std::string& filePath, const ConvexPolygonMesh& mesh) override;
+
+	protected:
+
+		void TokenizeLine(const std::string& line, char delimeter, std::vector<std::string>& tokenArray, bool stripEmptyTokens);
+		void ProcessLine(const std::vector<std::string>& tokenArray, ConvexPolygonMesh& mesh);
+
+
 	};
 }

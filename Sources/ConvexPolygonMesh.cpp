@@ -5,7 +5,7 @@ using namespace MeshNinja;
 ConvexPolygonMesh::ConvexPolygonMesh()
 {
 	this->facetArray = new std::vector<Facet>();
-	this->vertexArray = new std::vector<Vertex>();
+	this->vertexArray = new std::vector<Vector>();
 }
 
 /*virtual*/ ConvexPolygonMesh::~ConvexPolygonMesh()

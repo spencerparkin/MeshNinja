@@ -13,9 +13,6 @@
     <ClInclude Include="Sources\Common.h">
       <Filter>Sources</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\Vertex.h">
-      <Filter>Sources</Filter>
-    </ClInclude>
     <ClInclude Include="Sources\Vector.h">
       <Filter>Sources</Filter>
     </ClInclude>
@@ -40,9 +37,6 @@
       <Filter>Sources</Filter>
     </ClCompile>
     <ClCompile Include="Sources\Vector.cpp">
-      <Filter>Sources</Filter>
-    </ClCompile>
-    <ClCompile Include="Sources\Vertex.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
     <ClCompile Include="Sources\MeshFileFormat.cpp">

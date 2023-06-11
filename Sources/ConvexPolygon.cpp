@@ -4,7 +4,7 @@ using namespace MeshNinja;
 
 ConvexPolygon::ConvexPolygon()
 {
-	this->vertexArray = new std::vector<Vertex>();
+	this->vertexArray = new std::vector<Vector>();
 }
 
 /*virtual*/ ConvexPolygon::~ConvexPolygon()

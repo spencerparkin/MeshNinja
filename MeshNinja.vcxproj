@@ -25,7 +25,6 @@
     <ClInclude Include="Sources\MeshFileFormat.h" />
     <ClInclude Include="Sources\MeshSetOperation.h" />
     <ClInclude Include="Sources\Vector.h" />
-    <ClInclude Include="Sources\Vertex.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sources\ConvexPolygon.cpp" />
@@ -33,7 +32,6 @@
     <ClCompile Include="Sources\MeshFileFormat.cpp" />
     <ClCompile Include="Sources\MeshSetOperation.cpp" />
     <ClCompile Include="Sources\Vector.cpp" />
-    <ClCompile Include="Sources\Vertex.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
