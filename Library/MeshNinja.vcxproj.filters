@@ -34,6 +34,12 @@
     <ClInclude Include="Sources\MeshSetOperation.h">
       <Filter>Sources</Filter>
     </ClInclude>
+    <ClInclude Include="Sources\PointCloud.h">
+      <Filter>Sources</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\AxisAlignedBoundingBox.h">
+      <Filter>Sources</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sources\MeshBinaryOperation.cpp">
@@ -58,6 +64,12 @@
       <Filter>Sources</Filter>
     </ClCompile>
     <ClCompile Include="Sources\MeshSetOperation.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\PointCloud.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\AxisAlignedBoundingBox.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
   </ItemGroup>

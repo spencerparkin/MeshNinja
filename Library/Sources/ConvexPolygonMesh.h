@@ -15,6 +15,7 @@ namespace MeshNinja
 		virtual ~ConvexPolygonMesh();
 
 		void Clear();
+		void Compress();
 
 		void ToConvexPolygonArray(std::vector<ConvexPolygon>& convexPolygonArray) const;
 		void FromConvexPolygonArray(const std::vector<ConvexPolygon>& convexPolygonArray);

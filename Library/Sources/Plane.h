@@ -18,7 +18,16 @@ namespace MeshNinja
 
 		double SignedDistanceToPoint(const Vector& point) const;
 
+		enum class Side
+		{
+			BACK,
+			FRONT,
+			NEITHER
+		};
+
+		Side WhichSide(const Vector& point, double eps = MESH_NINJA_EPS) const;
+
 		Vector normal;
-		double signedDistanceToOrigin;
+		double D;
 	};
 }

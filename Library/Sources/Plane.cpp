@@ -5,20 +5,20 @@ using namespace MeshNinja;
 Plane::Plane()
 {
 	this->normal = Vector(0.0, 0.0, 0.0);
-	this->signedDistanceToOrigin = 0.0;
+	this->D = 0.0;
 }
 
 Plane::Plane(const Plane& plane)
 {
 	this->normal = plane.normal;
-	this->signedDistanceToOrigin = plane.signedDistanceToOrigin;
+	this->D = plane.D;
 }
 
 Plane::Plane(const Vector& point, const Vector& normal)
 {
 	this->normal = normal;
 	this->normal.Normalize();
-	this->signedDistanceToOrigin = point.Dot(this->normal);
+	this->D = point.Dot(this->normal);
 }
 
 /*virtual*/ Plane::~Plane()
@@ -27,5 +27,18 @@ Plane::Plane(const Vector& point, const Vector& normal)
 
 double Plane::SignedDistanceToPoint(const Vector& point) const
 {
-	return point.Dot(this->normal) - this->signedDistanceToOrigin;
+	return point.Dot(this->normal) - this->D;
+}
+
+Plane::Side Plane::WhichSide(const Vector& point, double eps /*= MESH_NINJA_EPS*/) const
+{
+	double signedDistance = this->SignedDistanceToPoint(point);
+	
+	if (signedDistance < eps)
+		return Side::BACK;
+
+	if (signedDistance > eps)
+		return Side::FRONT;
+
+	return Side::NEITHER;
 }

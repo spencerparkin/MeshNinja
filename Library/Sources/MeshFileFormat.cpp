@@ -120,7 +120,7 @@ void ObjFileFormat::ProcessLine(const std::vector<std::string>& tokenArray, Conv
 
 		for(int i = 0; i < (signed)facet.vertexArray.size(); i++)
 		{
-			int j = facet.vertexArray[i];
+			int j = facet.vertexArray[i] + 1;
 			fileStream << j;
 			if (i < (signed)facet.vertexArray.size() - 1)
 				fileStream << " ";

@@ -12,6 +12,7 @@ namespace MeshNinja
 	{
 	public:
 		ConvexPolygon();
+		ConvexPolygon(const ConvexPolygon& polygon);
 		virtual ~ConvexPolygon();
 
 		void Clear();

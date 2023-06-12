@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Sources\AxisAlignedBoundingBox.h" />
     <ClInclude Include="Sources\Common.h" />
     <ClInclude Include="Sources\ConvexPolygon.h" />
     <ClInclude Include="Sources\ConvexPolygonMesh.h" />
@@ -27,9 +28,11 @@
     <ClInclude Include="Sources\MeshBinaryOperation.h" />
     <ClInclude Include="Sources\MeshSetOperation.h" />
     <ClInclude Include="Sources\Plane.h" />
+    <ClInclude Include="Sources\PointCloud.h" />
     <ClInclude Include="Sources\Vector.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Sources\AxisAlignedBoundingBox.cpp" />
     <ClCompile Include="Sources\ConvexPolygon.cpp" />
     <ClCompile Include="Sources\ConvexPolygonMesh.cpp" />
     <ClCompile Include="Sources\Line.cpp" />
@@ -37,6 +40,7 @@
     <ClCompile Include="Sources\MeshBinaryOperation.cpp" />
     <ClCompile Include="Sources\MeshSetOperation.cpp" />
     <ClCompile Include="Sources\Plane.cpp" />
+    <ClCompile Include="Sources\PointCloud.cpp" />
     <ClCompile Include="Sources\Vector.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

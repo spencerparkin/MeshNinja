@@ -60,6 +60,13 @@ void Vector::operator*=(double scale)
 	this->z *= scale;
 }
 
+void Vector::operator/=(double scale)
+{
+	this->x /= scale;
+	this->y /= scale;
+	this->z /= scale;
+}
+
 Vector Vector::operator*(double scale)
 {
 	return Vector(
@@ -154,6 +161,20 @@ bool Vector::Intersect(const Line& line, const Plane& plane)
 	return false;
 }
 
+bool Vector::ToString(std::string& str) const
+{
+	std::stringstream stringStream;
+	stringStream << this->x << ", " << this->y << ", " << this->z;
+	str = stringStream.str();
+	return true;
+}
+
+bool Vector::FromString(const std::string& str)
+{
+	// TODO: Write this.
+	return false;
+}
+
 namespace MeshNinja
 {
 	Vector operator+(const Vector& vectorA, const Vector& vectorB)
@@ -186,5 +207,21 @@ namespace MeshNinja
 			vector.x * scale,
 			vector.y * scale,
 			vector.z * scale);
+	}
+
+	Vector operator/(const Vector& vector, double scale)
+	{
+		return Vector(
+			vector.x / scale,
+			vector.y / scale,
+			vector.z / scale);
+	}
+
+	bool operator<(const Vector& vectorA, const Vector& vectorB)
+	{
+		std::string strA, strB;
+		vectorA.ToString(strA);
+		vectorB.ToString(strB);
+		return ::strcmp(strA.c_str(), strB.c_str()) < 0;
 	}
 }
