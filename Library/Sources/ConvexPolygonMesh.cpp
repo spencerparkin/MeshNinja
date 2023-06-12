@@ -22,10 +22,15 @@ void ConvexPolygonMesh::Clear()
 	this->vertexArray->clear();
 }
 
-void ConvexPolygonMesh::Compress()
+void ConvexPolygonMesh::Compress(double eps /*= MESH_NINJA_EPS*/)
 {
 	std::vector<ConvexPolygon> polygonArray;
+
 	this->ToConvexPolygonArray(polygonArray);
+
+	for (ConvexPolygon& polygon : polygonArray)
+		polygon.Compress(eps);
+
 	this->FromConvexPolygonArray(polygonArray);
 }
 

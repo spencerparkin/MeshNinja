@@ -16,6 +16,7 @@ namespace MeshNinja
 		virtual ~ConvexPolygon();
 
 		void Clear();
+		void Compress(double eps = MESH_NINJA_EPS);
 
 		std::vector<Vector>* vertexArray;
 	};
