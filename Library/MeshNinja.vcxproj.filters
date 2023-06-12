@@ -28,7 +28,7 @@
     <ClInclude Include="Sources\Plane.h">
       <Filter>Sources</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\Line.h">
+    <ClInclude Include="Sources\Ray.h">
       <Filter>Sources</Filter>
     </ClInclude>
     <ClInclude Include="Sources\MeshSetOperation.h">
@@ -60,7 +60,7 @@
     <ClCompile Include="Sources\Plane.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\Line.cpp">
+    <ClCompile Include="Sources\Ray.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
     <ClCompile Include="Sources\MeshSetOperation.cpp">

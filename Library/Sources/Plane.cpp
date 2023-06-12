@@ -30,6 +30,11 @@ double Plane::SignedDistanceToPoint(const Vector& point) const
 	return point.Dot(this->normal) - this->D;
 }
 
+Vector Plane::CalcCenter() const
+{
+	return this->normal * this->D;
+}
+
 Plane::Side Plane::WhichSide(const Vector& point, double eps /*= MESH_NINJA_EPS*/) const
 {
 	double signedDistance = this->SignedDistanceToPoint(point);

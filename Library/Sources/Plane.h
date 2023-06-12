@@ -18,6 +18,8 @@ namespace MeshNinja
 
 		double SignedDistanceToPoint(const Vector& point) const;
 
+		Vector CalcCenter() const;
+
 		enum class Side
 		{
 			BACK,

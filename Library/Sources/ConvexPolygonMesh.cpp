@@ -31,6 +31,8 @@ void ConvexPolygonMesh::Compress(double eps /*= MESH_NINJA_EPS*/)
 	for (ConvexPolygon& polygon : polygonArray)
 		polygon.Compress(eps);
 
+	// TODO: Here we should reduce the polygon array by merging all coplanar polygons into a single polygon.
+
 	this->FromConvexPolygonArray(polygonArray);
 }
 

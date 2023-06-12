@@ -11,6 +11,8 @@ namespace MeshNinja
 	public:
 		MeshSetOperation();
 		virtual ~MeshSetOperation();
+
+
 	};
 
 	class MESH_NINJA_API MeshUnion : public MeshSetOperation
