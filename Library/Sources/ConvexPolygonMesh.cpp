@@ -14,8 +14,15 @@ ConvexPolygonMesh::ConvexPolygonMesh()
 	delete this->vertexArray;
 }
 
+void ConvexPolygonMesh::Clear()
+{
+	this->facetArray->clear();
+	this->vertexArray->clear();
+}
+
 void ConvexPolygonMesh::ToConvexPolygonArray(std::vector<ConvexPolygon>& convexPolygonArray) const
 {
+
 }
 
 void ConvexPolygonMesh::FromConvexPolygonArray(const std::vector<ConvexPolygon>& convexPolygonArray)

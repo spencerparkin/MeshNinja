@@ -11,3 +11,8 @@ ConvexPolygon::ConvexPolygon()
 {
 	delete this->vertexArray;
 }
+
+void ConvexPolygon::Clear()
+{
+	this->vertexArray->clear();
+}

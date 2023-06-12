@@ -19,7 +19,7 @@
     <ClInclude Include="Sources\ConvexPolygon.h">
       <Filter>Sources</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\MeshSetOperation.h">
+    <ClInclude Include="Sources\MeshBinaryOperation.h">
       <Filter>Sources</Filter>
     </ClInclude>
     <ClInclude Include="Sources\MeshFileFormat.h">
@@ -31,9 +31,12 @@
     <ClInclude Include="Sources\Line.h">
       <Filter>Sources</Filter>
     </ClInclude>
+    <ClInclude Include="Sources\MeshSetOperation.h">
+      <Filter>Sources</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Sources\MeshSetOperation.cpp">
+    <ClCompile Include="Sources\MeshBinaryOperation.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
     <ClCompile Include="Sources\ConvexPolygonMesh.cpp">
@@ -52,6 +55,9 @@
       <Filter>Sources</Filter>
     </ClCompile>
     <ClCompile Include="Sources\Line.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\MeshSetOperation.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
   </ItemGroup>

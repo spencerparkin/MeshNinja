@@ -1,4 +1,5 @@
 #include "MeshSetOperation.h"
+#include "ConvexPolygonMesh.h"
 
 using namespace MeshNinja;
 
@@ -54,5 +55,14 @@ MeshSubtraction::MeshSubtraction()
 
 /*virtual*/ bool MeshSubtraction::Perform(const ConvexPolygonMesh& meshA, const ConvexPolygonMesh& meshB, ConvexPolygonMesh& resultingMesh)
 {
+	std::vector<ConvexPolygon> polygonArray;
+
+	meshA.ToConvexPolygonArray(polygonArray);
+	meshB.ToConvexPolygonArray(polygonArray);
+
+	resultingMesh.Clear();
+
+	resultingMesh.FromConvexPolygonArray(polygonArray);
+
 	return true;
 }

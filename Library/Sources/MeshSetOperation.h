@@ -1,18 +1,16 @@
 #pragma once
 
-#include "Common.h"
+#include "MeshBinaryOperation.h"
 
 namespace MeshNinja
 {
 	class ConvexPolygonMesh;
 
-	class MESH_NINJA_API MeshSetOperation
+	class MESH_NINJA_API MeshSetOperation : public MeshBinaryOperation
 	{
 	public:
 		MeshSetOperation();
 		virtual ~MeshSetOperation();
-
-		virtual bool Perform(const ConvexPolygonMesh& meshA, const ConvexPolygonMesh& meshB, ConvexPolygonMesh& resultingMesh) = 0;
 	};
 
 	class MESH_NINJA_API MeshUnion : public MeshSetOperation

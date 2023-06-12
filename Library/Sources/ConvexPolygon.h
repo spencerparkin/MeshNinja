@@ -14,6 +14,8 @@ namespace MeshNinja
 		ConvexPolygon();
 		virtual ~ConvexPolygon();
 
+		void Clear();
+
 		std::vector<Vector>* vertexArray;
 	};
 }
