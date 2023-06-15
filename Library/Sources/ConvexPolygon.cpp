@@ -1,6 +1,7 @@
 #include "ConvexPolygon.h"
 #include "Plane.h"
 #include "Ray.h"
+#include "LineSegment.h"
 
 using namespace MeshNinja;
 
@@ -85,10 +86,23 @@ bool ConvexPolygon::IntersectWithLineSegment(const Vector& pointA, const Vector&
 
 bool ConvexPolygon::ContainsPoint(const Vector& point, double eps /*= MESH_NINJA_EPS*/) const
 {
+	// Is the given point in the same plane of the polygon?
 	Plane plane = this->CalcPlane();
 	if (plane.WhichSide(point, eps) != Plane::Side::NEITHER)
 		return false;
 
+	// Is the given point on the boundary of the polygon?
+	for (int i = 0; i < (signed)this->vertexArray->size(); i++)
+	{
+		int j = (i + 1) % this->vertexArray->size();
+		const Vector& vertexA = (*this->vertexArray)[i];
+		const Vector& vertexB = (*this->vertexArray)[j];
+		LineSegment line(vertexA, vertexB);
+		if (line.ContainsPoint(point, eps))
+			return true;
+	}
+
+	// Is the given point in the interior of the polygon?
 	for (int i = 0; i < (signed)this->vertexArray->size(); i++)
 	{
 		int j = (i + 1) % this->vertexArray->size();
@@ -104,7 +118,68 @@ bool ConvexPolygon::ContainsPoint(const Vector& point, double eps /*= MESH_NINJA
 
 bool ConvexPolygon::Intersect(const ConvexPolygon& polygonA, const ConvexPolygon& polygonB, double eps /*= MESH_NINJA_EPS*/)
 {
-	//...
+	this->Clear();
+
+	const ConvexPolygon* polygonArray[2] = { &polygonA, &polygonB };
+	const ConvexPolygon* chosenPolygon = nullptr;
+	int chosenVertex = -1;
+
+	for (int i = 0; i < 2 && !chosenPolygon; i++)
+	{
+		const ConvexPolygon* polygon = polygonArray[i];
+		const ConvexPolygon* otherPolygon = polygonArray[1 - i];
+
+		for (int j = 0; j < (signed)polygon->vertexArray->size(); j++)
+		{
+			const Vector& vertex = (*polygon->vertexArray)[j];
+			if (!otherPolygon->ContainsPoint(vertex))
+			{
+				chosenPolygon = polygon;
+				chosenVertex = j;
+				break;
+			}
+		}
+	}
+
+	if (!chosenPolygon)
+	{
+		// Polygons A and B must be the same polygon.
+		*this = polygonA;
+		return true;
+	}
+
+	Plane planeA, planeB;
+
+	planeA = polygonA.CalcPlane();
+	planeB = polygonB.CalcPlane();
+
+	Vector centerA = planeA.CalcCenter();
+	Vector centerB = planeB.CalcCenter();
+
+	if ((planeB.normal - planeA.normal).Length() < eps && (centerB - centerA).Length() < eps)
+	{
+		//...
+	}
+	else
+	{
+		const ConvexPolygon* otherPolygon = (chosenPolygon == &polygonA) ? &polygonB : &polygonA;
+
+		for (int i = 0; i < (signed)chosenPolygon->vertexArray->size(); i++)
+		{
+			int j = (chosenVertex + i) % chosenPolygon->vertexArray->size();
+			int k = (j + 1) % chosenPolygon->vertexArray->size();
+			const Vector& vertexA = (*chosenPolygon->vertexArray)[j];
+			const Vector& vertexB = (*chosenPolygon->vertexArray)[k];
+
+			Ray ray(vertexA, vertexB - vertexA);
+			double alpha = 0.0;
+			if (ray.CastAgainst(*otherPolygon, alpha))
+			{
+				Vector hitPoint = ray.Lerp(alpha);
+				this->vertexArray->push_back(hitPoint);
+			}
+		}
+	}
 
 	return false;
 }
