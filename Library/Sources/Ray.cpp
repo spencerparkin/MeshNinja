@@ -43,7 +43,7 @@ bool Ray::CastAgainst(const LineSegment& lineSegment, double& alpha, double eps 
 {
 	Ray ray(lineSegment.vertexA, lineSegment.vertexB - lineSegment.vertexA);
 
-	double alpha, beta;
+	double beta = 0.0;
 	if (!Ray::Intersect(*this, ray, alpha, beta, eps))
 		return false;
 
