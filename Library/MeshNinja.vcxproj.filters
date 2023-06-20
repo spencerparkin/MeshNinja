@@ -43,9 +43,6 @@
     <ClInclude Include="Sources\LineSegment.h">
       <Filter>Sources</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\Function.h">
-      <Filter>Sources</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sources\MeshBinaryOperation.cpp">
@@ -79,9 +76,6 @@
       <Filter>Sources</Filter>
     </ClCompile>
     <ClCompile Include="Sources\LineSegment.cpp">
-      <Filter>Sources</Filter>
-    </ClCompile>
-    <ClCompile Include="Sources\Function.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
   </ItemGroup>

@@ -9,7 +9,7 @@ namespace MeshNinja
 	// convex polygon.  If this is not the case, then the result of any
 	// algorithm is left undefined.  Polygons of 0, 1, or 2 vertices
 	// are allowed.  Doing so, the intersection of any two polygons can
-	// said to be a polygon.
+	// be said to be a polygon.
 	class MESH_NINJA_API ConvexPolygon
 	{
 	public:

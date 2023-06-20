@@ -36,30 +36,19 @@ bool Ray::CastAgainst(const Plane& plane, double& alpha, double eps /* = MESH_NI
 	if (::isnan(alpha) || ::isinf(alpha))
 		return false;
 
-	return true;
+	return alpha >= 0.0;
 }
 
-// There is a way to solve this analytically using matrix algebra, but I'm going to be lazy here.
 bool Ray::CastAgainst(const LineSegment& lineSegment, double& alpha, double eps /*= MESH_NINJA_EPS*/) const
 {
-	alpha = 0.0;
-	double delta = this->direction.Length();
-	double smallestDistance = DBL_MAX;
-	while (smallestDistance >= eps && delta >= eps)
-	{
-		Vector point = this->Lerp(alpha);
-		double distance = lineSegment.DistanceToPoint(point);
-		if (distance < smallestDistance)
-			smallestDistance = distance;
-		else
-		{
-			alpha -= delta;
-			delta /= -2.0;
-		}
-		alpha += delta;
-	}
+	Ray ray(lineSegment.vertexA, lineSegment.vertexB - lineSegment.vertexA);
 
-	return smallestDistance < eps;
+	double alpha, beta;
+	if (!Ray::Intersect(*this, ray, alpha, beta, eps))
+		return false;
+
+	Vector point = this->Lerp(alpha);
+	return lineSegment.ContainsPoint(point, eps);
 }
 
 bool Ray::CastAgainst(const ConvexPolygon& polygon, double& alpha, double eps /*= MESH_NINJA_EPS*/) const
@@ -101,4 +90,47 @@ bool Ray::CastAgainst(const ConvexPolygon& polygon, double& alpha, double eps /*
 Vector Ray::Lerp(double alpha) const
 {
 	return this->origin + this->direction * alpha;
+}
+
+double Ray::LerpInverse(const Vector& point) const
+{
+	return (point - this->origin).Dot(this->direction) / this->direction.Dot(this->direction);
+}
+
+/*static*/ bool Ray::Intersect(const Ray& rayA, const Ray& rayB, double& alpha, double& beta, double eps /*= MESH_NINJA_EPS*/)
+{
+	Vector normal = rayA.direction.Cross(rayB.direction);
+	if (!normal.Normalize())
+	{
+		// The rays are parallel.
+		if ((rayB.origin - rayB.origin).Length() < eps)
+		{
+			// The rays are the same ray.
+			alpha = 0.0;
+			beta = 0.0;
+			return true;
+		}
+
+		return false;
+	}
+	
+	Plane plane(rayA.origin, normal);
+	if (plane.WhichSide(rayB.origin, eps) != Plane::Side::NEITHER)
+	{
+		// The rays are not in the same plane.
+		return false;
+	}
+
+	Plane planeA(rayA.origin, rayA.direction.Cross(normal));
+	if (!rayB.CastAgainst(planeA, beta, eps))
+		return false;
+
+	Plane planeB(rayB.origin, rayB.direction.Cross(normal));
+	if (!rayA.CastAgainst(planeB, alpha, eps))
+		return false;
+
+	// Perform sanity check.
+	assert((rayA.Lerp(alpha) - rayB.Lerp(beta)).Length() < eps);
+
+	return true;
 }

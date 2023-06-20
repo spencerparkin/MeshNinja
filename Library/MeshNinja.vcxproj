@@ -23,7 +23,6 @@
     <ClInclude Include="Sources\Common.h" />
     <ClInclude Include="Sources\ConvexPolygon.h" />
     <ClInclude Include="Sources\ConvexPolygonMesh.h" />
-    <ClInclude Include="Sources\Function.h" />
     <ClInclude Include="Sources\LineSegment.h" />
     <ClInclude Include="Sources\Ray.h" />
     <ClInclude Include="Sources\MeshFileFormat.h" />
@@ -37,7 +36,6 @@
     <ClCompile Include="Sources\AxisAlignedBoundingBox.cpp" />
     <ClCompile Include="Sources\ConvexPolygon.cpp" />
     <ClCompile Include="Sources\ConvexPolygonMesh.cpp" />
-    <ClCompile Include="Sources\Function.cpp" />
     <ClCompile Include="Sources\LineSegment.cpp" />
     <ClCompile Include="Sources\Ray.cpp" />
     <ClCompile Include="Sources\MeshFileFormat.cpp" />

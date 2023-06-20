@@ -156,14 +156,14 @@ bool ConvexPolygon::Intersect(const ConvexPolygon& polygonA, const ConvexPolygon
 	Vector centerA = planeA.CalcCenter();
 	Vector centerB = planeB.CalcCenter();
 
+	const ConvexPolygon* otherPolygon = (chosenPolygon == &polygonA) ? &polygonB : &polygonA;
+
 	if ((planeB.normal - planeA.normal).Length() < eps && (centerB - centerA).Length() < eps)
 	{
 		//...
 	}
 	else
 	{
-		const ConvexPolygon* otherPolygon = (chosenPolygon == &polygonA) ? &polygonB : &polygonA;
-
 		for (int i = 0; i < (signed)chosenPolygon->vertexArray->size(); i++)
 		{
 			int j = (chosenVertex + i) % chosenPolygon->vertexArray->size();
@@ -181,5 +181,5 @@ bool ConvexPolygon::Intersect(const ConvexPolygon& polygonA, const ConvexPolygon
 		}
 	}
 
-	return false;
+	return this->vertexArray->size() > 0;
 }

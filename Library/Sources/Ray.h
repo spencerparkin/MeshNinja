@@ -22,6 +22,9 @@ namespace MeshNinja
 		bool CastAgainst(const ConvexPolygon& polygon, double& alpha, double eps = MESH_NINJA_EPS) const;
 		bool CastAgainst(const LineSegment& lineSegment, double& alpha, double eps = MESH_NINJA_EPS) const;
 		Vector Lerp(double alpha) const;
+		double LerpInverse(const Vector& point) const;
+
+		static bool Intersect(const Ray& rayA, const Ray& rayB, double& alpha, double& beta, double eps = MESH_NINJA_EPS);
 
 		Vector origin;
 		Vector direction;
