@@ -121,10 +121,9 @@ bool ConvexPolygon::Intersect(const ConvexPolygon& polygonA, const ConvexPolygon
 	this->Clear();
 
 	const ConvexPolygon* polygonArray[2] = { &polygonA, &polygonB };
-	const ConvexPolygon* chosenPolygon = nullptr;
-	int chosenVertex = -1;
+	bool samePolygon = true;
 
-	for (int i = 0; i < 2 && !chosenPolygon; i++)
+	for (int i = 0; i < 2 && samePolygon; i++)
 	{
 		const ConvexPolygon* polygon = polygonArray[i];
 		const ConvexPolygon* otherPolygon = polygonArray[1 - i];
@@ -134,51 +133,73 @@ bool ConvexPolygon::Intersect(const ConvexPolygon& polygonA, const ConvexPolygon
 			const Vector& vertex = (*polygon->vertexArray)[j];
 			if (!otherPolygon->ContainsPoint(vertex))
 			{
-				chosenPolygon = polygon;
-				chosenVertex = j;
+				samePolygon = false;
 				break;
 			}
 		}
 	}
 
-	if (!chosenPolygon)
+	if (samePolygon)
 	{
 		// Polygons A and B must be the same polygon.
 		*this = polygonA;
 		return true;
 	}
 
-	Plane planeA, planeB;
+	std::vector<Vector> hitPointArray[2];
 
-	planeA = polygonA.CalcPlane();
-	planeB = polygonB.CalcPlane();
-
-	Vector centerA = planeA.CalcCenter();
-	Vector centerB = planeB.CalcCenter();
-
-	const ConvexPolygon* otherPolygon = (chosenPolygon == &polygonA) ? &polygonB : &polygonA;
-
-	if ((planeB.normal - planeA.normal).Length() < eps && (centerB - centerA).Length() < eps)
+	for (int i = 0; i < 2; i++)
 	{
-		//...
-	}
-	else
-	{
-		for (int i = 0; i < (signed)chosenPolygon->vertexArray->size(); i++)
+		const ConvexPolygon* polygon = polygonArray[i];
+		const ConvexPolygon* otherPolygon = polygonArray[1 - i];
+
+		for (int j = 0; i < (signed)polygon->vertexArray->size(); i++)
 		{
-			int j = (chosenVertex + i) % chosenPolygon->vertexArray->size();
-			int k = (j + 1) % chosenPolygon->vertexArray->size();
-			const Vector& vertexA = (*chosenPolygon->vertexArray)[j];
-			const Vector& vertexB = (*chosenPolygon->vertexArray)[k];
+			int k = (j + 1) % otherPolygon->vertexArray->size();
+
+			const Vector& vertexA = (*polygon->vertexArray)[j];
+			const Vector& vertexB = (*otherPolygon->vertexArray)[k];
 
 			Ray ray(vertexA, vertexB - vertexA);
 			double alpha = 0.0;
 			if (ray.CastAgainst(*otherPolygon, alpha))
 			{
 				Vector hitPoint = ray.Lerp(alpha);
-				this->vertexArray->push_back(hitPoint);
+				hitPointArray[i].push_back(hitPoint);
 			}
 		}
+	}
+
+	if (hitPointArray[0].size() <= 2 && hitPointArray[1].size() <= 2)
+	{
+		std::vector<Vector> combinedHitPointArray;
+		for (int i = 0; i < 2; i++)
+			for (Vector& hitPoint : hitPointArray[i])
+				combinedHitPointArray.push_back(hitPoint);
+
+		for (Vector& hitPoint : combinedHitPointArray)
+		{
+			bool pointFound = false;
+			for (Vector& vertex : *this->vertexArray)
+			{
+				if ((vertex - hitPoint).Length() < eps)
+				{
+					pointFound = true;
+					break;
+				}
+			}
+
+			if (!pointFound)
+				this->vertexArray->push_back(hitPoint);
+		}
+	}
+	else
+	{
+		// This is a valid case and can happen if the two polygons are
+		// co-planar.  However, it's not a case that I need to handle
+		// yet, so here I'm just going to ignore it.  For the record,
+		// however, this is where we might return a polygon with three
+		// or more vertices.
 	}
 
 	return this->vertexArray->size() > 0;
