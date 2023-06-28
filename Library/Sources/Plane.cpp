@@ -39,10 +39,10 @@ Plane::Side Plane::WhichSide(const Vector& point, double eps /*= MESH_NINJA_EPS*
 {
 	double signedDistance = this->SignedDistanceToPoint(point);
 	
-	if (signedDistance < eps)
+	if (signedDistance < -eps / 2.0)
 		return Side::BACK;
 
-	if (signedDistance > eps)
+	if (signedDistance > eps / 2.0)
 		return Side::FRONT;
 
 	return Side::NEITHER;

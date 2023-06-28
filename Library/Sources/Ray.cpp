@@ -27,8 +27,14 @@ Ray::Ray(const Vector& origin, const Vector& direction)
 
 bool Ray::CastAgainst(const Plane& plane, double& alpha, double eps /* = MESH_NINJA_EPS*/) const
 {
+	if (plane.WhichSide(this->origin, eps) == Plane::Side::NEITHER)
+	{
+		alpha = 0.0;
+		return true;
+	}
+
 	double dotDenominator = this->direction.Dot(plane.normal);
-	if (dotDenominator < eps)
+	if (fabs(dotDenominator) < eps)
 		return false;
 
 	double dotNumerator = (plane.CalcCenter() - this->origin).Dot(plane.normal);

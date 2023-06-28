@@ -153,12 +153,12 @@ bool ConvexPolygon::Intersect(const ConvexPolygon& polygonA, const ConvexPolygon
 		const ConvexPolygon* polygon = polygonArray[i];
 		const ConvexPolygon* otherPolygon = polygonArray[1 - i];
 
-		for (int j = 0; i < (signed)polygon->vertexArray->size(); i++)
+		for (int j = 0; j < (signed)polygon->vertexArray->size(); j++)
 		{
-			int k = (j + 1) % otherPolygon->vertexArray->size();
+			int k = (j + 1) % polygon->vertexArray->size();
 
 			const Vector& vertexA = (*polygon->vertexArray)[j];
-			const Vector& vertexB = (*otherPolygon->vertexArray)[k];
+			const Vector& vertexB = (*polygon->vertexArray)[k];
 
 			Ray ray(vertexA, vertexB - vertexA);
 			double alpha = 0.0;
