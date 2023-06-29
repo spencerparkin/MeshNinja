@@ -41,7 +41,7 @@ int main(int argc, char** argv)
 	ConvexPolygonMesh differenceMesh;
 	if (!subtractOp.Perform(meshA, meshB, differenceMesh))
 	{
-		fprintf(stderr, "Failed to subject thw two boxes!\n");
+		fprintf(stderr, "Failed to subject the two boxes!\n");
 		return 1;
 	}
 
