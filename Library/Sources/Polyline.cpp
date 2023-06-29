@@ -59,26 +59,51 @@ bool Polyline::Merge(const Polyline& polylineA, const Polyline& polylineB, doubl
 {
 	if ((polylineA.GetLastVertex() - polylineB.GetFirstVertex()).Length() < eps)
 	{
-		this->Concatinate(polylineA, polylineB);
+		Polyline copyPolylineA(polylineA);
+		copyPolylineA.vertexArray->pop_back();
+		this->Concatinate(copyPolylineA, polylineB);
 		return true;
 	}
 	else if ((polylineA.GetFirstVertex() - polylineB.GetLastVertex()).Length() < eps)
 	{
-		this->Concatinate(polylineB, polylineA);
+		Polyline copyPolylineB(polylineB);
+		copyPolylineB.vertexArray->pop_back();
+		this->Concatinate(copyPolylineB, polylineA);
+		return true;
+	}
+	else if ((polylineA.GetFirstVertex() - polylineB.GetFirstVertex()).Length() < eps && (polylineA.GetLastVertex() - polylineB.GetLastVertex()).Length() < eps)
+	{
+		if (polylineA.vertexArray->size() <= polylineB.vertexArray->size())
+		{
+			Polyline reversePolylineA(polylineA);
+			reversePolylineA.ReverseOrder();
+			reversePolylineA.vertexArray->pop_back();
+			this->Concatinate(reversePolylineA, polylineB);
+			return true;
+		}
+		else
+		{
+			Polyline reversePolylineB(polylineB);
+			reversePolylineB.ReverseOrder();
+			reversePolylineB.vertexArray->erase(reversePolylineB.vertexArray->begin());
+			this->Concatinate(polylineA, reversePolylineB);
+			return true;
+		}
+	}
+	else if ((polylineA.GetFirstVertex() - polylineB.GetFirstVertex()).Length() < eps)
+	{
+		Polyline reversePolylineA(polylineA);
+		reversePolylineA.ReverseOrder();
+		reversePolylineA.vertexArray->pop_back();
+		this->Concatinate(reversePolylineA, polylineB);
 		return true;
 	}
 	else if ((polylineA.GetLastVertex() - polylineB.GetLastVertex()).Length() < eps)
 	{
 		Polyline reversePolylineB(polylineB);
 		reversePolylineB.ReverseOrder();
+		reversePolylineB.vertexArray->erase(reversePolylineB.vertexArray->begin());
 		this->Concatinate(polylineA, reversePolylineB);
-		return true;
-	}
-	else if ((polylineA.GetFirstVertex() - polylineB.GetFirstVertex()).Length() < eps)
-	{
-		Polyline reversePolylineA(polylineA);
-		reversePolylineA.ReverseOrder();
-		this->Concatinate(reversePolylineA, polylineB);
 		return true;
 	}
 
