@@ -271,3 +271,10 @@ bool ConvexPolygon::SplitAgainst(const Plane& cuttingPlane, ConvexPolygon& polyg
 
 	return polygonA.vertexArray->size() > 0 && polygonB.vertexArray->size() > 0;
 }
+
+void ConvexPolygon::MakeReverseOf(const ConvexPolygon& polygon)
+{
+	this->vertexArray->clear();
+	for (int i = (signed)polygon.vertexArray->size() - 1; i >= 0; i--)
+		this->vertexArray->push_back((*polygon.vertexArray)[i]);
+}

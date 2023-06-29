@@ -273,7 +273,11 @@ MeshSubtraction::MeshSubtraction()
 		polygonArray.push_back(polygon);
 
 	for (const ConvexPolygon& polygon : polygonLists.meshB_insidePolygonList)
-		polygonArray.push_back(polygon);
+	{
+		ConvexPolygon reversePolygon;
+		reversePolygon.MakeReverseOf(polygon);
+		polygonArray.push_back(reversePolygon);
+	}
 
 	resultingMesh.FromConvexPolygonArray(polygonArray);
 	return true;

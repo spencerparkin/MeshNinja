@@ -26,6 +26,7 @@ namespace MeshNinja
 		bool ContainsPoint(const Vector& point, bool* isInteriorPoint = nullptr, double eps = MESH_NINJA_EPS) const;
 		bool ContainsPointOnBoundary(const Vector& point, double eps = MESH_NINJA_EPS) const;
 		bool SplitAgainst(const Plane& cuttingPlane, ConvexPolygon& polygonA, ConvexPolygon& polygonB, double eps = MESH_NINJA_EPS) const;
+		void MakeReverseOf(const ConvexPolygon& polygon);
 
 		std::vector<Vector>* vertexArray;
 	};
