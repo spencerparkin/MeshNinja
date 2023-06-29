@@ -1,5 +1,8 @@
 #include "MeshSetOperation.h"
 #include "ConvexPolygonMesh.h"
+#if defined MESH_NINJA_DEBUG_MESH_SET_OPERATION
+#	include "MeshFileFormat.h"
+#endif
 
 using namespace MeshNinja;
 
@@ -58,6 +61,19 @@ bool MeshSetOperation::CalculatePolygonLists(const ConvexPolygonMesh& meshA, con
 			return false;
 		}
 	}
+
+#if defined MESH_NINJA_DEBUG_MESH_SET_OPERATION
+	int fileCount = 0;
+	for (const Polyline& polyline : polylineCollection.polylineList)
+	{
+		ConvexPolygonMesh tubeMesh;
+		if (polyline.GenerateTubeMesh(tubeMesh, 0.5, 10))
+		{
+			ObjFileFormat objFileFormat;
+			objFileFormat.SaveMesh(std::format("Meshes/polyline{}.obj", fileCount++), tubeMesh);
+		}
+	}
+#endif //MESH_NINJA_DEBUG_MESH_SET_OPERATION
 
 	// TODO: Cut the polygons against the line-loops.
 

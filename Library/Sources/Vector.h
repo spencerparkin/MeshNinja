@@ -33,6 +33,7 @@ namespace MeshNinja
 		bool Intersect(const Line& line, const Plane& plane);
 		bool ToString(std::string& str) const;
 		bool FromString(const std::string& str);
+		bool MakeOrthogonalTo(const Vector& vector);
 
 		double x, y, z;
 	};

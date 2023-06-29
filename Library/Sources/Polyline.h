@@ -5,6 +5,8 @@
 
 namespace MeshNinja
 {
+	class ConvexPolygonMesh;
+
 	class MESH_NINJA_API Polyline
 	{
 	public:
@@ -20,6 +22,7 @@ namespace MeshNinja
 		void ReverseOrder();
 		bool Merge(const Polyline& polylineA, const Polyline& polylineB, double eps = MESH_NINJA_EPS);
 		void Concatinate(const Polyline& polylineA, const Polyline& polylineB);
+		bool GenerateTubeMesh(ConvexPolygonMesh& tubeMesh, double radius, int numSides) const;
 
 		std::vector<Vector>* vertexArray;
 	};

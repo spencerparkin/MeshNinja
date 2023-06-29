@@ -175,6 +175,37 @@ bool Vector::FromString(const std::string& str)
 	return false;
 }
 
+bool Vector::MakeOrthogonalTo(const Vector& vector)
+{
+	double ax = fabs(vector.x);
+	double ay = fabs(vector.y);
+	double az = fabs(vector.z);
+
+	if (ax > ay && ax > az)
+	{
+		this->z = vector.x;
+		this->x = -vector.z;
+		this->y = 0.0;
+		return true;
+	}
+	else if (ay > ax && ay > az)
+	{
+		this->x = vector.y;
+		this->y = -vector.x;
+		this->z = 0.0;
+		return true;
+	}
+	else if (az > ax && az > ay)
+	{
+		this->y = vector.z;
+		this->z = -vector.y;
+		this->x = 0.0;
+		return true;
+	}
+
+	return false;
+}
+
 namespace MeshNinja
 {
 	Vector operator+(const Vector& vectorA, const Vector& vectorB)

@@ -4,6 +4,8 @@
 #include "ConvexPolygon.h"
 #include "Polyline.h"
 
+#define MESH_NINJA_DEBUG_MESH_SET_OPERATION
+
 namespace MeshNinja
 {
 	class ConvexPolygonMesh;

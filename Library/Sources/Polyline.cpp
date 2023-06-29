@@ -1,4 +1,7 @@
 #include "Polyline.h"
+#include "Plane.h"
+#include "ConvexPolygonMesh.h"
+#include "Ray.h"
 
 using namespace MeshNinja;
 
@@ -119,4 +122,92 @@ void Polyline::Concatinate(const Polyline& polylineA, const Polyline& polylineB)
 
 	for (const Vector& vertex : *polylineB.vertexArray)
 		this->vertexArray->push_back(vertex);
+}
+
+bool Polyline::GenerateTubeMesh(ConvexPolygonMesh& tubeMesh, double radius, int numSides) const
+{
+	if (numSides < 2 || this->vertexArray->size() < 2)
+		return false;
+
+	std::vector<ConvexPolygon> polygonArray;
+	int numVertices = this->vertexArray->size();
+	for (int i = 0; i < numVertices - 1; i++)
+	{
+		const Vector& vertexA = (*this->vertexArray)[i];
+		const Vector& vertexB = (*this->vertexArray)[i + 1];
+
+		Vector vectorA, vectorB;
+
+		if (i > 0)
+			vectorA = (*this->vertexArray)[i - 1] - (*this->vertexArray)[i];
+		else if (this->IsLineLoop())
+			vectorA = (*this->vertexArray)[numVertices - 2] - (*this->vertexArray)[numVertices - 1];
+		else
+			vectorA = vertexA - vertexB;
+
+		if (i < numVertices - 2)
+			vectorB = (*this->vertexArray)[i + 2] - (*this->vertexArray)[i + 1];
+		else if (this->IsLineLoop())
+			vectorB = (*this->vertexArray)[1] - (*this->vertexArray)[0];
+		else
+			vectorB = vertexB - vertexA;
+
+		vectorA.Normalize();
+		vectorB.Normalize();
+
+		Vector axisVectorA(vertexA - vertexB);
+		Vector axisVectorB(vertexB - vertexA);
+
+		axisVectorA.Normalize();
+		axisVectorB.Normalize();
+
+		Vector capNormalA(axisVectorA + vectorA);
+		Vector capNormalB(axisVectorB + vectorB);
+
+		capNormalA.Normalize();
+		capNormalB.Normalize();
+
+		Plane capPlaneA(vertexA, capNormalA);
+		Plane capPlaneB(vertexB, capNormalB);
+
+		Vector origin = (vertexA + vertexB) / 2.0;
+
+		Vector zAxis = vertexB - vertexA;
+		zAxis.Normalize();
+		Vector yAxis;
+		yAxis.MakeOrthogonalTo(zAxis);
+		Vector xAxis = yAxis.Cross(zAxis);
+
+		std::vector<Vector> pointArrayA, pointArrayB;
+		for (int j = 0; j < numSides; j++)
+		{
+			double angle = (double(j) / double(numSides)) * 2.0 * M_PI;
+			Vector circlePoint;
+			circlePoint = origin + (xAxis * cos(angle) + yAxis * sin(angle)) * radius;
+
+			double alpha = 0.0;
+			Ray rayA(circlePoint, axisVectorA);
+			rayA.CastAgainst(capPlaneA, alpha);
+			pointArrayA.push_back(rayA.Lerp(alpha));
+
+			double beta = 0.0;
+			Ray rayB(circlePoint, axisVectorB);
+			rayB.CastAgainst(capPlaneB, beta);
+			pointArrayB.push_back(rayB.Lerp(beta));
+		}
+
+		for (int j = 0; j < numSides; j++)
+		{
+			int k = (j + 1) % numSides;
+			ConvexPolygon polygon;
+			polygon.vertexArray->push_back(pointArrayA[j]);
+			polygon.vertexArray->push_back(pointArrayB[j]);
+			polygon.vertexArray->push_back(pointArrayB[k]);
+			polygon.vertexArray->push_back(pointArrayA[k]);
+			polygonArray.push_back(polygon);
+		}
+	}
+	
+	tubeMesh.FromConvexPolygonArray(polygonArray);
+	return true;
 }
