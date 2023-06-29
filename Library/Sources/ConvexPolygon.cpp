@@ -84,23 +84,19 @@ bool ConvexPolygon::IntersectWithLineSegment(const Vector& pointA, const Vector&
 	return false;
 }
 
-bool ConvexPolygon::ContainsPoint(const Vector& point, double eps /*= MESH_NINJA_EPS*/) const
+bool ConvexPolygon::ContainsPoint(const Vector& point, bool* isInteriorPoint /*= nullptr*/, double eps /*= MESH_NINJA_EPS*/) const
 {
+	if (isInteriorPoint)
+		*isInteriorPoint = false;
+
 	// Is the given point in the same plane of the polygon?
 	Plane plane = this->CalcPlane();
 	if (plane.WhichSide(point, eps) != Plane::Side::NEITHER)
 		return false;
 
 	// Is the given point on the boundary of the polygon?
-	for (int i = 0; i < (signed)this->vertexArray->size(); i++)
-	{
-		int j = (i + 1) % this->vertexArray->size();
-		const Vector& vertexA = (*this->vertexArray)[i];
-		const Vector& vertexB = (*this->vertexArray)[j];
-		LineSegment line(vertexA, vertexB);
-		if (line.ContainsPoint(point, eps))
-			return true;
-	}
+	if (this->ContainsPointOnBoundary(point, eps))
+		return true;
 
 	// Is the given point in the interior of the polygon?
 	for (int i = 0; i < (signed)this->vertexArray->size(); i++)
@@ -113,7 +109,25 @@ bool ConvexPolygon::ContainsPoint(const Vector& point, double eps /*= MESH_NINJA
 			return false;
 	}
 
+	if (isInteriorPoint)
+		*isInteriorPoint = true;
+
 	return true;
+}
+
+bool ConvexPolygon::ContainsPointOnBoundary(const Vector& point, double eps /*= MESH_NINJA_EPS*/) const
+{
+	for (int i = 0; i < (signed)this->vertexArray->size(); i++)
+	{
+		int j = (i + 1) % this->vertexArray->size();
+		const Vector& vertexA = (*this->vertexArray)[i];
+		const Vector& vertexB = (*this->vertexArray)[j];
+		LineSegment line(vertexA, vertexB);
+		if (line.ContainsPoint(point, eps))
+			return true;
+	}
+
+	return false;
 }
 
 bool ConvexPolygon::Intersect(const ConvexPolygon& polygonA, const ConvexPolygon& polygonB, double eps /*= MESH_NINJA_EPS*/)
@@ -203,4 +217,57 @@ bool ConvexPolygon::Intersect(const ConvexPolygon& polygonA, const ConvexPolygon
 	}
 
 	return this->vertexArray->size() > 0;
+}
+
+bool ConvexPolygon::SplitAgainst(const Plane& cuttingPlane, ConvexPolygon& polygonA, ConvexPolygon& polygonB, double eps /*= MESH_NINJA_EPS*/) const
+{
+	polygonA.Clear();
+	polygonB.Clear();
+
+	for (int i = 0; i < (signed)this->vertexArray->size(); i++)
+	{
+		int j = (i + 1) % this->vertexArray->size();
+
+		const Vector& vertexA = (*this->vertexArray)[i];
+		const Vector& vertexB = (*this->vertexArray)[j];
+
+		Plane::Side vertexASide = cuttingPlane.WhichSide(vertexA, eps);
+		Plane::Side vertexBSide = cuttingPlane.WhichSide(vertexB, eps);
+
+		if (vertexASide == Plane::Side::FRONT)
+		{
+			polygonA.vertexArray->push_back(vertexA);
+
+			if (vertexBSide == Plane::Side::BACK)
+			{
+				Ray ray(vertexA, vertexB - vertexA);
+				double alpha = 0.0;
+				ray.CastAgainst(cuttingPlane, alpha, eps);
+				Vector hitPoint = ray.Lerp(alpha);
+				polygonA.vertexArray->push_back(hitPoint);
+				polygonB.vertexArray->push_back(hitPoint);
+			}
+		}
+		else if (vertexASide == Plane::Side::BACK)
+		{
+			polygonB.vertexArray->push_back(vertexA);
+
+			if (vertexBSide == Plane::Side::FRONT)
+			{
+				Ray ray(vertexA, vertexB - vertexA);
+				double alpha = 0.0;
+				ray.CastAgainst(cuttingPlane, alpha, eps);
+				Vector hitPoint = ray.Lerp(alpha);
+				polygonA.vertexArray->push_back(hitPoint);
+				polygonB.vertexArray->push_back(hitPoint);
+			}
+		}
+		else if (vertexASide == Plane::Side::NEITHER)
+		{
+			polygonA.vertexArray->push_back(vertexA);
+			polygonB.vertexArray->push_back(vertexB);
+		}
+	}
+
+	return polygonA.vertexArray->size() > 0 && polygonB.vertexArray->size() > 0;
 }

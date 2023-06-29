@@ -9,6 +9,7 @@
 namespace MeshNinja
 {
 	class ConvexPolygonMesh;
+	class LineSegment;
 
 	class MESH_NINJA_API MeshSetOperation : public MeshBinaryOperation
 	{
@@ -38,6 +39,9 @@ namespace MeshNinja
 
 			std::list<Polyline> polylineList;
 		};
+
+		void ChopupPolygonArray(std::vector<ConvexPolygon>& polygonArray, const std::vector<LineSegment>& lineSegmentArray);
+		bool ChopupPolygon(const ConvexPolygon& polygon, ConvexPolygon& polygonA, ConvexPolygon& polygonB, const std::vector<LineSegment>& lineSegmentArray);
 	};
 
 	class MESH_NINJA_API MeshUnion : public MeshSetOperation

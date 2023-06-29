@@ -59,7 +59,7 @@ bool Ray::CastAgainst(const LineSegment& lineSegment, double& alpha, double eps 
 
 bool Ray::CastAgainst(const ConvexPolygon& polygon, double& alpha, double eps /*= MESH_NINJA_EPS*/) const
 {
-	if (polygon.ContainsPoint(this->origin, eps))
+	if (polygon.ContainsPoint(this->origin, nullptr, eps))
 	{
 		alpha = 0.0;
 		return true;
@@ -90,7 +90,7 @@ bool Ray::CastAgainst(const ConvexPolygon& polygon, double& alpha, double eps /*
 		return false;
 
 	Vector hitPoint = this->Lerp(alpha);
-	return polygon.ContainsPoint(hitPoint, eps);
+	return polygon.ContainsPoint(hitPoint, nullptr, eps);
 }
 
 Vector Ray::Lerp(double alpha) const
