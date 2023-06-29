@@ -13,6 +13,8 @@ namespace MeshNinja
 		virtual ~MeshBinaryOperation();
 
 		virtual bool Perform(const ConvexPolygonMesh& meshA, const ConvexPolygonMesh& meshB, ConvexPolygonMesh& resultingMesh) = 0;
+
+		std::string* error;
 	};
 
 	class MESH_NINJA_API MeshMergeOperation : public MeshBinaryOperation

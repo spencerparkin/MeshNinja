@@ -1,6 +1,8 @@
 #pragma once
 
 #include "MeshBinaryOperation.h"
+#include "ConvexPolygon.h"
+#include "Polyline.h"
 
 namespace MeshNinja
 {
@@ -12,7 +14,28 @@ namespace MeshNinja
 		MeshSetOperation();
 		virtual ~MeshSetOperation();
 
+	protected:
 
+		struct PolygonLists
+		{
+			std::vector<ConvexPolygon> meshA_outsidePolygonList;
+			std::vector<ConvexPolygon> meshA_insidePolygonList;
+			std::vector<ConvexPolygon> meshB_outsidePolygonList;
+			std::vector<ConvexPolygon> meshB_insidePolygonList;
+		};
+
+		bool CalculatePolygonLists(const ConvexPolygonMesh& meshA, const ConvexPolygonMesh& meshB, PolygonLists& polygonLists);
+
+		class PolylineCollection
+		{
+		public:
+			PolylineCollection();
+			virtual ~PolylineCollection();
+
+			void AddPolyline(const Polyline& givenPolyline);
+
+			std::list<Polyline> polylineList;
+		};
 	};
 
 	class MESH_NINJA_API MeshUnion : public MeshSetOperation

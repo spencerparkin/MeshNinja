@@ -7,10 +7,12 @@ using namespace MeshNinja;
 
 MeshBinaryOperation::MeshBinaryOperation()
 {
+	this->error = new std::string;
 }
 
 /*virtual*/ MeshBinaryOperation::~MeshBinaryOperation()
 {
+	delete this->error;
 }
 
 //----------------------------------- MeshMergeOperation -----------------------------------

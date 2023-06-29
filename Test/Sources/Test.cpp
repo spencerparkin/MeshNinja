@@ -1,6 +1,7 @@
 #include "MeshFileFormat.h"
 #include "ConvexPolygonMesh.h"
 #include "MeshBinaryOperation.h"
+#include "MeshSetOperation.h"
 #include "ConvexPolygon.h"
 
 int main(int argc, char** argv)
@@ -36,30 +37,18 @@ int main(int argc, char** argv)
 		return 1;
 	}
 
-	ConvexPolygon polygonA, polygonB;
-
-	polygonA.vertexArray->push_back(Vector(-1.0, -1.0, 0.0));
-	polygonA.vertexArray->push_back(Vector(1.0, -1.0, 0.0));
-	polygonA.vertexArray->push_back(Vector(1.0, 1.0, 0.0));
-	polygonA.vertexArray->push_back(Vector(-1.0, 1.0, 0.0));
-
-	polygonB.vertexArray->push_back(Vector(0.0, 0.0, -1.0));
-	polygonB.vertexArray->push_back(Vector(2.0, 0.0, -1.0));
-	polygonB.vertexArray->push_back(Vector(2.0, 0.0, 1.0));
-	polygonB.vertexArray->push_back(Vector(0.0, 0.0, 1.0));
-
-	ConvexPolygon intersection;
-	if (!intersection.Intersect(polygonA, polygonB))
+	MeshSubtraction subtractOp;
+	ConvexPolygonMesh differenceMesh;
+	if (!subtractOp.Perform(meshA, meshB, differenceMesh))
 	{
-		fprintf(stderr, "Polygons do not intersect!");
+		fprintf(stderr, "Failed to subject thw two boxes!\n");
 		return 1;
 	}
 
-	printf("Intersection...\n");
-	for (int i = 0; i < (signed)intersection.vertexArray->size(); i++)
+	if (!fileFormat.SaveMesh("Meshes/DifferenceMesh.obj", differenceMesh))
 	{
-		const Vector& vertex = (*intersection.vertexArray)[i];
-		printf("%d -> %f, %f, %f\n", i, vertex.x, vertex.y, vertex.z);
+		fprintf(stderr, "Failed to save difference mesh!\n");
+		return 1;
 	}
 
 	return 0;
