@@ -14,6 +14,7 @@ namespace MeshNinja
 
 		double DistanceToPoint(const Vector& point) const;
 		bool ContainsPoint(const Vector& point, double eps = MESH_NINJA_EPS) const;
+		Vector CalcMidpoint() const;
 
 		Vector vertexA, vertexB;
 	};

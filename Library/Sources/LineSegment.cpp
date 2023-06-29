@@ -46,3 +46,8 @@ bool LineSegment::ContainsPoint(const Vector& point, double eps /*= MESH_NINJA_E
 {
 	return this->DistanceToPoint(point) < eps;
 }
+
+Vector LineSegment::CalcMidpoint() const
+{
+	return (this->vertexA + this->vertexB) / 2.0;
+}

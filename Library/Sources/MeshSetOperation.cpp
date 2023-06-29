@@ -138,8 +138,10 @@ bool MeshSetOperation::ChopupPolygon(const ConvexPolygon& polygon, ConvexPolygon
 	for (const LineSegment& lineSegment : lineSegmentArray)
 	{
 		bool isInteriorPoint = false;
+		Vector midPoint = lineSegment.CalcMidpoint();
 		if ((polygon.ContainsPoint(lineSegment.vertexA, &isInteriorPoint) && isInteriorPoint) ||
-			(polygon.ContainsPoint(lineSegment.vertexB, &isInteriorPoint) && isInteriorPoint))
+			(polygon.ContainsPoint(lineSegment.vertexB, &isInteriorPoint) && isInteriorPoint) ||
+			(polygon.ContainsPoint(midPoint, &isInteriorPoint) && isInteriorPoint))
 		{
 			Plane plane = polygon.CalcPlane();
 			Vector normal = (lineSegment.vertexB - lineSegment.vertexA).Cross(plane.normal);
