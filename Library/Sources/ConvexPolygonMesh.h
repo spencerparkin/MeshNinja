@@ -26,6 +26,8 @@ namespace MeshNinja
 			Facet();
 			virtual ~Facet();
 
+			void MakePolygon(ConvexPolygon& polygon, const ConvexPolygonMesh* mesh) const;
+
 			std::vector<int> vertexArray;
 		};
 

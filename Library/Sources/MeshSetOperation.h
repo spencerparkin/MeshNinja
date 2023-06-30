@@ -3,6 +3,7 @@
 #include "MeshBinaryOperation.h"
 #include "ConvexPolygon.h"
 #include "Polyline.h"
+#include "MeshGraph.h"
 
 #define MESH_NINJA_DEBUG_MESH_SET_OPERATION
 
@@ -42,6 +43,33 @@ namespace MeshNinja
 
 		void ChopupPolygonArray(std::vector<ConvexPolygon>& polygonArray, const std::vector<LineSegment>& lineSegmentArray);
 		bool ChopupPolygon(const ConvexPolygon& polygon, ConvexPolygon& polygonA, ConvexPolygon& polygonB, const std::vector<LineSegment>& lineSegmentArray);
+
+		class Node : public MeshGraph::Node
+		{
+		public:
+			Node();
+			virtual ~Node();
+
+			enum class Side
+			{
+				UNKNOWN,
+				INSIDE,
+				OUTSIDE
+			};
+
+			Side side;
+		};
+
+		class Graph : public MeshGraph
+		{
+		public:
+			Graph();
+			virtual ~Graph();
+
+			virtual Node* CreateNode() override;
+
+			void PopulatePolygonLists(std::vector<ConvexPolygon>& insidePolygonList, std::vector<ConvexPolygon>& outsidePolygonList) const;
+		};
 	};
 
 	class MESH_NINJA_API MeshUnion : public MeshSetOperation

@@ -100,10 +100,15 @@ bool MeshSetOperation::CalculatePolygonLists(const ConvexPolygonMesh& meshA, con
 	objFileFormat.SaveMesh("Meshes/CutMeshB.obj", cutMeshB);
 #endif //MESH_NINJA_DEBUG_MESH_SET_OPERATION
 
-	// TODO: Create cutMeshA and cutMeshB, then provide a way to perform a BFS across the facets.
-	//       As we walk the meshes, we can label each facet as inside or outside.  We start the BFS
-	//       on the outside (somehow), then we flip from outside to inside (or vise-versa) whenever
-	//       we cross a line-loop boundary.
+	Graph graphA, graphB;
+
+	graphA.Generate(cutMeshA);
+	graphB.Generate(cutMeshB);
+
+	// TODO: Color the graphs here.  The BFS is simple, but the initial starting point is a bit tricky.
+
+	graphA.PopulatePolygonLists(polygonLists.meshA_insidePolygonList, polygonLists.meshA_outsidePolygonList);
+	graphB.PopulatePolygonLists(polygonLists.meshB_insidePolygonList, polygonLists.meshB_outsidePolygonList);
 
 	return false;
 }
@@ -192,6 +197,62 @@ void MeshSetOperation::PolylineCollection::AddPolyline(const Polyline& givenPoly
 
 		if (!mergeHappened)
 			this->polylineList.push_back(polyline);
+	}
+}
+
+//----------------------------------- MeshSetOperation::Node -----------------------------------
+
+MeshSetOperation::Node::Node()
+{
+	this->side = Side::UNKNOWN;
+}
+
+/*virtual*/ MeshSetOperation::Node::~Node()
+{
+}
+
+//----------------------------------- MeshSetOperation::Graph -----------------------------------
+
+MeshSetOperation::Graph::Graph()
+{
+}
+
+/*virtual*/ MeshSetOperation::Graph::~Graph()
+{
+}
+
+/*virtual*/ MeshGraph::Node* MeshSetOperation::Graph::CreateNode()
+{
+	return new Node();
+}
+
+void MeshSetOperation::Graph::PopulatePolygonLists(std::vector<ConvexPolygon>& insidePolygonList, std::vector<ConvexPolygon>& outsidePolygonList) const
+{
+	for (const MeshGraph::Node* baseNode : *this->nodeArray)
+	{
+		MeshSetOperation::Node* node = (MeshSetOperation::Node*)baseNode;
+		
+		ConvexPolygon polygon;
+		node->facet->MakePolygon(polygon, this->mesh);
+
+		switch (node->side)
+		{
+			case MeshSetOperation::Node::Side::INSIDE:
+			{
+				insidePolygonList.push_back(polygon);
+				break;
+			}
+			case MeshSetOperation::Node::Side::OUTSIDE:
+			{
+				outsidePolygonList.push_back(polygon);
+				break;
+			}
+			default:
+			{
+				assert(false);
+				break;
+			}
+		}
 	}
 }
 

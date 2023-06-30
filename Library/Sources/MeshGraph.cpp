@@ -2,9 +2,12 @@
 
 using namespace MeshNinja;
 
+//----------------------------------- MeshGraph -----------------------------------
+
 MeshGraph::MeshGraph()
 {
 	this->nodeArray = new std::vector<Node*>();
+	this->mesh = nullptr;
 }
 
 /*virtual*/ MeshGraph::~MeshGraph()
@@ -22,11 +25,13 @@ void MeshGraph::Clear()
 	this->nodeArray->clear();
 }
 
-void MeshGraph::Generate(const ConvexPolygonMesh& mesh)
+void MeshGraph::Generate(const ConvexPolygonMesh& givenMesh)
 {
 	this->Clear();
 
-	for (const ConvexPolygonMesh::Facet& facet : *mesh.facetArray)
+	this->mesh = &givenMesh;
+
+	for (const ConvexPolygonMesh::Facet& facet : *this->mesh->facetArray)
 	{
 		Node* node = this->CreateNode();
 		node->facet = &facet;
@@ -72,6 +77,8 @@ void MeshGraph::Generate(const ConvexPolygonMesh& mesh)
 	return new Node();
 }
 
+//----------------------------------- MeshGraph::Edge -----------------------------------
+
 uint64_t MeshGraph::Edge::CalcKey() const
 {
 	if (this->i < this->j)
@@ -79,6 +86,8 @@ uint64_t MeshGraph::Edge::CalcKey() const
 
 	return uint64_t(this->j) | (uint64_t(this->i) << 32);
 }
+
+//----------------------------------- MeshGraph::Node -----------------------------------
 
 MeshGraph::Node::Node()
 {

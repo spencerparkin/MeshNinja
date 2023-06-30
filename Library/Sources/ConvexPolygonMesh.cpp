@@ -41,9 +41,7 @@ void ConvexPolygonMesh::ToConvexPolygonArray(std::vector<ConvexPolygon>& convexP
 	for (const Facet& facet : *this->facetArray)
 	{
 		ConvexPolygon polygon;
-		for (int i : facet.vertexArray)
-			polygon.vertexArray->push_back((*this->vertexArray)[i]);
-
+		facet.MakePolygon(polygon, this);
 		convexPolygonArray.push_back(polygon);
 	}
 }
@@ -84,4 +82,11 @@ ConvexPolygonMesh::Facet::Facet()
 
 /*virtual*/ ConvexPolygonMesh::Facet::~Facet()
 {
+}
+
+void ConvexPolygonMesh::Facet::MakePolygon(ConvexPolygon& polygon, const ConvexPolygonMesh* mesh) const
+{
+	polygon.vertexArray->clear();
+	for (int i : this->vertexArray)
+		polygon.vertexArray->push_back((*mesh->vertexArray)[i]);
 }

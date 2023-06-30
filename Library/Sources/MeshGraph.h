@@ -16,7 +16,7 @@ namespace MeshNinja
 		class Node;
 
 		void Clear();
-		void Generate(const ConvexPolygonMesh& mesh);
+		void Generate(const ConvexPolygonMesh& givenMesh);
 		virtual Node* CreateNode();
 
 		struct Adjacency
@@ -45,6 +45,7 @@ namespace MeshNinja
 	protected:
 
 		std::vector<Node*>* nodeArray;
+		const ConvexPolygonMesh* mesh;
 	};
 
 	bool operator<(const MeshGraph::Edge& edgeA, const MeshGraph::Edge& edgeB);
