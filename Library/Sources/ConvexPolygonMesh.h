@@ -16,6 +16,7 @@ namespace MeshNinja
 
 		void Clear();
 		void Compress(double eps = MESH_NINJA_EPS);
+		void NormalizeEdges(double eps = MESH_NINJA_EPS);
 
 		void ToConvexPolygonArray(std::vector<ConvexPolygon>& convexPolygonArray) const;
 		void FromConvexPolygonArray(const std::vector<ConvexPolygon>& convexPolygonArray);
