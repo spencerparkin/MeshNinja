@@ -95,6 +95,8 @@ bool MeshSetOperation::CalculatePolygonLists(const ConvexPolygonMesh& meshA, con
 	cutMeshA.FromConvexPolygonArray(polygonArrayA);
 	cutMeshB.FromConvexPolygonArray(polygonArrayB);
 
+	// TODO: Normalize edges.  Bisect edges so that every edge shares exactly two faces.
+
 #if defined MESH_NINJA_DEBUG_MESH_SET_OPERATION
 	objFileFormat.SaveMesh("Meshes/CutMeshA.obj", cutMeshA);
 	objFileFormat.SaveMesh("Meshes/CutMeshB.obj", cutMeshB);
@@ -104,8 +106,9 @@ bool MeshSetOperation::CalculatePolygonLists(const ConvexPolygonMesh& meshA, con
 
 	graphA.Generate(cutMeshA);
 	graphB.Generate(cutMeshB);
-
-	// TODO: Color the graphs here.  The BFS is simple, but the initial starting point is a bit tricky.
+	
+	// TODO: Color edges.  Fail if not all line-segments color an edge.
+	// TODO: Color nodes.  The BFS is simple, but the initial starting point is a bit tricky.
 
 	graphA.PopulatePolygonLists(polygonLists.meshA_insidePolygonList, polygonLists.meshA_outsidePolygonList);
 	graphB.PopulatePolygonLists(polygonLists.meshB_insidePolygonList, polygonLists.meshB_outsidePolygonList);
