@@ -65,7 +65,8 @@ bool Ray::CastAgainst(const ConvexPolygon& polygon, double& alpha, double eps /*
 		return true;
 	}
 
-	Plane plane = polygon.CalcPlane();
+	Plane plane;
+	polygon.CalcPlane(plane, eps);
 	if (this->direction.Dot(plane.normal) < eps && plane.WhichSide(this->origin) == Plane::Side::NEITHER)
 	{
 		double smallestAlpha = DBL_MAX;
@@ -106,7 +107,8 @@ double Ray::LerpInverse(const Vector& point) const
 /*static*/ bool Ray::Intersect(const Ray& rayA, const Ray& rayB, double& alpha, double& beta, double eps /*= MESH_NINJA_EPS*/)
 {
 	Vector normal = rayA.direction.Cross(rayB.direction);
-	if (!normal.Normalize())
+	double length = normal.Length();
+	if (length < eps || !normal.Normalize())
 	{
 		// The rays are parallel.
 		if ((rayB.origin - rayB.origin).Length() < eps)
@@ -136,7 +138,7 @@ double Ray::LerpInverse(const Vector& point) const
 		return false;
 
 	// Perform sanity check.
-	assert((rayA.Lerp(alpha) - rayB.Lerp(beta)).Length() < eps);
+	assert(rayA.Lerp(alpha).IsEqualTo(rayB.Lerp(beta), eps));
 
 	return true;
 }

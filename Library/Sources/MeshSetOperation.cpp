@@ -2,6 +2,7 @@
 #include "ConvexPolygonMesh.h"
 #include "LineSegment.h"
 #include "Plane.h"
+#include "Ray.h"
 #if defined MESH_NINJA_DEBUG_MESH_SET_OPERATION
 #	include "MeshFileFormat.h"
 #endif
@@ -184,28 +185,24 @@ bool MeshSetOperation::ChopupPolygon(const ConvexPolygon& polygon, ConvexPolygon
 {
 	for (const LineSegment& lineSegment : lineSegmentArray)
 	{
-		bool isInteriorPoint = false;
-		Vector midPoint = lineSegment.CalcMidpoint();
-		if ((polygon.ContainsPoint(lineSegment.vertexA, &isInteriorPoint) && isInteriorPoint) ||
-			(polygon.ContainsPoint(lineSegment.vertexB, &isInteriorPoint) && isInteriorPoint) ||
-			(polygon.ContainsPoint(midPoint, &isInteriorPoint) && isInteriorPoint))
+		Plane plane;
+		polygon.CalcPlane(plane);
+
+		if (plane.WhichSide(lineSegment.vertexA) == Plane::Side::NEITHER &&
+			plane.WhichSide(lineSegment.vertexB) == Plane::Side::NEITHER)
 		{
-			Plane plane = polygon.CalcPlane();
 			Vector normal = (lineSegment.vertexB - lineSegment.vertexA).Cross(plane.normal);
 			Plane cuttingPlane(lineSegment.vertexA, normal);
-			bool split = polygon.SplitAgainst(cuttingPlane, polygonA, polygonB);
-			assert(split);
-
-			polygonA.Compress();
-			polygonB.Compress();
-
-			if (polygonA.vertexArray->size() < 3 || polygonB.vertexArray->size() < 3)
+			if (polygon.SplitAgainst(cuttingPlane, polygonA, polygonB))
 			{
-				// TODO: Investigate this case to see if something went wrong.
-				return false;
-			}
+				polygonA.Compress();
+				polygonB.Compress();
 
-			return true;
+				if (polygonA.vertexArray->size() < 3 || polygonB.vertexArray->size() < 3)
+					return false;
+				
+				return true;
+			}
 		}
 	}
 
@@ -306,6 +303,7 @@ bool MeshSetOperation::Graph::ColorEdges(const std::vector<LineSegment>& lineSeg
 
 		for (const LineSegment& lineSegment : lineSegmentArray)
 		{
+			// TODO: Actually, I think we just need to check that the edge segment is contained within the line segment.
 			if (edgeSegment.IsEqualTo(lineSegment))
 			{
 				cutCount++;
@@ -377,7 +375,8 @@ MeshSetOperation::Node* MeshSetOperation::Graph::FindInitialOutsideNode(const Gr
 		ConvexPolygon polygon;
 		node->facet->MakePolygon(polygon, this->mesh);
 
-		Plane plane = polygon.CalcPlane();
+		Plane plane;
+		polygon.CalcPlane(plane);
 
 		if (plane.AllPointsNotOnSide(*this->mesh->vertexArray, Plane::Side::FRONT) && plane.AllPointsNotOnSide(*otherGraph->mesh->vertexArray, Plane::Side::FRONT))
 		{

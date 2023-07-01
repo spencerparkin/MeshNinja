@@ -70,25 +70,42 @@ void ConvexPolygon::Compress(double eps /*= MESH_NINJA_EPS*/)
 	}
 }
 
-Plane ConvexPolygon::CalcPlane() const
+bool ConvexPolygon::CalcPlane(Plane& plane, double eps /*= MESH_NINJA_EPS*/) const
 {
-	Plane plane;
+	if (this->vertexArray->size() < 3)
+		return false;
+	
+	double largestLength = DBL_MIN;
+	Vector bestNormal;
 
-	if (this->vertexArray->size() >= 3)
+	for(int i = 0; i < (signed)vertexArray->size(); i++)
 	{
-		const Vector& vertexA = (*this->vertexArray)[0];
-		const Vector& vertexB = (*this->vertexArray)[1];
-		const Vector& vertexC = (*this->vertexArray)[2];
+		const Vector& vertexA = (*this->vertexArray)[i];
+		const Vector& vertexB = (*this->vertexArray)[(i + 1) % vertexArray->size()];
+		const Vector& vertexC = (*this->vertexArray)[(i + 2) % vertexArray->size()];
 
-		plane = Plane(vertexA, (vertexB - vertexA).Cross(vertexC - vertexA));
+		Vector normal = (vertexC - vertexB).Cross(vertexA - vertexB);
+		double length = normal.Length();
+		if (length > largestLength)
+		{
+			largestLength = length;
+			bestNormal = normal;
+		}
 	}
 
-	return plane;
+	if (largestLength < eps)
+		return false;
+
+	plane = Plane((*this->vertexArray)[0], bestNormal);
+	return true;
 }
 
 bool ConvexPolygon::IntersectWithLineSegment(const Vector& pointA, const Vector& pointB, Vector& intersectionPoint, double eps /*= MESH_NINJA_EPS*/) const
 {
-	Plane plane = this->CalcPlane();
+	Plane plane;
+	if (!this->CalcPlane(plane, eps))
+		return false;
+
 	double alpha = 0.0;
 	Ray ray(pointA, pointB - pointA);
 	if (!ray.CastAgainst(plane, alpha))
@@ -109,7 +126,8 @@ bool ConvexPolygon::ContainsPoint(const Vector& point, bool* isInteriorPoint /*=
 		*isInteriorPoint = false;
 
 	// Is the given point in the same plane of the polygon?
-	Plane plane = this->CalcPlane();
+	Plane plane;
+	this->CalcPlane(plane, eps);
 	if (plane.WhichSide(point, eps) != Plane::Side::NEITHER)
 		return false;
 

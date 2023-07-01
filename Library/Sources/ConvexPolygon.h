@@ -20,7 +20,7 @@ namespace MeshNinja
 		void Clear();
 		void Compress(double eps = MESH_NINJA_EPS);
 
-		Plane CalcPlane() const;
+		bool CalcPlane(Plane& plane, double eps = MESH_NINJA_EPS) const;
 		bool Intersect(const ConvexPolygon& polygonA, const ConvexPolygon& polygonB, double eps = MESH_NINJA_EPS);
 		bool IntersectWithLineSegment(const Vector& pointA, const Vector& pointB, Vector& intersectionPoint, double eps = MESH_NINJA_EPS) const;
 		bool ContainsPoint(const Vector& point, bool* isInteriorPoint = nullptr, double eps = MESH_NINJA_EPS) const;
