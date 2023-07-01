@@ -121,12 +121,22 @@ bool MeshSetOperation::CalculatePolygonLists(const ConvexPolygonMesh& meshA, con
 		return false;
 	}
 	
-	// TODO: Color nodes.  The BFS is simple, but the initial starting point is a bit tricky.
+	if (!graphA.ColorNodes(&graphB))
+	{
+		*this->error = "Failed to color nodes of graph A.";
+		return false;
+	}
 
-	//graphA.PopulatePolygonLists(polygonLists.meshA_insidePolygonList, polygonLists.meshA_outsidePolygonList);
-	//graphB.PopulatePolygonLists(polygonLists.meshB_insidePolygonList, polygonLists.meshB_outsidePolygonList);
+	if (!graphB.ColorNodes(&graphA))
+	{
+		*this->error = "Failed to color nodes of graph B.";
+		return false;
+	}
 
-	return false;
+	graphA.PopulatePolygonLists(polygonLists.meshA_insidePolygonList, polygonLists.meshA_outsidePolygonList);
+	graphB.PopulatePolygonLists(polygonLists.meshB_insidePolygonList, polygonLists.meshB_outsidePolygonList);
+
+	return true;
 }
 
 void MeshSetOperation::ChopupPolygonArray(std::vector<ConvexPolygon>& polygonArray, const std::vector<LineSegment>& lineSegmentArray)
@@ -284,6 +294,72 @@ bool MeshSetOperation::Graph::ColorEdges(const std::vector<LineSegment>& lineSeg
 	}
 
 	return cutCount == lineSegmentArray.size();
+}
+
+bool MeshSetOperation::Graph::ColorNodes(const Graph* otherGraph)
+{
+	MeshSetOperation::Node* node = this->FindInitialOutsideNode(otherGraph);
+	node->side = MeshSetOperation::Node::Side::OUTSIDE;
+
+	std::list<MeshSetOperation::Node*> nodeQueue;
+	nodeQueue.push_back(node);
+
+	while (nodeQueue.size() > 0)
+	{
+		std::list<MeshSetOperation::Node*>::iterator iter = nodeQueue.begin();
+		node = *iter;
+		nodeQueue.erase(iter);
+
+		for (Edge* edge : node->edgeArray)
+		{
+			MeshSetOperation::Node* adjacentNode = (MeshSetOperation::Node*)edge->Fallow(node);
+			if (adjacentNode->side == MeshSetOperation::Node::Side::UNKNOWN)
+			{
+				switch(((MeshSetOperation::Edge*)edge)->type)
+				{
+					case MeshSetOperation::Edge::Type::CUT_BOUNDARY:
+					{
+						if (node->side == MeshSetOperation::Node::Side::INSIDE)
+							adjacentNode->side = MeshSetOperation::Node::Side::OUTSIDE;
+						else
+							adjacentNode->side = MeshSetOperation::Node::Side::INSIDE;
+						break;
+					}
+					case MeshSetOperation::Edge::Type::NORMAL:
+					{
+						adjacentNode->side = node->side;
+						break;
+					}
+					default:
+					{
+						return false;
+					}
+				}
+
+				nodeQueue.push_back(adjacentNode);
+			}
+		}
+	}
+
+	return true;
+}
+
+MeshSetOperation::Node* MeshSetOperation::Graph::FindInitialOutsideNode(const Graph* otherGraph)
+{
+	for (Node* node : *this->nodeArray)
+	{
+		ConvexPolygon polygon;
+		node->facet->MakePolygon(polygon, this->mesh);
+
+		Plane plane = polygon.CalcPlane();
+
+		if (plane.AllPointsNotOnSide(*this->mesh->vertexArray, Plane::Side::FRONT) && plane.AllPointsNotOnSide(*otherGraph->mesh->vertexArray, Plane::Side::FRONT))
+		{
+			return (MeshSetOperation::Node*)node;
+		}
+	}
+
+	return nullptr;
 }
 
 void MeshSetOperation::Graph::PopulatePolygonLists(std::vector<ConvexPolygon>& insidePolygonList, std::vector<ConvexPolygon>& outsidePolygonList) const

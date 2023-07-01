@@ -91,7 +91,7 @@ void MeshGraph::Generate(const ConvexPolygonMesh& givenMesh)
 	return new Edge();
 }
 
-//----------------------------------- MeshGraph::Edge -----------------------------------
+//----------------------------------- MeshGraph::VertexPair -----------------------------------
 
 uint64_t MeshGraph::VertexPair::CalcKey() const
 {
@@ -123,6 +123,11 @@ MeshGraph::Edge::Edge()
 
 /*virtual*/ MeshGraph::Edge::~Edge()
 {
+}
+
+MeshGraph::Node* MeshGraph::Edge::Fallow(Node* origin)
+{
+	return (origin == this->node[0]) ? this->node[1] : this->node[0];
 }
 
 namespace MeshNinja

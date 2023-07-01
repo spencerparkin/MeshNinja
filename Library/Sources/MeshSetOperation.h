@@ -86,6 +86,9 @@ namespace MeshNinja
 			virtual Edge* CreateEdge() override;
 
 			bool ColorEdges(const std::vector<LineSegment>& lineSegmentArray);
+			bool ColorNodes(const Graph* otherGraph);
+
+			MeshSetOperation::Node* FindInitialOutsideNode(const Graph* otherGraph);
 
 			void PopulatePolygonLists(std::vector<ConvexPolygon>& insidePolygonList, std::vector<ConvexPolygon>& outsidePolygonList) const;
 		};

@@ -45,6 +45,8 @@ namespace MeshNinja
 			Edge();
 			virtual ~Edge();
 
+			Node* Fallow(Node* origin);
+
 			VertexPair pair;
 			Node* node[2];
 		};

@@ -29,6 +29,9 @@ namespace MeshNinja
 
 		Side WhichSide(const Vector& point, double eps = MESH_NINJA_EPS) const;
 
+		bool AllPointsOnSide(const std::vector<Vector>& pointArray, Side side) const;
+		bool AllPointsNotOnSide(const std::vector<Vector>& pointArray, Side side) const;
+
 		Vector normal;
 		double D;
 	};

@@ -47,3 +47,21 @@ Plane::Side Plane::WhichSide(const Vector& point, double eps /*= MESH_NINJA_EPS*
 
 	return Side::NEITHER;
 }
+
+bool Plane::AllPointsOnSide(const std::vector<Vector>& pointArray, Side side) const
+{
+	for (const Vector& point : pointArray)
+		if (this->WhichSide(point) != side)
+			return false;
+
+	return true;
+}
+
+bool Plane::AllPointsNotOnSide(const std::vector<Vector>& pointArray, Side side) const
+{
+	for (const Vector& point : pointArray)
+		if (this->WhichSide(point) == side)
+			return false;
+
+	return true;
+}
