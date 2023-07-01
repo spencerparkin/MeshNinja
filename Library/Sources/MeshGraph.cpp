@@ -7,6 +7,8 @@ using namespace MeshNinja;
 MeshGraph::MeshGraph()
 {
 	this->nodeArray = new std::vector<Node*>();
+	this->edgeArray = new std::vector<Edge*>();
+
 	this->mesh = nullptr;
 }
 
@@ -15,6 +17,7 @@ MeshGraph::MeshGraph()
 	this->Clear();
 
 	delete this->nodeArray;
+	delete this->edgeArray;
 }
 
 void MeshGraph::Clear()
@@ -22,7 +25,11 @@ void MeshGraph::Clear()
 	for (Node* node : *this->nodeArray)
 		delete node;
 
+	for (Edge* edge : *this->edgeArray)
+		delete edge;
+
 	this->nodeArray->clear();
+	this->edgeArray->clear();
 }
 
 void MeshGraph::Generate(const ConvexPolygonMesh& givenMesh)
@@ -38,7 +45,7 @@ void MeshGraph::Generate(const ConvexPolygonMesh& givenMesh)
 		this->nodeArray->push_back(node);
 	}
 
-	std::map<Edge, Node*> nodeMap;
+	std::map<VertexPair, Node*> nodeMap;
 
 	// We're assuming here that an edge is shared by at most two polygons.
 	for (Node* nodeA : *this->nodeArray)
@@ -46,27 +53,29 @@ void MeshGraph::Generate(const ConvexPolygonMesh& givenMesh)
 		for (int i = 0; i < (signed)nodeA->facet->vertexArray.size(); i++)
 		{
 			int j = (i + 1) % nodeA->facet->vertexArray.size();
-			Edge edge{ nodeA->facet->vertexArray[i], nodeA->facet->vertexArray[j] };
 
-			std::map<Edge, Node*>::iterator iter = nodeMap.find(edge);
+			VertexPair pair;
+
+			pair.i = nodeA->facet->vertexArray[i];
+			pair.j = nodeA->facet->vertexArray[j];
+
+			std::map<VertexPair, Node*>::iterator iter = nodeMap.find(pair);
 			if (iter == nodeMap.end())
-				nodeMap.insert(std::pair<Edge, Node*>(edge, nodeA));
+				nodeMap.insert(std::pair<VertexPair, Node*>(pair, nodeA));
 			else
 			{
 				Node* nodeB = iter->second;
-				
-				Adjacency adjacencyA{ i, nodeB };
-				nodeA->adjacencyArray.push_back(adjacencyA);
 
-				int k;
-				for (k = 0; k < (signed)nodeB->facet->vertexArray.size(); k++)
-					if (nodeB->facet->vertexArray[k] == nodeA->facet->vertexArray[j])
-						break;
+				Edge* edge = this->CreateEdge();
+				this->edgeArray->push_back(edge);
 
-				assert(k < (signed)nodeB->facet->vertexArray.size());
+				edge->pair = pair;
 
-				Adjacency adjacencyB{ k, nodeA };
-				nodeB->adjacencyArray.push_back(adjacencyB);
+				nodeA->edgeArray.push_back(edge);
+				nodeB->edgeArray.push_back(edge);
+
+				edge->node[0] = nodeA;
+				edge->node[1] = nodeB;
 			}
 		}
 	}
@@ -77,9 +86,14 @@ void MeshGraph::Generate(const ConvexPolygonMesh& givenMesh)
 	return new Node();
 }
 
+/*virtual*/ MeshGraph::Edge* MeshGraph::CreateEdge()
+{
+	return new Edge();
+}
+
 //----------------------------------- MeshGraph::Edge -----------------------------------
 
-uint64_t MeshGraph::Edge::CalcKey() const
+uint64_t MeshGraph::VertexPair::CalcKey() const
 {
 	if (this->i < this->j)
 		return uint64_t(this->i) | (uint64_t(this->j) << 32);
@@ -98,12 +112,25 @@ MeshGraph::Node::Node()
 {
 }
 
+//----------------------------------- MeshGraph::Edge -----------------------------------
+
+MeshGraph::Edge::Edge()
+{
+	this->pair = VertexPair{ -1, -1 };
+	this->node[0] = nullptr;
+	this->node[1] = nullptr;
+}
+
+/*virtual*/ MeshGraph::Edge::~Edge()
+{
+}
+
 namespace MeshNinja
 {
-	bool operator<(const MeshGraph::Edge& edgeA, const MeshGraph::Edge& edgeB)
+	bool operator<(const MeshGraph::VertexPair& pairA, const MeshGraph::VertexPair& pairB)
 	{
-		uint64_t keyA = edgeA.CalcKey();
-		uint64_t keyB = edgeB.CalcKey();
+		uint64_t keyA = pairA.CalcKey();
+		uint64_t keyB = pairB.CalcKey();
 
 		return keyA < keyB;
 	}

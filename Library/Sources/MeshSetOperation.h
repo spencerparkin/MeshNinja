@@ -60,6 +60,22 @@ namespace MeshNinja
 			Side side;
 		};
 
+		class Edge : public MeshGraph::Edge
+		{
+		public:
+			Edge();
+			virtual ~Edge();
+
+			enum class Type
+			{
+				UNKNOWN,
+				NORMAL,
+				CUT_BOUNDARY
+			};
+
+			Type type;
+		};
+
 		class Graph : public MeshGraph
 		{
 		public:
@@ -67,6 +83,9 @@ namespace MeshNinja
 			virtual ~Graph();
 
 			virtual Node* CreateNode() override;
+			virtual Edge* CreateEdge() override;
+
+			bool ColorEdges(const std::vector<LineSegment>& lineSegmentArray);
 
 			void PopulatePolygonLists(std::vector<ConvexPolygon>& insidePolygonList, std::vector<ConvexPolygon>& outsidePolygonList) const;
 		};

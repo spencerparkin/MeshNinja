@@ -95,7 +95,7 @@ bool MeshSetOperation::CalculatePolygonLists(const ConvexPolygonMesh& meshA, con
 	cutMeshA.FromConvexPolygonArray(polygonArrayA);
 	cutMeshB.FromConvexPolygonArray(polygonArrayB);
 
-	// This ensures that each edge is adjacent to two and only two faces.
+	// This ensures that each edge is adjacent to at most two faces.
 	cutMeshA.NormalizeEdges();
 	cutMeshB.NormalizeEdges();
 
@@ -106,10 +106,21 @@ bool MeshSetOperation::CalculatePolygonLists(const ConvexPolygonMesh& meshA, con
 
 	Graph graphA, graphB;
 
-	//graphA.Generate(cutMeshA);
-	//graphB.Generate(cutMeshB);
+	graphA.Generate(cutMeshA);
+	graphB.Generate(cutMeshB);
+
+	if (!graphA.ColorEdges(lineSegmentArray))
+	{
+		*this->error = "Failed to color edges of graph A.";
+		return false;
+	}
+
+	if (!graphB.ColorEdges(lineSegmentArray))
+	{
+		*this->error = "Failed to color edges of graph B.";
+		return false;
+	}
 	
-	// TODO: Color edges.  Fail if not all line-segments color an edge.
 	// TODO: Color nodes.  The BFS is simple, but the initial starting point is a bit tricky.
 
 	//graphA.PopulatePolygonLists(polygonLists.meshA_insidePolygonList, polygonLists.meshA_outsidePolygonList);
@@ -216,6 +227,17 @@ MeshSetOperation::Node::Node()
 {
 }
 
+//----------------------------------- MeshSetOperation::Edge -----------------------------------
+
+MeshSetOperation::Edge::Edge()
+{
+	this->type = Type::UNKNOWN;
+}
+
+/*virtual*/ MeshSetOperation::Edge::~Edge()
+{
+}
+
 //----------------------------------- MeshSetOperation::Graph -----------------------------------
 
 MeshSetOperation::Graph::Graph()
@@ -228,7 +250,40 @@ MeshSetOperation::Graph::Graph()
 
 /*virtual*/ MeshGraph::Node* MeshSetOperation::Graph::CreateNode()
 {
-	return new Node();
+	return new MeshSetOperation::Node();
+}
+
+/*virtual*/ MeshGraph::Edge* MeshSetOperation::Graph::CreateEdge()
+{
+	return new MeshSetOperation::Edge();
+}
+
+bool MeshSetOperation::Graph::ColorEdges(const std::vector<LineSegment>& lineSegmentArray)
+{
+	int cutCount = 0;
+
+	for (Edge* edge : *this->edgeArray)
+	{
+		LineSegment edgeSegment((*this->mesh->vertexArray)[edge->pair.i], (*this->mesh->vertexArray)[edge->pair.j]);
+
+		bool cutFound = false;
+
+		for (const LineSegment& lineSegment : lineSegmentArray)
+		{
+			if (edgeSegment.IsEqualTo(lineSegment))
+			{
+				cutCount++;
+				cutFound = true;
+				((MeshSetOperation::Edge*)edge)->type = MeshSetOperation::Edge::Type::CUT_BOUNDARY;
+				break;
+			}
+		}
+
+		if (!cutFound)
+			((MeshSetOperation::Edge*)edge)->type = MeshSetOperation::Edge::Type::NORMAL;
+	}
+
+	return cutCount == lineSegmentArray.size();
 }
 
 void MeshSetOperation::Graph::PopulatePolygonLists(std::vector<ConvexPolygon>& insidePolygonList, std::vector<ConvexPolygon>& outsidePolygonList) const

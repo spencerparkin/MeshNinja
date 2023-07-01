@@ -57,6 +57,17 @@ bool LineSegment::IsInteriorPoint(const Vector& point, double eps /*= MESH_NINJA
 	return !this->IsEndPoint(point, eps) && this->ContainsPoint(point, eps);
 }
 
+bool LineSegment::IsEqualTo(const LineSegment& lineSegment, double eps /*= MESH_NINJA_EPS*/) const
+{
+	if ((this->vertexA - lineSegment.vertexA).Length() < eps && (this->vertexB - lineSegment.vertexB).Length() < eps)
+		return true;
+
+	if ((this->vertexA - lineSegment.vertexB).Length() < eps && (this->vertexB - lineSegment.vertexA).Length() < eps)
+		return true;
+
+	return false;
+}
+
 Vector LineSegment::CalcMidpoint() const
 {
 	return (this->vertexA + this->vertexB) / 2.0;

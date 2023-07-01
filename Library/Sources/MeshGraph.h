@@ -14,16 +14,13 @@ namespace MeshNinja
 		virtual ~MeshGraph();
 
 		class Node;
+		class Edge;
 
 		void Clear();
 		void Generate(const ConvexPolygonMesh& givenMesh);
-		virtual Node* CreateNode();
 
-		struct Adjacency
-		{
-			int i;
-			Node* node;
-		};
+		virtual Node* CreateNode();
+		virtual Edge* CreateEdge();
 
 		class Node
 		{
@@ -32,21 +29,33 @@ namespace MeshNinja
 			virtual ~Node();
 
 			const ConvexPolygonMesh::Facet* facet;
-			std::vector<Adjacency> adjacencyArray;
+			std::vector<Edge*> edgeArray;
 		};
 
-		struct Edge
+		struct VertexPair
 		{
 			int i, j;
 
 			uint64_t CalcKey() const;
 		};
 
+		class Edge
+		{
+		public:
+			Edge();
+			virtual ~Edge();
+
+			VertexPair pair;
+			Node* node[2];
+		};
+
 	protected:
 
 		std::vector<Node*>* nodeArray;
+		std::vector<Edge*>* edgeArray;
+
 		const ConvexPolygonMesh* mesh;
 	};
 
-	bool operator<(const MeshGraph::Edge& edgeA, const MeshGraph::Edge& edgeB);
+	bool operator<(const MeshGraph::VertexPair& pairA, const MeshGraph::VertexPair& pairB);
 }
