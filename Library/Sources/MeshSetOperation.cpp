@@ -20,6 +20,10 @@ MeshSetOperation::MeshSetOperation()
 
 bool MeshSetOperation::CalculatePolygonLists(const ConvexPolygonMesh& meshA, const ConvexPolygonMesh& meshB, PolygonLists& polygonLists)
 {
+#if defined MESH_NINJA_DEBUG_MESH_SET_OPERATION
+	ObjFileFormat objFileFormat;
+#endif //MESH_NINJA_DEBUG_MESH_SET_OPERATION
+
 	std::vector<ConvexPolygon> polygonArrayA, polygonArrayB;
 
 	meshA.ToConvexPolygonArray(polygonArrayA);
@@ -44,6 +48,16 @@ bool MeshSetOperation::CalculatePolygonLists(const ConvexPolygonMesh& meshA, con
 					// to try to support with this algorithm, and I don't think that failing to do so results in
 					// any major limitation; at least, for the applications I can think of.
 					*this->error = "Non-trivial intersection between two polygons encountered.";
+
+#if defined MESH_NINJA_DEBUG_MESH_SET_OPERATION
+					std::vector<ConvexPolygon> debugPolygonArray;
+					debugPolygonArray.push_back(polygonA);
+					debugPolygonArray.push_back(polygonB);
+					ConvexPolygonMesh debugMesh;
+					debugMesh.FromConvexPolygonArray(debugPolygonArray);
+					objFileFormat.SaveMesh("Meshes/ProblematicPolygons.obj", debugMesh);
+#endif //MESH_NINJA_DEBUG_MESH_SET_OPERATION
+
 					return false;
 				}
 				else if (intersection.vertexArray->size() == 2)
@@ -65,7 +79,6 @@ bool MeshSetOperation::CalculatePolygonLists(const ConvexPolygonMesh& meshA, con
 	}
 
 #if defined MESH_NINJA_DEBUG_MESH_SET_OPERATION
-	ObjFileFormat objFileFormat;
 	int fileCount = 0;
 	for (const Polyline& polyline : polylineCollection.polylineList)
 	{
