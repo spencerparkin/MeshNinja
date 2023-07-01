@@ -11,15 +11,15 @@ int main(int argc, char** argv)
 	ConvexPolygonMesh meshA, meshB;
 	ObjFileFormat fileFormat;
 
-	if (!fileFormat.LoadMesh("Meshes/BoxA.obj", meshA))
+	if (!fileFormat.LoadMesh("Meshes/SphereA.obj", meshA))
 	{
-		fprintf(stderr, "Failed to load first box!\n");
+		fprintf(stderr, "Failed to load first mesh!\n");
 		return 1;
 	}
 
-	if (!fileFormat.LoadMesh("Meshes/BoxB.obj", meshB))
+	if (!fileFormat.LoadMesh("Meshes/CylinderA.obj", meshB))
 	{
-		fprintf(stderr, "Failed to load second box!\n");
+		fprintf(stderr, "Failed to load second mesh!\n");
 		return 1;
 	}
 
@@ -27,7 +27,7 @@ int main(int argc, char** argv)
 	ConvexPolygonMesh mergedMesh;
 	if (!mergeOp.Perform(meshA, meshB, mergedMesh))
 	{
-		fprintf(stderr, "Failed to merge the two boxes!\n");
+		fprintf(stderr, "Failed to merge the two meshes!\n");
 		return 1;
 	}
 
@@ -41,7 +41,7 @@ int main(int argc, char** argv)
 	ConvexPolygonMesh differenceMesh;
 	if (!subtractOp.Perform(meshA, meshB, differenceMesh))
 	{
-		fprintf(stderr, "Failed to subject the two boxes!\n");
+		fprintf(stderr, "Failed to subject the two meshes!\n");
 		return 1;
 	}
 
