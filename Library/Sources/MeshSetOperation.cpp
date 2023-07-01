@@ -86,7 +86,7 @@ bool MeshSetOperation::CalculatePolygonLists(const ConvexPolygonMesh& meshA, con
 	for (const Polyline& polyline : polylineCollection.polylineList)
 	{
 		ConvexPolygonMesh tubeMesh;
-		if (polyline.GenerateTubeMesh(tubeMesh, 0.5, 10))
+		if (polyline.GenerateTubeMesh(tubeMesh, 0.05, 10))
 			objFileFormat.SaveMesh(std::format("Meshes/polyline{}.obj", fileCount++), tubeMesh);
 	}
 #endif //MESH_NINJA_DEBUG_MESH_SET_OPERATION
@@ -195,6 +195,16 @@ bool MeshSetOperation::ChopupPolygon(const ConvexPolygon& polygon, ConvexPolygon
 			Plane cuttingPlane(lineSegment.vertexA, normal);
 			bool split = polygon.SplitAgainst(cuttingPlane, polygonA, polygonB);
 			assert(split);
+
+			polygonA.Compress();
+			polygonB.Compress();
+
+			if (polygonA.vertexArray->size() < 3 || polygonB.vertexArray->size() < 3)
+			{
+				// TODO: Investigate this case to see if something went wrong.
+				return false;
+			}
+
 			return true;
 		}
 	}
