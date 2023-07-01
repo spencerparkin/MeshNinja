@@ -206,6 +206,11 @@ bool Vector::MakeOrthogonalTo(const Vector& vector)
 	return false;
 }
 
+bool Vector::IsEqualTo(const Vector& vector, double eps /*= MESH_NINJA_EPS*/) const
+{
+	return (*this - vector).Length() < eps;
+}
+
 namespace MeshNinja
 {
 	Vector operator+(const Vector& vectorA, const Vector& vectorB)

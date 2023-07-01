@@ -50,12 +50,15 @@ bool MeshSetOperation::CalculatePolygonLists(const ConvexPolygonMesh& meshA, con
 					*this->error = "Non-trivial intersection between two polygons encountered.";
 
 #if defined MESH_NINJA_DEBUG_MESH_SET_OPERATION
+					ConvexPolygonMesh debugMesh;
 					std::vector<ConvexPolygon> debugPolygonArray;
 					debugPolygonArray.push_back(polygonA);
-					debugPolygonArray.push_back(polygonB);
-					ConvexPolygonMesh debugMesh;
 					debugMesh.FromConvexPolygonArray(debugPolygonArray);
-					objFileFormat.SaveMesh("Meshes/ProblematicPolygons.obj", debugMesh);
+					objFileFormat.SaveMesh("Meshes/DebugMeshA.obj", debugMesh);
+					debugPolygonArray.clear();
+					debugPolygonArray.push_back(polygonB);
+					debugMesh.FromConvexPolygonArray(debugPolygonArray);
+					objFileFormat.SaveMesh("Meshes/DebugMeshB.obj", debugMesh);
 #endif //MESH_NINJA_DEBUG_MESH_SET_OPERATION
 
 					return false;

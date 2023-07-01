@@ -11,13 +11,19 @@ int main(int argc, char** argv)
 	ConvexPolygonMesh meshA, meshB;
 	ObjFileFormat fileFormat;
 
-	if (!fileFormat.LoadMesh("Meshes/SphereA.obj", meshA))
+	std::string meshA_path = "Meshes/SphereA.obj";
+	std::string meshB_path = "Meshes/CylinderA.obj";
+
+	//std::string meshA_path = "Meshes/DebugMeshA.obj";
+	//std::string meshB_path = "Meshes/DebugMeshB.obj";
+
+	if (!fileFormat.LoadMesh(meshA_path, meshA))
 	{
 		fprintf(stderr, "Failed to load first mesh!\n");
 		return 1;
 	}
 
-	if (!fileFormat.LoadMesh("Meshes/CylinderA.obj", meshB))
+	if (!fileFormat.LoadMesh(meshB_path, meshB))
 	{
 		fprintf(stderr, "Failed to load second mesh!\n");
 		return 1;

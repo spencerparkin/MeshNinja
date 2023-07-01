@@ -176,10 +176,11 @@ bool ConvexPolygon::Intersect(const ConvexPolygon& polygonA, const ConvexPolygon
 
 			Ray ray(vertexA, vertexB - vertexA);
 			double alpha = 0.0;
-			if (ray.CastAgainst(*otherPolygon, alpha))
+			if (ray.CastAgainst(*otherPolygon, alpha) && alpha <= 1.0)
 			{
 				Vector hitPoint = ray.Lerp(alpha);
-				hitPointArray[i].push_back(hitPoint);
+				if (!hitPoint.IsEqualTo(vertexB))
+					hitPointArray[i].push_back(hitPoint);
 			}
 		}
 	}
