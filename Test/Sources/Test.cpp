@@ -43,17 +43,17 @@ int main(int argc, char** argv)
 		return 1;
 	}
 
-	MeshSubtraction subtractOp;
-	ConvexPolygonMesh differenceMesh;
-	if (!subtractOp.Perform(meshA, meshB, differenceMesh))
+	MeshIntersection meshOp;
+	ConvexPolygonMesh resultMesh;
+	if (!meshOp.Perform(meshA, meshB, resultMesh))
 	{
-		fprintf(stderr, "Failed to subject the two meshes!\n");
+		fprintf(stderr, "Failed to perform operation on the two given meshes!\n");
 		return 1;
 	}
 
-	if (!fileFormat.SaveMesh("Meshes/DifferenceMesh.obj", differenceMesh))
+	if (!fileFormat.SaveMesh("Meshes/ResultMesh.obj", resultMesh))
 	{
-		fprintf(stderr, "Failed to save difference mesh!\n");
+		fprintf(stderr, "Failed to save result mesh!\n");
 		return 1;
 	}
 
