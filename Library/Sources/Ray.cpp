@@ -106,12 +106,12 @@ double Ray::LerpInverse(const Vector& point) const
 
 /*static*/ bool Ray::Intersect(const Ray& rayA, const Ray& rayB, double& alpha, double& beta, double eps /*= MESH_NINJA_EPS*/)
 {
-	Vector normal = rayA.direction.Cross(rayB.direction);
+	Vector normal = rayA.direction.Normalized().Cross(rayB.direction.Normalized());
 	double length = normal.Length();
 	if (length < eps || !normal.Normalize())
 	{
 		// The rays are parallel.
-		if ((rayB.origin - rayB.origin).Length() < eps)
+		if (rayA.origin.IsEqualTo(rayB.origin, eps))
 		{
 			// The rays are the same ray.
 			alpha = 0.0;

@@ -25,6 +25,7 @@ namespace MeshNinja
 
 		double Length() const;
 		bool Normalize(double* returnedLength = nullptr);
+		Vector Normalized() const;
 		double Dot(const Vector& vector) const;
 		Vector Cross(const Vector& vector) const;
 		bool ProjectOnto(const Vector& vector);

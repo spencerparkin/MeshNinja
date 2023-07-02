@@ -97,6 +97,13 @@ bool Vector::Normalize(double* returnedLength /*= nullptr*/)
 	return true;
 }
 
+Vector Vector::Normalized() const
+{
+	Vector unitVector(*this);
+	unitVector.Normalize();
+	return unitVector;
+}
+
 double Vector::Dot(const Vector& vector) const
 {
 	double dot =
