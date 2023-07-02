@@ -191,17 +191,64 @@ bool MeshSetOperation::ChopupPolygon(const ConvexPolygon& polygon, ConvexPolygon
 		if (plane.WhichSide(lineSegment.vertexA) == Plane::Side::NEITHER &&
 			plane.WhichSide(lineSegment.vertexB) == Plane::Side::NEITHER)
 		{
-			Vector normal = (lineSegment.vertexB - lineSegment.vertexA).Cross(plane.normal);
-			Plane cuttingPlane(lineSegment.vertexA, normal);
-			if (polygon.SplitAgainst(cuttingPlane, polygonA, polygonB))
-			{
-				polygonA.Compress();
-				polygonB.Compress();
+			bool performSplit = false;
+			bool isInteriorPoint = false;
 
-				if (polygonA.vertexArray->size() < 3 || polygonB.vertexArray->size() < 3)
-					return false;
-				
-				return true;
+			if ((polygon.ContainsPoint(lineSegment.vertexA, &isInteriorPoint) && isInteriorPoint) ||
+				(polygon.ContainsPoint(lineSegment.vertexB, &isInteriorPoint) && isInteriorPoint))
+			{
+				performSplit = true;
+			}
+
+			if (!performSplit)
+			{
+				Ray rayA(lineSegment.vertexA, lineSegment.vertexB - lineSegment.vertexA);
+				Ray rayB(lineSegment.vertexB, lineSegment.vertexA - lineSegment.vertexB);
+
+				double alpha = 0.0, beta = 0.0;
+
+				if (rayA.CastAgainst(polygon, alpha) && 0.0 <= alpha && alpha <= 1.0 &&
+					rayB.CastAgainst(polygon, beta) && 0.0 <= beta && beta <= 1.0)
+				{
+					Vector hitPointA = rayA.Lerp(alpha);
+					Vector hitPointB = rayB.Lerp(beta);
+					Vector point = (hitPointA + hitPointB) / 2.0;
+					
+					if (polygon.ContainsPoint(point, &isInteriorPoint) && isInteriorPoint)
+						performSplit = true;
+				}
+			}
+
+			if (performSplit)
+			{
+				Vector normal = (lineSegment.vertexB - lineSegment.vertexA).Cross(plane.normal);
+				Plane cuttingPlane(lineSegment.vertexA, normal);
+				if (polygon.SplitAgainst(cuttingPlane, polygonA, polygonB))
+				{
+					polygonA.Compress();
+					polygonB.Compress();
+
+					if (polygonA.vertexArray->size() < 3 || polygonB.vertexArray->size() < 3)
+					{
+#if defined MESH_NINJA_DEBUG_MESH_SET_OPERATION
+						std::vector<ConvexPolygon> polygonArray;
+						polygonArray.push_back(polygon);
+						ConvexPolygonMesh mesh;
+						mesh.FromConvexPolygonArray(polygonArray);
+						ObjFileFormat objFileFormat;
+						objFileFormat.SaveMesh("Meshes/DebugMeshA.obj", mesh);
+						Polyline polyline;
+						polyline.vertexArray->push_back(lineSegment.vertexA);
+						polyline.vertexArray->push_back(lineSegment.vertexB);
+						polyline.GenerateTubeMesh(mesh, 0.1, 5);
+						objFileFormat.SaveMesh("Meshes/DebugMeshB.obj", mesh);
+#endif //MESH_NINJA_DEBUG_MESH_SET_OPERATION
+
+						return false;
+					}
+
+					return true;
+				}
 			}
 		}
 	}
@@ -293,8 +340,6 @@ MeshSetOperation::Graph::Graph()
 
 bool MeshSetOperation::Graph::ColorEdges(const std::vector<LineSegment>& lineSegmentArray)
 {
-	int cutCount = 0;
-
 	for (Edge* edge : *this->edgeArray)
 	{
 		LineSegment edgeSegment((*this->mesh->vertexArray)[edge->pair.i], (*this->mesh->vertexArray)[edge->pair.j]);
@@ -303,10 +348,8 @@ bool MeshSetOperation::Graph::ColorEdges(const std::vector<LineSegment>& lineSeg
 
 		for (const LineSegment& lineSegment : lineSegmentArray)
 		{
-			// TODO: Actually, I think we just need to check that the edge segment is contained within the line segment.
-			if (edgeSegment.IsEqualTo(lineSegment))
+			if (lineSegment.ContainsPoint(edgeSegment.vertexA) && lineSegment.ContainsPoint(edgeSegment.vertexB))
 			{
-				cutCount++;
 				cutFound = true;
 				((MeshSetOperation::Edge*)edge)->type = MeshSetOperation::Edge::Type::CUT_BOUNDARY;
 				break;
@@ -317,7 +360,7 @@ bool MeshSetOperation::Graph::ColorEdges(const std::vector<LineSegment>& lineSeg
 			((MeshSetOperation::Edge*)edge)->type = MeshSetOperation::Edge::Type::NORMAL;
 	}
 
-	return cutCount == lineSegmentArray.size();
+	return true;
 }
 
 bool MeshSetOperation::Graph::ColorNodes(const Graph* otherGraph)

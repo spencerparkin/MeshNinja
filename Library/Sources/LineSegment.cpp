@@ -37,8 +37,8 @@ double LineSegment::DistanceToPoint(const Vector& point) const
 	else if (dot >= length)
 		return (point - this->vertexB).Length();
 
-	double hypotenuse = (point - this->vertexA).Length();
-	double distance = ::sqrt(hypotenuse * hypotenuse - dot * dot);
+	double hypotenuseSquared = (point - this->vertexA).Dot(point - this->vertexA);
+	double distance = ::sqrt(::fabs(hypotenuseSquared - dot * dot));
 	return distance;
 }
 

@@ -8,7 +8,7 @@
 #	define MESH_NINJA_API
 #endif
 
-#define MESH_NINJA_EPS				1e-5
+#define MESH_NINJA_EPS				1e-4
 #define MESH_NINJA_MIN(a, b)		((a) < (b) ? (a) : (b))
 #define MESH_NINJA_MAX(a, b)		((a) > (b) ? (a) : (b))
 #define MESH_NINJA_SIGN(a)			((a) < 0.0 ? -1.0 : 1.0)

@@ -100,6 +100,19 @@ bool ConvexPolygon::CalcPlane(Plane& plane, double eps /*= MESH_NINJA_EPS*/) con
 	return true;
 }
 
+Vector ConvexPolygon::CalcCenter() const
+{
+	Vector center(0.0, 0.0, 0.0);
+
+	for (const Vector& vertex : *this->vertexArray)
+		center += vertex;
+
+	if (this->vertexArray->size() > 0)
+		center *= 1.0 / double(this->vertexArray->size());
+
+	return center;
+}
+
 bool ConvexPolygon::IntersectWithLineSegment(const Vector& pointA, const Vector& pointB, Vector& intersectionPoint, double eps /*= MESH_NINJA_EPS*/) const
 {
 	Plane plane;

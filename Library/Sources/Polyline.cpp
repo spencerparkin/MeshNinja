@@ -176,6 +176,7 @@ bool Polyline::GenerateTubeMesh(ConvexPolygonMesh& tubeMesh, double radius, int 
 		zAxis.Normalize();
 		Vector yAxis;
 		yAxis.MakeOrthogonalTo(zAxis);
+		yAxis.Normalize();
 		Vector xAxis = yAxis.Cross(zAxis);
 
 		std::vector<Vector> pointArrayA, pointArrayB;

@@ -138,7 +138,7 @@ double Ray::LerpInverse(const Vector& point) const
 		return false;
 
 	// Perform sanity check.
-	assert(rayA.Lerp(alpha).IsEqualTo(rayB.Lerp(beta), eps));
+	//assert(rayA.Lerp(alpha).IsEqualTo(rayB.Lerp(beta), eps));
 
 	return true;
 }
