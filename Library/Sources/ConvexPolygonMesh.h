@@ -17,9 +17,20 @@ namespace MeshNinja
 		void Clear();
 		void Compress(double eps = MESH_NINJA_EPS);
 		void NormalizeEdges(double eps = MESH_NINJA_EPS);
-
+		void UntessellateFaces(double eps = MESH_NINJA_EPS);
+		void TessellateFaces(double eps = MESH_NINJA_EPS);
 		void ToConvexPolygonArray(std::vector<ConvexPolygon>& convexPolygonArray) const;
 		void FromConvexPolygonArray(const std::vector<ConvexPolygon>& convexPolygonArray);
+		bool GenerateConvexHull(const std::vector<Vector>& pointArray, double eps = MESH_NINJA_EPS);
+
+		struct Triangle
+		{
+			int vertex[3];
+
+			bool IsCanceledBy(const Triangle& triangle) const;
+			void MakePolygon(ConvexPolygon& polygon, const std::vector<Vector>& pointArray) const;
+			void MakePlane(Plane& plane, const std::vector<Vector>& pointArray) const;
+		};
 
 		class Facet
 		{
@@ -34,5 +45,7 @@ namespace MeshNinja
 
 		std::vector<Facet>* facetArray;
 		std::vector<Vector>* vertexArray;
+
+	protected:
 	};
 }

@@ -19,7 +19,7 @@ namespace MeshNinja
 
 		void Clear();
 		void Compress(double eps = MESH_NINJA_EPS);
-
+		bool IsValid(double eps = MESH_NINJA_EPS) const;
 		bool CalcPlane(Plane& plane, double eps = MESH_NINJA_EPS) const;
 		Vector CalcCenter() const;
 		bool Intersect(const ConvexPolygon& polygonA, const ConvexPolygon& polygonB, double eps = MESH_NINJA_EPS);
