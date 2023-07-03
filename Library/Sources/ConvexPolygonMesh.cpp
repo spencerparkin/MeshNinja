@@ -110,6 +110,128 @@ void ConvexPolygonMesh::FromConvexPolygonArray(const std::vector<ConvexPolygon>&
 	}
 }
 
+bool ConvexPolygonMesh::GeneratePolyhedron(Polyhedron polyhedron, double eps /*= MESH_NINJA_EPS*/)
+{
+	std::vector<Vector> pointArray;
+
+	auto singleCombo = [](std::function<void(double a)> callback) {
+		for (int i = 0; i < 2; i++)
+		{
+			double a = (i == 0) ? -1.0 : 1.0;
+			callback(a);
+		}
+	};
+
+	auto doubleCombo = [](std::function<void(double a, double b)> callback) {
+		for (int i = 0; i < 2; i++)
+		{
+			double a = (i == 0) ? -1.0 : 1.0;
+			for (int j = 0; j < 2; j++)
+			{
+				double b = (j == 0) ? -1.0 : 1.0;
+				callback(a, b);
+			}
+		}
+	};
+
+	auto tripleCombo = [](std::function<void(double a, double b, double c)> callback) {
+		for (int i = 0; i < 2; i++)
+		{
+			double a = (i == 0) ? -1.0 : 1.0;
+			for (int j = 0; j < 2; j++)
+			{
+				double b = (j == 0) ? -1.0 : 1.0;
+				for (int k = 0; k < 2; k++)
+				{
+					double c = (k == 0) ? -1.0 : 1.0;
+					callback(a, b, c);
+				}
+			}
+		}
+	};
+
+	switch (polyhedron)
+	{
+		case Polyhedron::TETRAHEDRON:
+		{
+			singleCombo([&pointArray](double a) {
+				pointArray.push_back(Vector(a, 0, -1.0 / ::sqrt(2.0)));
+				pointArray.push_back(Vector(0, a, 1.0 / ::sqrt(2.0)));
+			});
+			break;
+		}
+		case Polyhedron::OCTAHEDRON:
+		{
+			singleCombo([&pointArray](double a) {
+				pointArray.push_back(Vector(a, 0.0, 0.0));
+				pointArray.push_back(Vector(0.0, a, 0.0));
+				pointArray.push_back(Vector(0.0, 0.0, a));
+			});
+			break;
+		}
+		case Polyhedron::HEXADRON:
+		{
+			tripleCombo([&pointArray](double a, double b, double c) {
+				pointArray.push_back(Vector(a, b, c));
+			});
+			break;
+		}
+		case Polyhedron::ICOSAHEDRON:
+		{
+			doubleCombo([&pointArray](double a, double b) {
+				pointArray.push_back(Vector(0.0, a, b * MESH_NINJA_PHI));
+				pointArray.push_back(Vector(a, b * MESH_NINJA_PHI, 0.0));
+				pointArray.push_back(Vector(a * MESH_NINJA_PHI, 0.0, b));
+			});
+			break;
+		}
+		case Polyhedron::DODECAHEDRON:
+		{
+			tripleCombo([&pointArray](double a, double b, double c) {
+				pointArray.push_back(Vector(a, b, c));
+			});
+			doubleCombo([&pointArray](double a, double b) {
+				pointArray.push_back(Vector(0.0, a * MESH_NINJA_PHI, b / MESH_NINJA_PHI));
+				pointArray.push_back(Vector(a / MESH_NINJA_PHI, 0.0, b * MESH_NINJA_PHI));
+				pointArray.push_back(Vector(a * MESH_NINJA_PHI, b / MESH_NINJA_PHI, 0.0));
+			});
+			break;
+		}
+		case Polyhedron::ICOSIDODECAHEDRON:
+		{
+			singleCombo([&pointArray](double a) {
+				pointArray.push_back(Vector(0.0, 0.0, a * MESH_NINJA_PHI));
+			});
+			tripleCombo([&pointArray](double a, double b, double c) {
+				pointArray.push_back(Vector(a / 2.0, b * MESH_NINJA_PHI / 2.0, c * MESH_NINJA_PHI * MESH_NINJA_PHI / 2.0));
+			});
+			break;
+		}
+		case Polyhedron::CUBOCTAHEDRON:
+		{
+			doubleCombo([&pointArray](double a, double b) {
+				pointArray.push_back(Vector(a, b, 0.0));
+				pointArray.push_back(Vector(a, 0.0, b));
+				pointArray.push_back(Vector(0.0, a, b));
+			});
+			break;
+		}
+		case Polyhedron::RHOMBICOSIDODECAHEDRON:
+		{
+			tripleCombo([&pointArray](double a, double b, double c) {
+				pointArray.push_back(Vector(a, b, c* MESH_NINJA_PHI* MESH_NINJA_PHI* MESH_NINJA_PHI));
+				pointArray.push_back(Vector(a* MESH_NINJA_PHI* MESH_NINJA_PHI, b* MESH_NINJA_PHI, 2.0 * c * MESH_NINJA_PHI));
+			});
+			doubleCombo([&pointArray](double a, double b) {
+				pointArray.push_back(Vector(a * (2.0 + MESH_NINJA_PHI), 0.0, b * MESH_NINJA_PHI * MESH_NINJA_PHI));
+			});
+			break;
+		}
+	}
+
+	return this->GenerateConvexHull(pointArray);
+}
+
 bool ConvexPolygonMesh::GenerateConvexHull(const std::vector<Vector>& pointArray, double eps /*= MESH_NINJA_EPS*/)
 {
 	this->Clear();

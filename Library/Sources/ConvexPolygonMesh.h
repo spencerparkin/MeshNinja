@@ -14,6 +14,18 @@ namespace MeshNinja
 		ConvexPolygonMesh();
 		virtual ~ConvexPolygonMesh();
 
+		enum class Polyhedron
+		{
+			TETRAHEDRON,
+			OCTAHEDRON,
+			HEXADRON,
+			ICOSAHEDRON,
+			DODECAHEDRON,
+			ICOSIDODECAHEDRON,
+			CUBOCTAHEDRON,
+			RHOMBICOSIDODECAHEDRON
+		};
+
 		void Clear();
 		void Compress(double eps = MESH_NINJA_EPS);
 		void NormalizeEdges(double eps = MESH_NINJA_EPS);
@@ -22,6 +34,7 @@ namespace MeshNinja
 		void ToConvexPolygonArray(std::vector<ConvexPolygon>& convexPolygonArray) const;
 		void FromConvexPolygonArray(const std::vector<ConvexPolygon>& convexPolygonArray);
 		bool GenerateConvexHull(const std::vector<Vector>& pointArray, double eps = MESH_NINJA_EPS);
+		bool GeneratePolyhedron(Polyhedron polyhedron, double eps = MESH_NINJA_EPS);
 
 		struct Triangle
 		{

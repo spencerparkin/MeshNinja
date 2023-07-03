@@ -9,6 +9,7 @@
 #endif
 
 #define MESH_NINJA_EPS				1e-3 //1e-4
+#define MESH_NINJA_PHI				1.618033988749
 #define MESH_NINJA_MIN(a, b)		((a) < (b) ? (a) : (b))
 #define MESH_NINJA_MAX(a, b)		((a) > (b) ? (a) : (b))
 #define MESH_NINJA_SIGN(a)			((a) < 0.0 ? -1.0 : 1.0)
@@ -23,3 +24,6 @@
 #include <sstream>
 #include <math.h>
 #include <assert.h>
+#include <functional>
+
+// TODO: Make PCH?
