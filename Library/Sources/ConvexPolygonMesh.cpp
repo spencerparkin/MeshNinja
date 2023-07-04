@@ -268,7 +268,8 @@ bool ConvexPolygonMesh::GenerateConvexHull(const std::vector<Vector>& pointArray
 	std::list<Triangle> triangleList;
 
 	// Hmmmm...Is there a better/faster way to find the initial tetrahedron?
-	auto findInitialTetrahedron = [&pointArray, &triangleList]() -> bool {
+	auto findInitialTetrahedron = [&pointArray, &triangleList]() -> bool
+	{
 		for (int i = 0; i < (signed)pointArray.size(); i++)
 		{
 			const Vector& vertexA = pointArray[i];
@@ -306,7 +307,8 @@ bool ConvexPolygonMesh::GenerateConvexHull(const std::vector<Vector>& pointArray
 	if (!findInitialTetrahedron())
 		return false;
 
-	auto convexHullContainsPoint = [&pointArray, &triangleList, eps](const Vector& point) -> bool {
+	auto convexHullContainsPoint = [&pointArray, &triangleList, eps](const Vector& point) -> bool
+	{
 		for (const Triangle& triangle : triangleList)
 		{
 			Plane plane;
@@ -318,7 +320,8 @@ bool ConvexPolygonMesh::GenerateConvexHull(const std::vector<Vector>& pointArray
 		return true;
 	};
 
-	auto cancelExistingTriangle = [&triangleList](const Triangle& newTriangle) -> bool {
+	auto cancelExistingTriangle = [&triangleList](const Triangle& newTriangle) -> bool
+	{
 		for (std::list<Triangle>::iterator iter = triangleList.begin(); iter != triangleList.end(); iter++)
 		{
 			const Triangle& existingTriangle = *iter;
@@ -446,6 +449,7 @@ void ConvexPolygonMesh::Facet::MakePolygon(ConvexPolygon& polygon, const ConvexP
 		polygon.vertexArray->push_back((*mesh->vertexArray)[i]);
 }
 
+// Note that the resulting facet might be concave!
 bool ConvexPolygonMesh::Facet::Merge(const Facet& facetA, const Facet& facetB, const ConvexPolygonMesh* mesh)
 {
 	ConvexPolygon polygonA, polygonB;
@@ -459,40 +463,81 @@ bool ConvexPolygonMesh::Facet::Merge(const Facet& facetA, const Facet& facetB, c
 	if (!planeA.IsEqualTo(planeB))
 		return false;
 
-	int i, j = 0;
-	for (i = 0; i < (signed)facetA.vertexArray.size(); i++)
-		if (facetB.HasVertex(facetA.vertexArray[i]))
-			j++;
+	struct Edge
+	{
+		int i, j;
+	};
 
-	if (j < 2)
+	std::list<Edge> edgeList;
+	int cancelationCount = 0;
+
+	auto integrateEdge = [&edgeList, &cancelationCount](Edge newEdge)
+	{
+		// The new edge might just cancel an existing edge.
+		for (std::list<Edge>::iterator iter = edgeList.begin(); iter != edgeList.end(); iter++)
+		{
+			const Edge& existingEdge = *iter;
+			if (existingEdge.i == newEdge.j && existingEdge.j == newEdge.i)
+			{
+				edgeList.erase(iter);
+				cancelationCount++;
+				return;
+			}
+		}
+
+		// The new edge might truncate an existing edge.  One or two parts of the existing edge may survive.  One or two parts of the new edge may survive.
+#if 0				// This is a case we really should handle, but I'm going to punt on it for now as it is a bit complex.
+		for (std::list<Edge>::iterator iter = edgeList.begin(); iter != edgeList.end(); iter++)
+		{
+			const Edge& existingEdge = *iter;
+			//...
+		}
+#endif
+
+		// At this point we just add the new edge to the list.
+		edgeList.push_back(newEdge);
+	};
+
+	// Reject the merge if no cancelation occurred, which indicates that the two facets don't share at least one edge.
+	if (cancelationCount == 0)
 		return false;
 
-	for (i = 0; i < (signed)facetA.vertexArray.size(); i++)
-		if (!facetB.HasVertex(facetA.vertexArray[i]))
-			break;
+	for (int i = 0; i < (signed)facetA.vertexArray.size(); i++)
+	{
+		int j = (i + 1) % facetA.vertexArray.size();
+		integrateEdge(Edge{ facetA.vertexArray[i], facetA.vertexArray[j] });
+	}
 
-	if (i == facetA.vertexArray.size())
-		return false;
+	for (int i = 0; i < (signed)facetB.vertexArray.size(); i++)
+	{
+		int j = (i + 1) % facetB.vertexArray.size();
+		integrateEdge(Edge{ facetB.vertexArray[i], facetB.vertexArray[j] });
+	}
 
 	this->vertexArray.clear();
-	j = 0;
-	const Facet* facetArray[2] = { &facetA, &facetB };
-	while (true)
+
+	if (edgeList.size() > 0)
 	{
-		const Facet* tracingFacet = facetArray[i];
-		const Facet* otherFacet = facetArray[1 - i];
-
-		if (this->HasVertex(tracingFacet->vertexArray[j]))
-			break;
-
-		this->vertexArray.push_back(tracingFacet->vertexArray[j]);
-
-		if (!otherFacet->HasVertex(tracingFacet->vertexArray[j], &j))
-			j = (j + 1) % tracingFacet->vertexArray.size();
-		else
+		this->vertexArray.push_back((*edgeList.begin()).i);
+		bool polygonComplete = false;
+		while (!polygonComplete)
 		{
-			i = 1 - i;
-			j = (j + 1) % otherFacet->vertexArray.size();
+			int i = this->vertexArray[this->vertexArray.size() - 1];
+			for (const Edge& edge : edgeList)
+			{
+				if (edge.i == i)
+				{
+					if (edge.j != this->vertexArray[0])
+						this->vertexArray.push_back(edge.j);
+					else
+						polygonComplete = true;
+					break;
+				}
+			}
+
+			// Something has gone wrong in this case.
+			if (this->vertexArray.size() > edgeList.size())
+				return false;
 		}
 	}
 

@@ -26,10 +26,15 @@ void ConvexPolygon::Clear()
 	this->vertexArray->clear();
 }
 
-bool ConvexPolygon::IsValid(double eps /*= MESH_NINJA_EPS*/) const
+bool ConvexPolygon::IsConvex(double eps /*= MESH_NINJA_EPS*/) const
 {
 	// TODO: Make sure all points are co-planar.  Then make sure the points form a convex polygon (not a concave one.)
 	return true;
+}
+
+bool ConvexPolygon::IsConcave(double eps /*= MESH_NINJA_EPS*/) const
+{
+	return !this->IsConvex(eps);
 }
 
 void ConvexPolygon::Compress(double eps /*= MESH_NINJA_EPS*/)
