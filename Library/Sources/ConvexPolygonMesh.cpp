@@ -37,6 +37,35 @@ void ConvexPolygonMesh::Compress(double eps /*= MESH_NINJA_EPS*/)
 
 void ConvexPolygonMesh::UntessellateFaces(double eps /*= MESH_NINJA_EPS*/)
 {
+	std::list<Facet> facetQueue;
+	for (Facet& facet : *this->facetArray)
+		facetQueue.push_back(facet);
+
+	this->facetArray->clear();
+
+	while (facetQueue.size() > 0)
+	{
+		std::list<Facet>::iterator iter = facetQueue.begin();
+		Facet facetA = *iter;
+		facetQueue.erase(iter);
+
+		bool mergeHappened = false;
+		for (iter = facetQueue.begin(); iter != facetQueue.end(); iter++)
+		{
+			Facet& facetB = *iter;
+			Facet mergedFacet;
+			if (mergedFacet.Merge(facetA, facetB, this))
+			{
+				facetQueue.erase(iter);
+				facetQueue.push_back(mergedFacet);
+				mergeHappened = true;
+				break;
+			}
+		}
+
+		if (!mergeHappened)
+			this->facetArray->push_back(facetA);
+	}
 }
 
 void ConvexPolygonMesh::TessellateFaces(double eps /*= MESH_NINJA_EPS*/)
@@ -415,4 +444,73 @@ void ConvexPolygonMesh::Facet::MakePolygon(ConvexPolygon& polygon, const ConvexP
 	polygon.vertexArray->clear();
 	for (int i : this->vertexArray)
 		polygon.vertexArray->push_back((*mesh->vertexArray)[i]);
+}
+
+bool ConvexPolygonMesh::Facet::Merge(const Facet& facetA, const Facet& facetB, const ConvexPolygonMesh* mesh)
+{
+	ConvexPolygon polygonA, polygonB;
+	facetA.MakePolygon(polygonA, mesh);
+	facetB.MakePolygon(polygonB, mesh);
+
+	Plane planeA, planeB;
+	polygonA.CalcPlane(planeA);
+	polygonB.CalcPlane(planeB);
+
+	if (!planeA.IsEqualTo(planeB))
+		return false;
+
+	int i, j = 0;
+	for (i = 0; i < (signed)facetA.vertexArray.size(); i++)
+		if (facetB.HasVertex(facetA.vertexArray[i]))
+			j++;
+
+	if (j < 2)
+		return false;
+
+	for (i = 0; i < (signed)facetA.vertexArray.size(); i++)
+		if (!facetB.HasVertex(facetA.vertexArray[i]))
+			break;
+
+	if (i == facetA.vertexArray.size())
+		return false;
+
+	this->vertexArray.clear();
+	j = 0;
+	const Facet* facetArray[2] = { &facetA, &facetB };
+	while (true)
+	{
+		const Facet* tracingFacet = facetArray[i];
+		const Facet* otherFacet = facetArray[1 - i];
+
+		if (this->HasVertex(tracingFacet->vertexArray[j]))
+			break;
+
+		this->vertexArray.push_back(tracingFacet->vertexArray[j]);
+
+		if (!otherFacet->HasVertex(tracingFacet->vertexArray[j], &j))
+			j = (j + 1) % tracingFacet->vertexArray.size();
+		else
+		{
+			i = 1 - i;
+			j = (j + 1) % otherFacet->vertexArray.size();
+		}
+	}
+
+	return true;
+}
+
+bool ConvexPolygonMesh::Facet::HasVertex(int i, int* j /*= nullptr*/) const
+{
+	for (int k : this->vertexArray)
+	{
+		if (i == k)
+		{
+			if (j)
+				*j = k;
+
+			return true;
+		}
+	}
+
+	return false;
 }

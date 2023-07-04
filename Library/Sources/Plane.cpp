@@ -30,6 +30,11 @@ double Plane::SignedDistanceToPoint(const Vector& point) const
 	return point.Dot(this->normal) - this->D;
 }
 
+bool Plane::IsEqualTo(const Plane& plane, double eps /*= MESH_NINJA_EPS*/) const
+{
+	return (this->D - plane.D) < eps && this->normal.IsEqualTo(plane.normal, eps);
+}
+
 Vector Plane::CalcCenter() const
 {
 	return this->normal * this->D;

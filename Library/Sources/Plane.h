@@ -17,8 +17,8 @@ namespace MeshNinja
 		virtual ~Plane();
 
 		double SignedDistanceToPoint(const Vector& point) const;
-
 		Vector CalcCenter() const;
+		bool IsEqualTo(const Plane& plane, double eps = MESH_NINJA_EPS) const;
 
 		enum class Side
 		{

@@ -52,13 +52,13 @@ namespace MeshNinja
 			virtual ~Facet();
 
 			void MakePolygon(ConvexPolygon& polygon, const ConvexPolygonMesh* mesh) const;
+			bool Merge(const Facet& facetA, const Facet& facetB, const ConvexPolygonMesh* mesh);
+			bool HasVertex(int i, int* j = nullptr) const;
 
 			std::vector<int> vertexArray;
 		};
 
 		std::vector<Facet>* facetArray;
 		std::vector<Vector>* vertexArray;
-
-	protected:
 	};
 }
