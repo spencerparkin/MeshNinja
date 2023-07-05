@@ -255,10 +255,14 @@ bool ConvexPolygonMesh::GeneratePolyhedron(Polyhedron polyhedron, double eps /*=
 		case Polyhedron::ICOSIDODECAHEDRON:
 		{
 			singleCombo([&pointArray](double a) {
+				pointArray.push_back(Vector(a * MESH_NINJA_PHI, 0.0, 0.0));
+				pointArray.push_back(Vector(0.0, a * MESH_NINJA_PHI, 0.0));
 				pointArray.push_back(Vector(0.0, 0.0, a * MESH_NINJA_PHI));
 			});
 			tripleCombo([&pointArray](double a, double b, double c) {
 				pointArray.push_back(Vector(a / 2.0, b * MESH_NINJA_PHI / 2.0, c * MESH_NINJA_PHI * MESH_NINJA_PHI / 2.0));
+				pointArray.push_back(Vector(a * MESH_NINJA_PHI / 2.0, b * MESH_NINJA_PHI * MESH_NINJA_PHI / 2.0, c / 2.0));
+				pointArray.push_back(Vector(a * MESH_NINJA_PHI * MESH_NINJA_PHI / 2.0, b / 2.0, c * MESH_NINJA_PHI / 2.0));
 			});
 			break;
 		}
@@ -275,10 +279,16 @@ bool ConvexPolygonMesh::GeneratePolyhedron(Polyhedron polyhedron, double eps /*=
 		{
 			tripleCombo([&pointArray](double a, double b, double c) {
 				pointArray.push_back(Vector(a, b, c * MESH_NINJA_PHI * MESH_NINJA_PHI * MESH_NINJA_PHI));
+				pointArray.push_back(Vector(a, b * MESH_NINJA_PHI * MESH_NINJA_PHI * MESH_NINJA_PHI, c));
+				pointArray.push_back(Vector(a * MESH_NINJA_PHI * MESH_NINJA_PHI * MESH_NINJA_PHI, b, c));
 				pointArray.push_back(Vector(a * MESH_NINJA_PHI * MESH_NINJA_PHI, b * MESH_NINJA_PHI, 2.0 * c * MESH_NINJA_PHI));
+				pointArray.push_back(Vector(a * MESH_NINJA_PHI, 2.0 * b * MESH_NINJA_PHI, c * MESH_NINJA_PHI * MESH_NINJA_PHI));
+				pointArray.push_back(Vector(2.0 * a * MESH_NINJA_PHI, b * MESH_NINJA_PHI * MESH_NINJA_PHI, c * MESH_NINJA_PHI));
 			});
 			doubleCombo([&pointArray](double a, double b) {
 				pointArray.push_back(Vector(a * (2.0 + MESH_NINJA_PHI), 0.0, b * MESH_NINJA_PHI * MESH_NINJA_PHI));
+				pointArray.push_back(Vector(0.0, a * MESH_NINJA_PHI * MESH_NINJA_PHI, b * (2.0 + MESH_NINJA_PHI)));
+				pointArray.push_back(Vector(a * MESH_NINJA_PHI * MESH_NINJA_PHI, b * (2.0 + MESH_NINJA_PHI), 0.0));
 			});
 			break;
 		}
@@ -287,6 +297,7 @@ bool ConvexPolygonMesh::GeneratePolyhedron(Polyhedron polyhedron, double eps /*=
 	return this->GenerateConvexHull(pointArray);
 }
 
+// Interestingly, this algorithm is also a proof that any polyhedron is the sum of tetrahedrons.
 bool ConvexPolygonMesh::GenerateConvexHull(const std::vector<Vector>& pointArray, double eps /*= MESH_NINJA_EPS*/)
 {
 	this->Clear();

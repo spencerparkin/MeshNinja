@@ -77,6 +77,7 @@ int main(int argc, char** argv)
 	fileFormat.SaveMesh("Meshes/Icosahedron.obj", mesh);
 
 	mesh.GeneratePolyhedron(ConvexPolygonMesh::Polyhedron::ICOSIDODECAHEDRON);
+	mesh.UntessellateFaces();
 	fileFormat.SaveMesh("Meshes/Icosidodecahedron.obj", mesh);
 
 	mesh.GeneratePolyhedron(ConvexPolygonMesh::Polyhedron::RHOMBICOSIDODECAHEDRON);
