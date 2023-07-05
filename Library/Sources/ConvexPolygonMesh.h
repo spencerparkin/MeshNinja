@@ -27,6 +27,8 @@ namespace MeshNinja
 		};
 
 		void Clear();
+		bool IsConvex(double eps = MESH_NINJA_EPS) const;
+		bool IsConcave(double eps = MESH_NINJA_EPS) const;
 		void Compress(double eps = MESH_NINJA_EPS);
 		void NormalizeEdges(double eps = MESH_NINJA_EPS);
 		void UntessellateFaces(double eps = MESH_NINJA_EPS);

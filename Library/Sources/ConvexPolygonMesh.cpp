@@ -24,6 +24,29 @@ void ConvexPolygonMesh::Clear()
 	this->vertexArray->clear();
 }
 
+bool ConvexPolygonMesh::IsConvex(double eps /*= MESH_NINJA_EPS*/) const
+{
+	for (const Facet& facet : *this->facetArray)
+	{
+		ConvexPolygon polygon;
+		facet.MakePolygon(polygon, this);
+
+		Plane plane;
+		polygon.CalcPlane(plane, eps);
+
+		for (const Vector& vertex : *this->vertexArray)
+			if (plane.WhichSide(vertex, eps) == Plane::Side::FRONT)
+				return false;
+	}
+
+	return true;
+}
+
+bool ConvexPolygonMesh::IsConcave(double eps /*= MESH_NINJA_EPS*/) const
+{
+	return !this->IsConvex(eps);
+}
+
 void ConvexPolygonMesh::Compress(double eps /*= MESH_NINJA_EPS*/)
 {
 	std::vector<ConvexPolygon> polygonArray;
@@ -143,7 +166,8 @@ bool ConvexPolygonMesh::GeneratePolyhedron(Polyhedron polyhedron, double eps /*=
 {
 	std::vector<Vector> pointArray;
 
-	auto singleCombo = [](std::function<void(double a)> callback) {
+	auto singleCombo = [](std::function<void(double a)> callback)
+	{
 		for (int i = 0; i < 2; i++)
 		{
 			double a = (i == 0) ? -1.0 : 1.0;
@@ -151,7 +175,8 @@ bool ConvexPolygonMesh::GeneratePolyhedron(Polyhedron polyhedron, double eps /*=
 		}
 	};
 
-	auto doubleCombo = [](std::function<void(double a, double b)> callback) {
+	auto doubleCombo = [](std::function<void(double a, double b)> callback)
+	{
 		for (int i = 0; i < 2; i++)
 		{
 			double a = (i == 0) ? -1.0 : 1.0;
@@ -163,7 +188,8 @@ bool ConvexPolygonMesh::GeneratePolyhedron(Polyhedron polyhedron, double eps /*=
 		}
 	};
 
-	auto tripleCombo = [](std::function<void(double a, double b, double c)> callback) {
+	auto tripleCombo = [](std::function<void(double a, double b, double c)> callback)
+	{
 		for (int i = 0; i < 2; i++)
 		{
 			double a = (i == 0) ? -1.0 : 1.0;
@@ -248,8 +274,8 @@ bool ConvexPolygonMesh::GeneratePolyhedron(Polyhedron polyhedron, double eps /*=
 		case Polyhedron::RHOMBICOSIDODECAHEDRON:
 		{
 			tripleCombo([&pointArray](double a, double b, double c) {
-				pointArray.push_back(Vector(a, b, c* MESH_NINJA_PHI* MESH_NINJA_PHI* MESH_NINJA_PHI));
-				pointArray.push_back(Vector(a* MESH_NINJA_PHI* MESH_NINJA_PHI, b* MESH_NINJA_PHI, 2.0 * c * MESH_NINJA_PHI));
+				pointArray.push_back(Vector(a, b, c * MESH_NINJA_PHI * MESH_NINJA_PHI * MESH_NINJA_PHI));
+				pointArray.push_back(Vector(a * MESH_NINJA_PHI * MESH_NINJA_PHI, b * MESH_NINJA_PHI, 2.0 * c * MESH_NINJA_PHI));
 			});
 			doubleCombo([&pointArray](double a, double b) {
 				pointArray.push_back(Vector(a * (2.0 + MESH_NINJA_PHI), 0.0, b * MESH_NINJA_PHI * MESH_NINJA_PHI));
@@ -498,10 +524,6 @@ bool ConvexPolygonMesh::Facet::Merge(const Facet& facetA, const Facet& facetB, c
 		edgeList.push_back(newEdge);
 	};
 
-	// Reject the merge if no cancelation occurred, which indicates that the two facets don't share at least one edge.
-	if (cancelationCount == 0)
-		return false;
-
 	for (int i = 0; i < (signed)facetA.vertexArray.size(); i++)
 	{
 		int j = (i + 1) % facetA.vertexArray.size();
@@ -513,6 +535,10 @@ bool ConvexPolygonMesh::Facet::Merge(const Facet& facetA, const Facet& facetB, c
 		int j = (i + 1) % facetB.vertexArray.size();
 		integrateEdge(Edge{ facetB.vertexArray[i], facetB.vertexArray[j] });
 	}
+
+	// Reject the merge if no cancelation occurred, which indicates that the two facets don't share at least one edge.
+	if (cancelationCount == 0)
+		return false;
 
 	this->vertexArray.clear();
 

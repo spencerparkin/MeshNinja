@@ -28,7 +28,29 @@ void ConvexPolygon::Clear()
 
 bool ConvexPolygon::IsConvex(double eps /*= MESH_NINJA_EPS*/) const
 {
-	// TODO: Make sure all points are co-planar.  Then make sure the points form a convex polygon (not a concave one.)
+	Plane plane;
+	if (!this->CalcPlane(plane, eps))
+		return false;
+
+	for (const Vector& vertex : *this->vertexArray)
+		if (plane.WhichSide(vertex, eps) != Plane::Side::NEITHER)
+			return false;
+
+	for (int i = 0; i < (signed)this->vertexArray->size(); i++)
+	{
+		int j = (i + 1) % this->vertexArray->size();
+		Vector edgeVector = (*this->vertexArray)[j] - (*this->vertexArray)[i];
+		Vector edgeNormal = edgeVector.Cross(plane.normal);
+		Plane edgePlane((*this->vertexArray)[i], edgeNormal);
+
+		for (j = 0; j < (signed)this->vertexArray->size(); j++)
+		{
+			const Vector& vertex = (*this->vertexArray)[j];
+			if (edgePlane.WhichSide(vertex, eps) == Plane::Side::FRONT)
+				return false;
+		}
+	}
+
 	return true;
 }
 

@@ -8,8 +8,10 @@ int main(int argc, char** argv)
 {
 	using namespace MeshNinja;
 
-	ConvexPolygonMesh meshA, meshB;
 	ObjFileFormat fileFormat;
+
+#if 0
+	ConvexPolygonMesh meshA, meshB;
 
 	std::string meshA_path = "Meshes/SphereA.obj";
 	std::string meshB_path = "Meshes/CylinderA.obj";
@@ -56,6 +58,32 @@ int main(int argc, char** argv)
 		fprintf(stderr, "Failed to save result mesh!\n");
 		return 1;
 	}
+#endif
+
+#if 1
+	ConvexPolygonMesh mesh;
+	
+	mesh.GeneratePolyhedron(ConvexPolygonMesh::Polyhedron::TETRAHEDRON);
+	fileFormat.SaveMesh("Meshes/Tetrahedron.obj", mesh);
+
+	mesh.GeneratePolyhedron(ConvexPolygonMesh::Polyhedron::OCTAHEDRON);
+	fileFormat.SaveMesh("Meshes/Octahedron.obj", mesh);
+
+	mesh.GeneratePolyhedron(ConvexPolygonMesh::Polyhedron::DODECAHEDRON);
+	mesh.UntessellateFaces();
+	fileFormat.SaveMesh("Meshes/Dodecahedron.obj", mesh);
+
+	mesh.GeneratePolyhedron(ConvexPolygonMesh::Polyhedron::ICOSAHEDRON);
+	fileFormat.SaveMesh("Meshes/Icosahedron.obj", mesh);
+
+	mesh.GeneratePolyhedron(ConvexPolygonMesh::Polyhedron::ICOSIDODECAHEDRON);
+	fileFormat.SaveMesh("Meshes/Icosidodecahedron.obj", mesh);
+
+	mesh.GeneratePolyhedron(ConvexPolygonMesh::Polyhedron::RHOMBICOSIDODECAHEDRON);
+	mesh.UntessellateFaces();
+	fileFormat.SaveMesh("Meshes/Rhombicosidodecahedron.obj", mesh);
+
+#endif
 
 	return 0;
 }
