@@ -218,6 +218,17 @@ bool Vector::IsEqualTo(const Vector& vector, double eps /*= MESH_NINJA_EPS*/) co
 	return (*this - vector).Length() < eps;
 }
 
+double Vector::AngleBetweenThisAnd(const Vector& vector) const
+{
+	Vector unitNormalA(*this);
+	Vector unitNormalB(vector);
+
+	if (!unitNormalA.Normalize() || !unitNormalB.Normalize())
+		return 0.0;
+
+	return ::acos(unitNormalA.Dot(unitNormalB));
+}
+
 namespace MeshNinja
 {
 	Vector operator+(const Vector& vectorA, const Vector& vectorB)

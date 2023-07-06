@@ -93,6 +93,27 @@ void ConvexPolygonMesh::UntessellateFaces(double eps /*= MESH_NINJA_EPS*/)
 
 void ConvexPolygonMesh::TessellateFaces(double eps /*= MESH_NINJA_EPS*/)
 {
+	std::list<Facet> facetQueue;
+	for (Facet& facet : *this->facetArray)
+		facetQueue.push_back(facet);
+
+	this->facetArray->clear();
+
+	while (facetQueue.size() > 0)
+	{
+		std::list<Facet>::iterator iter = facetQueue.begin();
+		Facet facet = *iter;
+		facetQueue.erase(iter);
+
+		Facet facetA, facetB;
+		if (!facet.Split(facetA, facetB, this))
+			this->facetArray->push_back(facet);
+		else
+		{
+			facetQueue.push_back(facetA);
+			facetQueue.push_back(facetB);
+		}
+	}
 }
 
 void ConvexPolygonMesh::NormalizeEdges(double eps /*= MESH_NINJA_EPS*/)
@@ -581,18 +602,91 @@ bool ConvexPolygonMesh::Facet::Merge(const Facet& facetA, const Facet& facetB, c
 	return true;
 }
 
-bool ConvexPolygonMesh::Facet::HasVertex(int i, int* j /*= nullptr*/) const
+bool ConvexPolygonMesh::Facet::Split(Facet& facetA, Facet& facetB, const ConvexPolygonMesh* mesh) const
 {
-	for (int k : this->vertexArray)
-	{
-		if (i == k)
-		{
-			if (j)
-				*j = k;
+	if (this->vertexArray.size() <= 3)
+		return false;
 
-			return true;
+	struct SplitCase
+	{
+		int i, j;
+	};
+
+	auto formulateSplit = [this, &facetA, &facetB](const SplitCase& splitCase)
+	{
+		facetA.vertexArray.clear();
+		facetB.vertexArray.clear();
+
+		int k = splitCase.i;
+
+		while (k != splitCase.j)
+		{
+			facetA.vertexArray.push_back(this->vertexArray[k]);
+			k = (k + 1) % this->vertexArray.size();
+		}
+
+		while (k != splitCase.i)
+		{
+			facetB.vertexArray.push_back(this->vertexArray[k]);
+			k = (k + 1) % this->vertexArray.size();
+		}
+	};
+
+	double largestSmallestInteriorAngle = -DBL_MAX;
+	SplitCase bestSplitCase{ -1, -1 };
+
+	for (int i = 0; i < (signed)this->vertexArray.size(); i++)
+	{
+		for (int j = 0; j < (signed)this->vertexArray.size(); j++)
+		{
+			if (i < j && i != (j + 1) % this->vertexArray.size() && j != (i + 1) % this->vertexArray.size())
+			{
+				SplitCase splitCase{ i, j };
+				formulateSplit(splitCase);
+
+				AngleStats angleStatsA, angleStatsB;
+
+				facetA.CalcInteriorAngleStats(angleStatsA, mesh);
+				facetB.CalcInteriorAngleStats(angleStatsB, mesh);
+
+				double smallestInteriorAngle = MESH_NINJA_MIN(angleStatsA.smallestInteriorAngle, angleStatsB.smallestInteriorAngle);
+				if (smallestInteriorAngle > largestSmallestInteriorAngle)
+				{
+					largestSmallestInteriorAngle = smallestInteriorAngle;
+					bestSplitCase = splitCase;
+				}
+			}
 		}
 	}
 
-	return false;
+	if (bestSplitCase.i < 0 || bestSplitCase.j < 0)
+		return false;
+
+	formulateSplit(bestSplitCase);
+	return true;
+}
+
+bool ConvexPolygonMesh::Facet::CalcInteriorAngleStats(AngleStats& angleStats, const ConvexPolygonMesh* mesh) const
+{
+	if (this->vertexArray.size() < 3)
+		return false;
+
+	angleStats.smallestInteriorAngle = DBL_MAX;
+	angleStats.largestInteriorAngle = -DBL_MAX;
+
+	for (int i = 0; i < (signed)this->vertexArray.size(); i++)
+	{
+		int j = (i + 1) % this->vertexArray.size();
+		int k = (i + 2) % this->vertexArray.size();
+
+		const Vector& edgeA = (*mesh->vertexArray)[i] - (*mesh->vertexArray)[j];
+		const Vector& edgeB = (*mesh->vertexArray)[k] - (*mesh->vertexArray)[j];
+
+		double angle = edgeA.AngleBetweenThisAnd(edgeB);
+
+		angleStats.smallestInteriorAngle = MESH_NINJA_MIN(angleStats.smallestInteriorAngle, angle);
+		angleStats.largestInteriorAngle = MESH_NINJA_MAX(angleStats.largestInteriorAngle, angle);
+	}
+
+	return true;
 }

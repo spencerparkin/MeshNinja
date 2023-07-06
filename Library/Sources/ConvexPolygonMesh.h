@@ -53,9 +53,16 @@ namespace MeshNinja
 			Facet();
 			virtual ~Facet();
 
+			struct AngleStats
+			{
+				double smallestInteriorAngle;
+				double largestInteriorAngle;
+			};
+
 			void MakePolygon(ConvexPolygon& polygon, const ConvexPolygonMesh* mesh) const;
 			bool Merge(const Facet& facetA, const Facet& facetB, const ConvexPolygonMesh* mesh);
-			bool HasVertex(int i, int* j = nullptr) const;
+			bool Split(Facet& facetA, Facet& facetB, const ConvexPolygonMesh* mesh) const;
+			bool CalcInteriorAngleStats(AngleStats& angleStats, const ConvexPolygonMesh* mesh) const;
 
 			std::vector<int> vertexArray;
 		};

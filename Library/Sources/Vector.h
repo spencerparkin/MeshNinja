@@ -36,6 +36,7 @@ namespace MeshNinja
 		bool FromString(const std::string& str);
 		bool MakeOrthogonalTo(const Vector& vector);
 		bool IsEqualTo(const Vector& vector, double eps = MESH_NINJA_EPS) const;
+		double AngleBetweenThisAnd(const Vector& vector) const;
 
 		double x, y, z;
 	};
