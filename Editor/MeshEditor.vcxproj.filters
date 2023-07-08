@@ -5,6 +5,9 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
+    <Filter Include="Sources\Panels">
+      <UniqueIdentifier>{fc949c03-53d7-4d73-9c7b-8e94c368d547}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h">
@@ -13,6 +16,15 @@
     <ClInclude Include="Frame.h">
       <Filter>Sources</Filter>
     </ClInclude>
+    <ClInclude Include="Panel.h">
+      <Filter>Sources</Filter>
+    </ClInclude>
+    <ClInclude Include="Canvas.h">
+      <Filter>Sources</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneViewPanel.h">
+      <Filter>Sources\Panels</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp">
@@ -20,6 +32,15 @@
     </ClCompile>
     <ClCompile Include="Frame.cpp">
       <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Panel.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Canvas.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneViewPanel.cpp">
+      <Filter>Sources\Panels</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

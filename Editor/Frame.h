@@ -1,6 +1,7 @@
 #pragma once
 
 #include <wx/frame.h>
+#include <wx/aui/aui.h>
 
 class Frame : public wxFrame
 {
@@ -20,4 +21,11 @@ public:
 		ID_ImportMesh,
 		ID_ExportMesh
 	};
+
+private:
+
+	void MakePanels();
+	void UpdatePanels();
+
+	wxAuiManager auiManager;
 };

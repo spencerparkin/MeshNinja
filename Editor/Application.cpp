@@ -20,6 +20,8 @@ Application::Application()
 	this->frame = new Frame(nullptr, wxDefaultPosition, wxDefaultSize);
 	this->frame->Show();
 
+	this->SetTopWindow(this->frame);
+
 	return true;
 }
 

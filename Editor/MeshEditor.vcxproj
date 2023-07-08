@@ -20,11 +20,17 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
+    <ClInclude Include="Canvas.h" />
     <ClInclude Include="Frame.h" />
+    <ClInclude Include="Panel.h" />
+    <ClInclude Include="SceneViewPanel.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
+    <ClCompile Include="Canvas.cpp" />
     <ClCompile Include="Frame.cpp" />
+    <ClCompile Include="Panel.cpp" />
+    <ClCompile Include="SceneViewPanel.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
