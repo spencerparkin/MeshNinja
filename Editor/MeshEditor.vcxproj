@@ -24,8 +24,10 @@
     <ClInclude Include="Frame.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="MeshCollectionScene.h" />
+    <ClInclude Include="MeshListControl.h" />
     <ClInclude Include="Panel.h" />
     <ClInclude Include="Scene.h" />
+    <ClInclude Include="SceneListPanel.h" />
     <ClInclude Include="SceneViewPanel.h" />
   </ItemGroup>
   <ItemGroup>
@@ -34,8 +36,10 @@
     <ClCompile Include="Frame.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="MeshCollectionScene.cpp" />
+    <ClCompile Include="MeshListControl.cpp" />
     <ClCompile Include="Panel.cpp" />
     <ClCompile Include="Scene.cpp" />
+    <ClCompile Include="SceneListPanel.cpp" />
     <ClCompile Include="SceneViewPanel.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

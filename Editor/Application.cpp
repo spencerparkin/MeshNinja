@@ -20,7 +20,7 @@ Application::Application()
 	if (!wxApp::OnInit())
 		return false;
 
-	this->frame = new Frame(nullptr, wxDefaultPosition, wxDefaultSize);
+	this->frame = new Frame(nullptr, wxDefaultPosition, wxSize(800, 500));
 	this->frame->Show();
 
 	this->SetTopWindow(this->frame);

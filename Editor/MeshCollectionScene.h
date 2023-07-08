@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Scene.h"
-#include <list>
+#include <vector>
 
 class Mesh;
 
@@ -15,7 +15,7 @@ public:
 
 	void Clear();
 
-	typedef std::list<Mesh*> MeshList;
+	typedef std::vector<Mesh*> MeshList;
 
 	const MeshList& GetMeshList() const { return this->meshList; }
 	MeshList& GetMeshList() { return this->meshList; }

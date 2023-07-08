@@ -34,6 +34,12 @@
     <ClInclude Include="MeshCollectionScene.h">
       <Filter>Sources</Filter>
     </ClInclude>
+    <ClInclude Include="SceneListPanel.h">
+      <Filter>Sources\Panels</Filter>
+    </ClInclude>
+    <ClInclude Include="MeshListControl.h">
+      <Filter>Sources</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp">
@@ -58,6 +64,12 @@
       <Filter>Sources</Filter>
     </ClCompile>
     <ClCompile Include="MeshCollectionScene.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneListPanel.cpp">
+      <Filter>Sources\Panels</Filter>
+    </ClCompile>
+    <ClCompile Include="MeshListControl.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
   </ItemGroup>
