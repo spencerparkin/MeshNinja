@@ -1,7 +1,12 @@
 #include "Frame.h"
 #include "Panel.h"
+#include "Application.h"
+#include "MeshCollectionScene.h"
+#include "Mesh.h"
 #include <wx/aboutdlg.h>
 #include <wx/menu.h>
+#include <wx/filedlg.h>
+#include <wx/msgdlg.h>
 
 Frame::Frame(wxWindow* parent, const wxPoint& pos, const wxSize& size) : wxFrame(parent, wxID_ANY, "Mesh Editor", pos, size)
 {
@@ -30,6 +35,7 @@ Frame::Frame(wxWindow* parent, const wxPoint& pos, const wxSize& size) : wxFrame
 	this->Bind(wxEVT_MENU, &Frame::OnExportMesh, this, ID_ExportMesh);
 
 	this->MakePanels();
+	this->UpdatePanels();
 
 	this->auiManager.Update();
 }
@@ -80,10 +86,43 @@ void Frame::UpdatePanels()
 
 void Frame::OnImportMesh(wxCommandEvent& event)
 {
+	wxFileDialog fileDialog(this, "Choose mesh file to open.", wxEmptyString, wxEmptyString, "Mesh file (*.*)|*.*", wxFD_OPEN | wxFD_FILE_MUST_EXIST);
+	if (wxID_OK == fileDialog.ShowModal())
+	{
+		Mesh* mesh = new Mesh();
+		mesh->fileSource = fileDialog.GetPath();
+		if (mesh->Load())
+			wxGetApp().GetMeshScene()->GetMeshList().push_back(mesh);
+		else
+		{
+			wxMessageBox("Failed to read file: " + mesh->fileSource, "Error", wxICON_ERROR | wxOK, this);
+			delete mesh;
+		}
+	}
+
+	this->UpdatePanels();
 }
 
 void Frame::OnExportMesh(wxCommandEvent& event)
 {
+	Mesh* mesh = wxGetApp().GetMeshScene()->FindFirstSelectedMesh();
+	if (!mesh)
+	{
+		wxMessageBox("You must first select the mesh you wish to export.", "Error", wxICON_ERROR | wxOK, this);
+		return;
+	}
+
+	if (mesh->fileSource.IsEmpty())
+	{
+		wxFileDialog fileDialog(this, "Choose mesh file to save.", wxEmptyString, wxEmptyString, "Mesh file (*.*)|*.*", wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+		if (wxID_OK != fileDialog.ShowModal())
+			return;
+		else
+			mesh->fileSource = fileDialog.GetPath();
+	}
+
+	if (!mesh->Save())
+		wxMessageBox("Failed to write file: " + mesh->fileSource, "Error", wxICON_ERROR | wxOK, this);
 }
 
 void Frame::OnExit(wxCommandEvent& event)

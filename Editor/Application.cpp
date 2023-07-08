@@ -1,15 +1,18 @@
 #include "Application.h"
 #include "Frame.h"
+#include "MeshCollectionScene.h"
 
 wxIMPLEMENT_APP(Application);
 
 Application::Application()
 {
 	this->frame = nullptr;
+	this->meshScene = new MeshCollectionScene();
 }
 
 /*virtual*/ Application::~Application()
 {
+	delete this->meshScene;
 }
 
 /*virtual*/ bool Application::OnInit(void)

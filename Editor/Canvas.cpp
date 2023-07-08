@@ -1,10 +1,12 @@
 #include "Canvas.h"
+#include "Scene.h"
 
 int Canvas::attributeList[] = { WX_GL_RGBA, WX_GL_DOUBLEBUFFER, 0 };
 
 Canvas::Canvas(wxWindow* parent) : wxGLCanvas(parent, wxID_ANY, attributeList, wxDefaultPosition, wxDefaultSize)
 {
 	this->context = nullptr;
+	this->scene = nullptr;
 
 	this->Bind(wxEVT_PAINT, &Canvas::OnPaint, this);
 	this->Bind(wxEVT_SIZE, &Canvas::OnSize, this);
@@ -15,10 +17,22 @@ Canvas::Canvas(wxWindow* parent) : wxGLCanvas(parent, wxID_ANY, attributeList, w
 	delete this->context;
 }
 
+void Canvas::SetScene(Scene* scene)
+{
+	this->scene = scene;
+}
+
 void Canvas::RenderScene(GLint renderMode)
 {
 	glClearColor(0, 0, 0, 0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	// TODO: Setup projection and camera here.
+
+	// TODO: Maybe draw axes and grid here.
+
+	if (this->scene)
+		this->scene->Render(renderMode);
 
 	glFlush();
 }

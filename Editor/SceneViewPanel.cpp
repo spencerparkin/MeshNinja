@@ -1,5 +1,7 @@
 #include "SceneViewPanel.h"
 #include "Canvas.h"
+#include "Application.h"
+#include "MeshCollectionScene.h"
 
 wxIMPLEMENT_DYNAMIC_CLASS(SceneViewPanel, Panel);
 
@@ -32,5 +34,6 @@ SceneViewPanel::SceneViewPanel()
 
 /*virtual*/ void SceneViewPanel::Update()
 {
-	//...
+	this->canvas->SetScene(wxGetApp().GetMeshScene());
+	this->canvas->Refresh();
 }

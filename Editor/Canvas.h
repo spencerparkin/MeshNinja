@@ -2,6 +2,8 @@
 
 #include <wx/glcanvas.h>
 
+class Scene;
+
 class Canvas : public wxGLCanvas
 {
 public:
@@ -11,6 +13,9 @@ public:
 	void OnPaint(wxPaintEvent& event);
 	void OnSize(wxSizeEvent& event);
 
+	void SetScene(Scene* scene);
+	Scene* GetScene() { return this->scene; }
+
 private:
 
 	void BindContext();
@@ -18,4 +23,5 @@ private:
 
 	wxGLContext* context;
 	static int attributeList[];
+	Scene* scene;
 };

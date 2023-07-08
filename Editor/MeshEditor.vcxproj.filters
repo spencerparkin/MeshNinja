@@ -25,6 +25,15 @@
     <ClInclude Include="SceneViewPanel.h">
       <Filter>Sources\Panels</Filter>
     </ClInclude>
+    <ClInclude Include="Scene.h">
+      <Filter>Sources</Filter>
+    </ClInclude>
+    <ClInclude Include="Mesh.h">
+      <Filter>Sources</Filter>
+    </ClInclude>
+    <ClInclude Include="MeshCollectionScene.h">
+      <Filter>Sources</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp">
@@ -41,6 +50,15 @@
     </ClCompile>
     <ClCompile Include="SceneViewPanel.cpp">
       <Filter>Sources\Panels</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Mesh.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="MeshCollectionScene.cpp">
+      <Filter>Sources</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
