@@ -6,6 +6,7 @@ namespace MeshNinja
 {
 	class Line;
 	class Plane;
+	class Quaternion;
 
 	class MESH_NINJA_API Vector
 	{
@@ -13,6 +14,7 @@ namespace MeshNinja
 		Vector();
 		Vector(double x, double y, double z);
 		Vector(const Vector& vector);
+		Vector(const Quaternion& quat);
 		virtual ~Vector();
 
 		bool operator==(const Vector& vector);

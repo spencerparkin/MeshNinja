@@ -1,4 +1,5 @@
 #include "Vector.h"
+#include "Quaternion.h"
 
 using namespace MeshNinja;
 
@@ -21,6 +22,13 @@ Vector::Vector(const Vector& vector)
 	this->x = vector.x;
 	this->y = vector.y;
 	this->z = vector.z;
+}
+
+Vector::Vector(const Quaternion& quat)
+{
+	this->x = quat.x;
+	this->y = quat.y;
+	this->z = quat.z;
 }
 
 /*virtual*/ Vector::~Vector()

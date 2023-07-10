@@ -19,34 +19,42 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Sources\AlgebraicSurface.h" />
     <ClInclude Include="Sources\AxisAlignedBoundingBox.h" />
     <ClInclude Include="Sources\Common.h" />
     <ClInclude Include="Sources\ConvexPolygon.h" />
     <ClInclude Include="Sources\ConvexPolygonMesh.h" />
     <ClInclude Include="Sources\LineSegment.h" />
+    <ClInclude Include="Sources\Matrix3x3.h" />
     <ClInclude Include="Sources\MeshGraph.h" />
     <ClInclude Include="Sources\Polyline.h" />
+    <ClInclude Include="Sources\Quaternion.h" />
     <ClInclude Include="Sources\Ray.h" />
     <ClInclude Include="Sources\MeshFileFormat.h" />
     <ClInclude Include="Sources\MeshBinaryOperation.h" />
     <ClInclude Include="Sources\MeshSetOperation.h" />
     <ClInclude Include="Sources\Plane.h" />
     <ClInclude Include="Sources\PointCloud.h" />
+    <ClInclude Include="Sources\Transform.h" />
     <ClInclude Include="Sources\Vector.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Sources\AlgebraicSurface.cpp" />
     <ClCompile Include="Sources\AxisAlignedBoundingBox.cpp" />
     <ClCompile Include="Sources\ConvexPolygon.cpp" />
     <ClCompile Include="Sources\ConvexPolygonMesh.cpp" />
     <ClCompile Include="Sources\LineSegment.cpp" />
+    <ClCompile Include="Sources\Matrix3x3.cpp" />
     <ClCompile Include="Sources\MeshGraph.cpp" />
     <ClCompile Include="Sources\Polyline.cpp" />
+    <ClCompile Include="Sources\Quaternion.cpp" />
     <ClCompile Include="Sources\Ray.cpp" />
     <ClCompile Include="Sources\MeshFileFormat.cpp" />
     <ClCompile Include="Sources\MeshBinaryOperation.cpp" />
     <ClCompile Include="Sources\MeshSetOperation.cpp" />
     <ClCompile Include="Sources\Plane.cpp" />
     <ClCompile Include="Sources\PointCloud.cpp" />
+    <ClCompile Include="Sources\Transform.cpp" />
     <ClCompile Include="Sources\Vector.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

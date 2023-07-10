@@ -49,6 +49,18 @@
     <ClInclude Include="Sources\MeshGraph.h">
       <Filter>Sources</Filter>
     </ClInclude>
+    <ClInclude Include="Sources\AlgebraicSurface.h">
+      <Filter>Sources</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Matrix3x3.h">
+      <Filter>Sources</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Quaternion.h">
+      <Filter>Sources</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Transform.h">
+      <Filter>Sources</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sources\MeshBinaryOperation.cpp">
@@ -88,6 +100,18 @@
       <Filter>Sources</Filter>
     </ClCompile>
     <ClCompile Include="Sources\MeshGraph.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\AlgebraicSurface.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Matrix3x3.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Quaternion.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Transform.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
   </ItemGroup>
