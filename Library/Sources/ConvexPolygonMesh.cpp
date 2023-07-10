@@ -456,6 +456,29 @@ bool ConvexPolygonMesh::GenerateConvexHull(const std::vector<Vector>& pointArray
 	return true;
 }
 
+// Note that we can do better than O(N) here if we used a point-cloud.
+// In that case, we would get O(log N), I believe.
+int ConvexPolygonMesh::FindClosestPointTo(const Vector& point, double* smallestDistance /*= nullptr*/) const
+{
+	double smallestDistanceStorage = 0.0;
+	if (!smallestDistance)
+		smallestDistance = &smallestDistanceStorage;
+
+	*smallestDistance = DBL_MAX;
+	int j = -1;
+	for (int i = 0; i < (signed)this->vertexArray->size(); i++)
+	{
+		double distance = ((*this->vertexArray)[i] - point).Length();
+		if (distance < *smallestDistance)
+		{
+			*smallestDistance = distance;
+			j = i;
+		}
+	}
+
+	return j;
+}
+
 //----------------------------------- ConvexPolygonMesh::Triangle -----------------------------------
 
 bool ConvexPolygonMesh::Triangle::IsCanceledBy(const Triangle& triangle) const

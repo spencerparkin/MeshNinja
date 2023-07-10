@@ -5,7 +5,10 @@
 
 namespace MeshNinja
 {
-	// TODO: Write an algorithm that can generate a mesh that approximates a given algebraic surface.
+	class ConvexPolygonMesh;
+	class AxisAlignedBoundingBox;
+	class Ray;
+
 	class MESH_NINJA_API AlgebraicSurface
 	{
 	public:
@@ -14,6 +17,10 @@ namespace MeshNinja
 
 		virtual double Evaluate(const Vector& point) const = 0;
 		virtual Vector EvaluateGradient(const Vector& point) const;
+		virtual double EvaluateDirectionalDerivative(const Vector& point, const Vector& unitDirection) const;
+		virtual double ApproximateDirectionalDerivative(const Vector& point, const Vector& unitDirection, double delta) const;
+
+		bool GenerateMesh(ConvexPolygonMesh& mesh, const Ray& initialContactRay, const AxisAlignedBoundingBox& aabb, double approximateEdgeLength) const;
 	};
 
 	class MESH_NINJA_API QuadraticSurface : public AlgebraicSurface

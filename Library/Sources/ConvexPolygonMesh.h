@@ -37,6 +37,7 @@ namespace MeshNinja
 		void FromConvexPolygonArray(const std::vector<ConvexPolygon>& convexPolygonArray);
 		bool GenerateConvexHull(const std::vector<Vector>& pointArray, double eps = MESH_NINJA_EPS);
 		bool GeneratePolyhedron(Polyhedron polyhedron, double eps = MESH_NINJA_EPS);
+		int FindClosestPointTo(const Vector& point, double* smallestDistance = nullptr) const;
 
 		struct Triangle
 		{

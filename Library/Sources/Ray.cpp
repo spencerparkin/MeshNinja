@@ -2,6 +2,7 @@
 #include "Plane.h"
 #include "ConvexPolygon.h"
 #include "LineSegment.h"
+#include "AlgebraicSurface.h"
 
 using namespace MeshNinja;
 
@@ -92,6 +93,44 @@ bool Ray::CastAgainst(const ConvexPolygon& polygon, double& alpha, double eps /*
 
 	Vector hitPoint = this->Lerp(alpha);
 	return polygon.ContainsPoint(hitPoint, nullptr, eps);
+}
+
+bool Ray::CastAgainst(const AlgebraicSurface& algebraicSurface, double& alpha,
+								double eps /*= MESH_NINJA_EPS*/,
+								int maxIterations /*= 100*/,
+								double initialStepSize /*= 1.0*/,
+								bool forwardOrBackward /*= false*/) const
+{
+	Vector unitDirection(this->direction);
+	if (!unitDirection.Normalize())
+		return false;
+
+	int iterationCount = 0;
+	Vector point(this->origin);
+	alpha = 0.0;
+	double value = algebraicSurface.Evaluate(point);
+	double stepSize = initialStepSize;
+	while (stepSize >= eps / 2.0 && iterationCount++ < maxIterations)
+	{
+		if (::fabs(value) < eps)
+		{
+			alpha = this->LerpInverse(point);
+			return forwardOrBackward || alpha >= 0.0;
+		}
+
+		double derivativeValue = algebraicSurface.EvaluateDirectionalDerivative(point, unitDirection);
+		double delta = -MESH_NINJA_SIGN(derivativeValue) * stepSize;
+
+		point += unitDirection * delta;
+
+		double nextValue = algebraicSurface.Evaluate(point);
+		if (MESH_NINJA_SIGN(value) != MESH_NINJA_SIGN(nextValue))
+			stepSize /= 2.0;
+
+		value = nextValue;
+	}
+
+	return false;
 }
 
 Vector Ray::Lerp(double alpha) const
