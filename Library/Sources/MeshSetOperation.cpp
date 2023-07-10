@@ -3,7 +3,7 @@
 #include "LineSegment.h"
 #include "Plane.h"
 #include "Ray.h"
-#if defined MESH_NINJA_DEBUG_MESH_SET_OPERATION
+#if defined MESH_NINJA_DEBUG
 #	include "MeshFileFormat.h"
 #endif
 
@@ -21,9 +21,9 @@ MeshSetOperation::MeshSetOperation()
 
 bool MeshSetOperation::CalculatePolygonLists(const ConvexPolygonMesh& meshA, const ConvexPolygonMesh& meshB, PolygonLists& polygonLists)
 {
-#if defined MESH_NINJA_DEBUG_MESH_SET_OPERATION
+#if defined MESH_NINJA_DEBUG
 	ObjFileFormat objFileFormat;
-#endif //MESH_NINJA_DEBUG_MESH_SET_OPERATION
+#endif //MESH_NINJA_DEBUG
 
 	std::vector<ConvexPolygon> polygonArrayA, polygonArrayB;
 
@@ -50,7 +50,7 @@ bool MeshSetOperation::CalculatePolygonLists(const ConvexPolygonMesh& meshA, con
 					// any major limitation; at least, for the applications I can think of.
 					*this->error = "Non-trivial intersection between two polygons encountered.";
 
-#if defined MESH_NINJA_DEBUG_MESH_SET_OPERATION
+#if defined MESH_NINJA_DEBUG
 					ConvexPolygonMesh debugMesh;
 					std::vector<ConvexPolygon> debugPolygonArray;
 					debugPolygonArray.push_back(polygonA);
@@ -60,7 +60,7 @@ bool MeshSetOperation::CalculatePolygonLists(const ConvexPolygonMesh& meshA, con
 					debugPolygonArray.push_back(polygonB);
 					debugMesh.FromConvexPolygonArray(debugPolygonArray);
 					objFileFormat.SaveMesh("Meshes/DebugMeshB.obj", debugMesh);
-#endif //MESH_NINJA_DEBUG_MESH_SET_OPERATION
+#endif //MESH_NINJA_DEBUG
 
 					return false;
 				}
@@ -82,7 +82,7 @@ bool MeshSetOperation::CalculatePolygonLists(const ConvexPolygonMesh& meshA, con
 		}
 	}
 
-#if defined MESH_NINJA_DEBUG_MESH_SET_OPERATION
+#if defined MESH_NINJA_DEBUG
 	int fileCount = 0;
 	for (const Polyline& polyline : polylineCollection.polylineList)
 	{
@@ -90,7 +90,7 @@ bool MeshSetOperation::CalculatePolygonLists(const ConvexPolygonMesh& meshA, con
 		if (polyline.GenerateTubeMesh(tubeMesh, 0.05, 10))
 			objFileFormat.SaveMesh(std::format("Meshes/polyline{}.obj", fileCount++), tubeMesh);
 	}
-#endif //MESH_NINJA_DEBUG_MESH_SET_OPERATION
+#endif //MESH_NINJA_DEBUG
 
 	std::vector<LineSegment> lineSegmentArray;
 	for (const Polyline& polyline : polylineCollection.polylineList)
@@ -116,10 +116,10 @@ bool MeshSetOperation::CalculatePolygonLists(const ConvexPolygonMesh& meshA, con
 	cutMeshA.NormalizeEdges();
 	cutMeshB.NormalizeEdges();
 
-#if defined MESH_NINJA_DEBUG_MESH_SET_OPERATION
+#if defined MESH_NINJA_DEBUG
 	objFileFormat.SaveMesh("Meshes/CutMeshA.obj", cutMeshA);
 	objFileFormat.SaveMesh("Meshes/CutMeshB.obj", cutMeshB);
-#endif //MESH_NINJA_DEBUG_MESH_SET_OPERATION
+#endif //MESH_NINJA_DEBUG
 
 	Graph graphA, graphB;
 
@@ -230,7 +230,7 @@ bool MeshSetOperation::ChopupPolygon(const ConvexPolygon& polygon, ConvexPolygon
 
 					if (polygonA.vertexArray->size() < 3 || polygonB.vertexArray->size() < 3)
 					{
-#if defined MESH_NINJA_DEBUG_MESH_SET_OPERATION
+#if defined MESH_NINJA_DEBUG
 						std::vector<ConvexPolygon> polygonArray;
 						polygonArray.push_back(polygon);
 						ConvexPolygonMesh mesh;
@@ -242,7 +242,7 @@ bool MeshSetOperation::ChopupPolygon(const ConvexPolygon& polygon, ConvexPolygon
 						polyline.vertexArray->push_back(lineSegment.vertexB);
 						polyline.GenerateTubeMesh(mesh, 0.1, 5);
 						objFileFormat.SaveMesh("Meshes/DebugMeshB.obj", mesh);
-#endif //MESH_NINJA_DEBUG_MESH_SET_OPERATION
+#endif //MESH_NINJA_DEBUG
 
 						return false;
 					}

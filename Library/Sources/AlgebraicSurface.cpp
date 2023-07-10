@@ -2,6 +2,9 @@
 #include "ConvexPolygonMesh.h"
 #include "Ray.h"
 #include "AxisAlignedBoundingBox.h"
+#if defined MESH_NINJA_DEBUG
+#	include "MeshFileFormat.h"
+#endif //MESH_NINJA_DEBUG
 
 using namespace MeshNinja;
 
@@ -35,20 +38,21 @@ bool AlgebraicSurface::GenerateMesh(ConvexPolygonMesh& mesh, const Ray& initialC
 	mesh.Clear();
 
 	double alpha = 0.0;
-	if (!initialContactRay.CastAgainst(*this, alpha, MESH_NINJA_EPS, 100, 1.0, false))
+	if (!initialContactRay.CastAgainst(*this, alpha, MESH_NINJA_EPS, 1000, 1.0, false))
 		return false;
 
 	Vector surfacePointA = initialContactRay.Lerp(alpha);
 	if (!aabb.ContainsPoint(surfacePointA))
 		return false;
 
-	Vector normalDirection = this->EvaluateGradient(surfacePointA);
+	Vector normalDirection = this->EvaluateGradient(surfacePointA).Normalized();
 	Vector tangentDirection;
 	if (!tangentDirection.MakeOrthogonalTo(normalDirection))
 		return false;
 
-	Ray ray(surfacePointA + tangentDirection.Normalized() * approximateEdgeLength, normalDirection);
-	if (!ray.CastAgainst(*this, alpha, MESH_NINJA_EPS, 100, 1.0, true))
+	tangentDirection.Normalize();
+	Ray ray(surfacePointA + tangentDirection * approximateEdgeLength, normalDirection);
+	if (!ray.CastAgainst(*this, alpha, MESH_NINJA_EPS, 1000, 1.0, true))
 		return false;
 
 	Vector surfacePointB = ray.Lerp(alpha);
@@ -80,7 +84,7 @@ bool AlgebraicSurface::GenerateMesh(ConvexPolygonMesh& mesh, const Ray& initialC
 		double length = approximateEdgeLength * ::sqrt(3.0) / 2.0;
 		Vector point = (*mesh.vertexArray)[edge.i] + (edgeVector / 2.0) + (tangentVector.Normalized() * length);
 		ray = Ray(point, normalVector);
-		if (!ray.CastAgainst(*this, alpha, MESH_NINJA_EPS, 100, 1.0, true))
+		if (!ray.CastAgainst(*this, alpha, MESH_NINJA_EPS, 1000, 1.0, true))
 			return false;
 
 		Vector surfacePointC = ray.Lerp(alpha);
@@ -92,15 +96,38 @@ bool AlgebraicSurface::GenerateMesh(ConvexPolygonMesh& mesh, const Ray& initialC
 			mesh.vertexArray->push_back(surfacePointC);
 		}
 
-		Edge newEdge[2] = { Edge{edge.j, i}, Edge{i, edge.i} };
+		ConvexPolygonMesh::Facet facet;
+		facet.vertexArray.push_back(edge.i);
+		facet.vertexArray.push_back(edge.j);
+		facet.vertexArray.push_back(i);
+		mesh.facetArray->push_back(facet);
+
+#if defined MESH_NINJA_DEBUG
+		static int count = 37;
+		if (count == mesh.facetArray->size())
+		{
+			static bool debug = true;
+			if (debug)
+			{
+				ObjFileFormat fileFormat;
+				fileFormat.SaveMesh("Meshes/DebugMesh.obj", mesh);
+				debug = false;
+			}
+		}
+#endif
+
+		Edge newEdge[2] = { Edge{i, edge.j}, Edge{edge.i, i} };
 		for (int j = 0; j < 2; j++)
 		{
 			bool edgeCanceled = false;
-			for (const Edge& queuedEdge : edgeQueue)
+			for (iter = edgeQueue.begin(); iter != edgeQueue.end(); iter++)
 			{
+				const Edge& queuedEdge = *iter;
+
 				if (queuedEdge.i == newEdge[j].j && queuedEdge.j == newEdge[j].i)
 				{
 					edgeCanceled = true;
+					edgeQueue.erase(iter);
 					break;
 				}
 			}
@@ -148,7 +175,7 @@ QuadraticSurface::QuadraticSurface()
 	double result =
 		this->a * xx + this->b * yy + this->c * zz +
 		this->d * xy + this->e * yz + this->f * xz +
-		this->g * x + this->h * y + this->i + z * z +
+		this->g * x + this->h * y + this->i * z +
 		this->j;
 
 	return result;
@@ -161,9 +188,9 @@ QuadraticSurface::QuadraticSurface()
 	double z = point.z;
 
 	return Vector(
-		2.0 * this->a * x + this->d * y + this->f * z,
-		2.0 * this->b * y + this->d * x + this->e * z,
-		2.0 * this->c * z + this->e * y + this->f * x);
+		2.0 * this->a * x + this->d * y + this->f * z + this->g,
+		2.0 * this->b * y + this->d * x + this->e * z + this->h,
+		2.0 * this->c * z + this->e * y + this->f * x + this->i);
 }
 
 void QuadraticSurface::MakeEllipsoid(double A, double B, double C)

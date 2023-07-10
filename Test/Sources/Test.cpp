@@ -90,13 +90,13 @@ int main(int argc, char** argv)
 #endif
 
 	QuadraticSurface surface;
-	surface.MakeEllipsoid(20.0, 30.0, 40.0);
+	surface.MakeEllipsoid(20.0, 20.0, 20.0);
 
 	Ray contactRay(Vector(0.0, 0.0, 0.0), Vector(1.0, 0.0, 0.0));
 	AxisAlignedBoundingBox aabb(Vector(-100.0, -100.0, -100.0), Vector(100.0, 100.0, 100.0));
 
 	ConvexPolygonMesh mesh;
-	surface.GenerateMesh(mesh, contactRay, aabb, 2.0);
+	surface.GenerateMesh(mesh, contactRay, aabb, 10.0);
 
 	fileFormat.SaveMesh("Meshes/Ellipsoid.obj", mesh);
 

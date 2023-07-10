@@ -101,33 +101,27 @@ bool Ray::CastAgainst(const AlgebraicSurface& algebraicSurface, double& alpha,
 								double initialStepSize /*= 1.0*/,
 								bool forwardOrBackward /*= false*/) const
 {
-	Vector unitDirection(this->direction);
-	if (!unitDirection.Normalize())
-		return false;
-
+	Vector unitDirection = this->direction.Normalized();
+	double signedStepSize = initialStepSize;
 	int iterationCount = 0;
-	Vector point(this->origin);
-	alpha = 0.0;
-	double value = algebraicSurface.Evaluate(point);
-	double stepSize = initialStepSize;
-	while (stepSize >= eps / 2.0 && iterationCount++ < maxIterations)
+	Vector currentPoint(this->origin);
+
+	while (iterationCount++ < maxIterations)
 	{
-		if (::fabs(value) < eps)
+		double currentValue = algebraicSurface.Evaluate(currentPoint);
+		if (::fabs(currentValue) < eps)
 		{
-			alpha = this->LerpInverse(point);
+			alpha = this->LerpInverse(currentPoint);
 			return forwardOrBackward || alpha >= 0.0;
 		}
 
-		double derivativeValue = algebraicSurface.EvaluateDirectionalDerivative(point, unitDirection);
-		double delta = -MESH_NINJA_SIGN(derivativeValue) * stepSize;
+		double currentDerivativeValue = algebraicSurface.EvaluateDirectionalDerivative(currentPoint, unitDirection * MESH_NINJA_SIGN(signedStepSize));
+		if (MESH_NINJA_SIGN(currentValue) == MESH_NINJA_SIGN(currentDerivativeValue))
+		{
+			signedStepSize = -signedStepSize / 2.0;
+		}
 
-		point += unitDirection * delta;
-
-		double nextValue = algebraicSurface.Evaluate(point);
-		if (MESH_NINJA_SIGN(value) != MESH_NINJA_SIGN(nextValue))
-			stepSize /= 2.0;
-
-		value = nextValue;
+		currentPoint += unitDirection * signedStepSize;
 	}
 
 	return false;
