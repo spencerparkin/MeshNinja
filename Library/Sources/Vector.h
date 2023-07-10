@@ -24,6 +24,7 @@ namespace MeshNinja
 		void operator*=(double scale);
 		void operator/=(double scale);
 		Vector operator*(double scale);
+		Vector operator-() const;
 
 		double Length() const;
 		bool Normalize(double* returnedLength = nullptr);

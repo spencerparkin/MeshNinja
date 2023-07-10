@@ -126,6 +126,7 @@ QuadraticSurface::QuadraticSurface()
 	this->g = 0.0;
 	this->h = 0.0;
 	this->i = 0.0;
+	this->j = 0.0;
 }
 
 /*virtual*/ QuadraticSurface::~QuadraticSurface()
@@ -145,9 +146,10 @@ QuadraticSurface::QuadraticSurface()
 	double zz = z * z;
 
 	double result =
-		a * xx + b * yy + c * zz +
-		d * xy + e * yz + f * xz +
-		g * x + h * y + i + z * z;
+		this->a * xx + this->b * yy + this->c * zz +
+		this->d * xy + this->e * yz + this->f * xz +
+		this->g * x + this->h * y + this->i + z * z +
+		this->j;
 
 	return result;
 }
@@ -159,7 +161,161 @@ QuadraticSurface::QuadraticSurface()
 	double z = point.z;
 
 	return Vector(
-		2.0 * a * x + d * y + f * z,
-		2.0 * b * y + d * x + e * z,
-		2.0 * c * z + e * y + f * x);
+		2.0 * this->a * x + this->d * y + this->f * z,
+		2.0 * this->b * y + this->d * x + this->e * z,
+		2.0 * this->c * z + this->e * y + this->f * x);
+}
+
+void QuadraticSurface::MakeEllipsoid(double A, double B, double C)
+{
+	this->a = 1.0 / (A * A);
+	this->b = 1.0 / (B * B);
+	this->c = 1.0 / (C * C);
+	this->d = 0.0;
+	this->e = 0.0;
+	this->f = 0.0;
+	this->g = 0.0;
+	this->h = 0.0;
+	this->i = 0.0;
+	this->j = -1.0;
+}
+
+void QuadraticSurface::MakeEllipticCone(double A, double B, double C)
+{
+	this->a = 1.0 / (A * A);
+	this->b = 1.0 / (B * B);
+	this->c = -1.0 / (C * C);
+	this->d = 0.0;
+	this->e = 0.0;
+	this->f = 0.0;
+	this->g = 0.0;
+	this->h = 0.0;
+	this->i = 0.0;
+	this->j = 0.0;
+}
+
+void QuadraticSurface::MakeEllipticCylinder(double A, double B)
+{
+	this->a = 1.0 / (A * A);
+	this->b = 1.0 / (B * B);
+	this->c = 0.0;
+	this->d = 0.0;
+	this->e = 0.0;
+	this->f = 0.0;
+	this->g = 0.0;
+	this->h = 0.0;
+	this->i = 0.0;
+	this->j = -1.0;
+}
+
+void QuadraticSurface::MakeEllipticParaboloid(double A, double B)
+{
+	this->a = 1.0 / (A * A);
+	this->b = 1.0 / (B * B);
+	this->c = 0.0;
+	this->d = 0.0;
+	this->e = 0.0;
+	this->f = 0.0;
+	this->g = 0.0;
+	this->h = 0.0;
+	this->i = 1.0;
+	this->j = 0.0;
+}
+
+void QuadraticSurface::MakeHyperbolicCylinder(double A, double B)
+{
+	this->a = 1.0 / (A * A);
+	this->b = -1.0 / (B * B);
+	this->c = 0.0;
+	this->d = 0.0;
+	this->e = 0.0;
+	this->f = 0.0;
+	this->g = 0.0;
+	this->h = 0.0;
+	this->i = 0.0;
+	this->j = 1.0;
+}
+
+void QuadraticSurface::MakeHyperbolicParaboloid(double A, double B)
+{
+	this->a = -1.0 / (A * A);
+	this->b = 1.0 / (B * B);
+	this->c = 0.0;
+	this->d = 0.0;
+	this->e = 0.0;
+	this->f = 0.0;
+	this->g = 0.0;
+	this->h = 0.0;
+	this->i = -1.0;
+	this->j = 0.0;
+}
+
+void QuadraticSurface::MakeHyperboloidOfOneSheet(double A, double B, double C)
+{
+	this->a = 1.0 / (A * A);
+	this->b = 1.0 / (B * B);
+	this->c = -1.0 / (C * C);
+	this->d = 0.0;
+	this->e = 0.0;
+	this->f = 0.0;
+	this->g = 0.0;
+	this->h = 0.0;
+	this->i = 0.0;
+	this->j = 1.0;
+}
+
+void QuadraticSurface::MakeHyperboloidOfTwoSheets(double A, double B, double C)
+{
+	this->a = 1.0 / (A * A);
+	this->b = 1.0 / (B * B);
+	this->c = -1.0 / (C * C);
+	this->d = 0.0;
+	this->e = 0.0;
+	this->f = 0.0;
+	this->g = 0.0;
+	this->h = 0.0;
+	this->i = 0.0;
+	this->j = -1.0;
+}
+
+void QuadraticSurface::MakeIntersectingPlanes(double A, double B)
+{
+	this->a = 1.0 / (A * A);
+	this->b = -1.0 / (B * B);
+	this->c = 0.0;
+	this->d = 0.0;
+	this->e = 0.0;
+	this->f = 0.0;
+	this->g = 0.0;
+	this->h = 0.0;
+	this->i = 0.0;
+	this->j = 0.0;
+}
+
+void QuadraticSurface::MakeParabolicSylinder(double R)
+{
+	this->a = 1.0;
+	this->b = 0.0;
+	this->c = 0.0;
+	this->d = 0.0;
+	this->e = 0.0;
+	this->f = 0.0;
+	this->g = 0.0;
+	this->h = 0.0;
+	this->i = 2.0 * R;
+	this->j = 0.0;
+}
+
+void QuadraticSurface::MakeParallelPlanes(double A)
+{
+	this->a = 1.0;
+	this->b = 0.0;
+	this->c = 0.0;
+	this->d = 0.0;
+	this->e = 0.0;
+	this->f = 0.0;
+	this->g = 0.0;
+	this->h = 0.0;
+	this->i = 0.0;
+	this->j = -A * A;
 }

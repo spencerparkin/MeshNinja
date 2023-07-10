@@ -83,6 +83,14 @@ Vector Vector::operator*(double scale)
 		this->z * scale);
 }
 
+Vector Vector::operator-() const
+{
+	return Vector(
+		-this->x,
+		-this->y,
+		-this->z);
+}
+
 double Vector::Length() const
 {
 	return ::sqrt(this->Dot(*this));

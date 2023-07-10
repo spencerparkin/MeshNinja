@@ -3,6 +3,9 @@
 #include "MeshBinaryOperation.h"
 #include "MeshSetOperation.h"
 #include "ConvexPolygon.h"
+#include "AlgebraicSurface.h"
+#include "Ray.h"
+#include "AxisAlignedBoundingBox.h"
 
 int main(int argc, char** argv)
 {
@@ -60,7 +63,7 @@ int main(int argc, char** argv)
 	}
 #endif
 
-#if 1
+#if 0
 	ConvexPolygonMesh mesh;
 	
 	mesh.GeneratePolyhedron(ConvexPolygonMesh::Polyhedron::TETRAHEDRON);
@@ -85,6 +88,17 @@ int main(int argc, char** argv)
 	fileFormat.SaveMesh("Meshes/Rhombicosidodecahedron.obj", mesh);
 
 #endif
+
+	QuadraticSurface surface;
+	surface.MakeEllipsoid(20.0, 30.0, 40.0);
+
+	Ray contactRay(Vector(0.0, 0.0, 0.0), Vector(1.0, 0.0, 0.0));
+	AxisAlignedBoundingBox aabb(Vector(-100.0, -100.0, -100.0), Vector(100.0, 100.0, 100.0));
+
+	ConvexPolygonMesh mesh;
+	surface.GenerateMesh(mesh, contactRay, aabb, 2.0);
+
+	fileFormat.SaveMesh("Meshes/Ellipsoid.obj", mesh);
 
 	return 0;
 }
