@@ -78,29 +78,75 @@ bool AlgebraicSurface::GenerateMesh(ConvexPolygonMesh& mesh, const Ray& initialC
 		if (!aabb.ContainsPoint((*mesh.vertexArray)[edge.i]) || !aabb.ContainsPoint((*mesh.vertexArray)[edge.j]))
 			continue;
 
-		Vector edgeVector = (*mesh.vertexArray)[edge.j] - (*mesh.vertexArray)[edge.i];
-		Vector normalVector = this->EvaluateGradient((*mesh.vertexArray)[edge.i]);
-		Vector tangentVector = normalVector.Cross(edgeVector);
-		double length = approximateEdgeLength * ::sqrt(3.0) / 2.0;
-		Vector point = (*mesh.vertexArray)[edge.i] + (edgeVector / 2.0) + (tangentVector.Normalized() * length);
-		ray = Ray(point, normalVector);
-		if (!ray.CastAgainst(*this, alpha, MESH_NINJA_EPS, 1000, 1.0, true))
-			return false;
+		std::vector<Edge> newEdgeArray;
+		ConvexPolygonMesh::Facet newFacet;
 
-		Vector surfacePointC = ray.Lerp(alpha);
-		double smallestDistance = 0.0;
-		int i = mesh.FindClosestPointTo(surfacePointC, &smallestDistance);
-		if (i < 0 || smallestDistance > approximateEdgeLength / 2.0)
+		// Merge two edges together first if we can.
+		for (iter = edgeQueue.begin(); iter != edgeQueue.end(); iter++)
 		{
-			i = mesh.vertexArray->size();
-			mesh.vertexArray->push_back(surfacePointC);
+			const Edge& adjacentEdge = *iter;
+			if (adjacentEdge.j == edge.i)
+			{
+				Vector vectorA = (*mesh.vertexArray)[adjacentEdge.i] - (*mesh.vertexArray)[adjacentEdge.j];
+				Vector vectorB = (*mesh.vertexArray)[edge.j] - (*mesh.vertexArray)[edge.i];
+				double angle = vectorA.AngleBetweenThisAnd(vectorB);
+				if (angle < MESH_NINJA_PI / 2.0)
+				{
+					edgeQueue.erase(iter);
+					newEdgeArray.push_back(Edge{ adjacentEdge.i, edge.j });
+					newFacet.vertexArray.push_back(adjacentEdge.i);
+					newFacet.vertexArray.push_back(edge.i);
+					newFacet.vertexArray.push_back(edge.j);
+					break;
+				}
+			}
+			else if (edge.j == adjacentEdge.i)
+			{
+				Vector vectorA = (*mesh.vertexArray)[adjacentEdge.j] - (*mesh.vertexArray)[adjacentEdge.i];
+				Vector vectorB = (*mesh.vertexArray)[edge.i] - (*mesh.vertexArray)[edge.j];
+				double angle = vectorA.AngleBetweenThisAnd(vectorB);
+				if (angle < MESH_NINJA_PI / 2.0)
+				{
+					edgeQueue.erase(iter);
+					newEdgeArray.push_back(Edge{ edge.i, adjacentEdge.j });
+					newFacet.vertexArray.push_back(adjacentEdge.j);
+					newFacet.vertexArray.push_back(edge.i);
+					newFacet.vertexArray.push_back(edge.j);
+					break;
+				}
+			}
 		}
 
-		ConvexPolygonMesh::Facet facet;
-		facet.vertexArray.push_back(edge.i);
-		facet.vertexArray.push_back(edge.j);
-		facet.vertexArray.push_back(i);
-		mesh.facetArray->push_back(facet);
+		// Okay, we should have enough room to create a new flap.
+		if (newFacet.vertexArray.size() == 0)
+		{
+			Vector edgeVector = (*mesh.vertexArray)[edge.j] - (*mesh.vertexArray)[edge.i];
+			Vector normalVector = this->EvaluateGradient((*mesh.vertexArray)[edge.i]);
+			Vector tangentVector = normalVector.Cross(edgeVector);
+			double length = approximateEdgeLength * ::sqrt(3.0) / 2.0;
+			Vector point = (*mesh.vertexArray)[edge.i] + (edgeVector / 2.0) + (tangentVector.Normalized() * length);
+			ray = Ray(point, normalVector);
+			if (!ray.CastAgainst(*this, alpha, MESH_NINJA_EPS, 1000, 1.0, true))
+				return false;
+
+			Vector surfacePointC = ray.Lerp(alpha);
+			double smallestDistance = 0.0;
+			int i = mesh.FindClosestPointTo(surfacePointC, &smallestDistance);
+			if (i < 0 || smallestDistance > approximateEdgeLength / 2.0)
+			{
+				i = mesh.vertexArray->size();
+				mesh.vertexArray->push_back(surfacePointC);
+			}
+
+			newFacet.vertexArray.push_back(edge.i);
+			newFacet.vertexArray.push_back(edge.j);
+			newFacet.vertexArray.push_back(i);
+
+			newEdgeArray.push_back(Edge{ i, edge.j });
+			newEdgeArray.push_back(Edge{ edge.i, i });
+		}
+
+		mesh.facetArray->push_back(newFacet);
 
 #if defined MESH_NINJA_DEBUG
 		static int count = 37;
@@ -116,15 +162,13 @@ bool AlgebraicSurface::GenerateMesh(ConvexPolygonMesh& mesh, const Ray& initialC
 		}
 #endif
 
-		Edge newEdge[2] = { Edge{i, edge.j}, Edge{edge.i, i} };
-		for (int j = 0; j < 2; j++)
+		for (const Edge& newEdge : newEdgeArray)
 		{
 			bool edgeCanceled = false;
 			for (iter = edgeQueue.begin(); iter != edgeQueue.end(); iter++)
 			{
 				const Edge& queuedEdge = *iter;
-
-				if (queuedEdge.i == newEdge[j].j && queuedEdge.j == newEdge[j].i)
+				if (queuedEdge.i == newEdge.j && queuedEdge.j == newEdge.i)
 				{
 					edgeCanceled = true;
 					edgeQueue.erase(iter);
@@ -133,7 +177,7 @@ bool AlgebraicSurface::GenerateMesh(ConvexPolygonMesh& mesh, const Ray& initialC
 			}
 
 			if (!edgeCanceled)
-				edgeQueue.push_back(newEdge[j]);
+				edgeQueue.push_back(newEdge);
 		}
 	}
 
