@@ -1,6 +1,7 @@
 #include "AlgebraicSurface.h"
 #include "ConvexPolygonMesh.h"
 #include "Ray.h"
+#include "Plane.h"
 #include "AxisAlignedBoundingBox.h"
 #if defined MESH_NINJA_DEBUG
 #	include "MeshFileFormat.h"
@@ -81,37 +82,42 @@ bool AlgebraicSurface::GenerateMesh(ConvexPolygonMesh& mesh, const Ray& initialC
 		std::vector<Edge> newEdgeArray;
 		ConvexPolygonMesh::Facet newFacet;
 
+		Vector normalVector = this->EvaluateGradient((*mesh.vertexArray)[edge.i]);
+		Vector edgeVector = (*mesh.vertexArray)[edge.j] - (*mesh.vertexArray)[edge.i];
+		Vector tangentVector = normalVector.Cross(edgeVector);
+		Plane edgePlane((*mesh.vertexArray)[edge.i], tangentVector);
+
 		// Merge two edges together first if we can.
 		for (iter = edgeQueue.begin(); iter != edgeQueue.end(); iter++)
 		{
 			const Edge& adjacentEdge = *iter;
-			if (adjacentEdge.j == edge.i)
+			if (adjacentEdge.j == edge.i && adjacentEdge.i != edge.j && edgePlane.WhichSide((*mesh.vertexArray)[adjacentEdge.i]) == Plane::Side::FRONT)
 			{
 				Vector vectorA = (*mesh.vertexArray)[adjacentEdge.i] - (*mesh.vertexArray)[adjacentEdge.j];
 				Vector vectorB = (*mesh.vertexArray)[edge.j] - (*mesh.vertexArray)[edge.i];
 				double angle = vectorA.AngleBetweenThisAnd(vectorB);
 				if (angle < MESH_NINJA_PI / 2.0)
 				{
-					edgeQueue.erase(iter);
 					newEdgeArray.push_back(Edge{ adjacentEdge.i, edge.j });
 					newFacet.vertexArray.push_back(adjacentEdge.i);
 					newFacet.vertexArray.push_back(edge.i);
 					newFacet.vertexArray.push_back(edge.j);
+					edgeQueue.erase(iter);
 					break;
 				}
 			}
-			else if (edge.j == adjacentEdge.i)
+			else if (edge.j == adjacentEdge.i && edge.i != adjacentEdge.j && edgePlane.WhichSide((*mesh.vertexArray)[adjacentEdge.j]) == Plane::Side::FRONT)
 			{
 				Vector vectorA = (*mesh.vertexArray)[adjacentEdge.j] - (*mesh.vertexArray)[adjacentEdge.i];
 				Vector vectorB = (*mesh.vertexArray)[edge.i] - (*mesh.vertexArray)[edge.j];
 				double angle = vectorA.AngleBetweenThisAnd(vectorB);
 				if (angle < MESH_NINJA_PI / 2.0)
 				{
-					edgeQueue.erase(iter);
 					newEdgeArray.push_back(Edge{ edge.i, adjacentEdge.j });
 					newFacet.vertexArray.push_back(adjacentEdge.j);
 					newFacet.vertexArray.push_back(edge.i);
 					newFacet.vertexArray.push_back(edge.j);
+					edgeQueue.erase(iter);
 					break;
 				}
 			}
@@ -120,9 +126,7 @@ bool AlgebraicSurface::GenerateMesh(ConvexPolygonMesh& mesh, const Ray& initialC
 		// Okay, we should have enough room to create a new flap.
 		if (newFacet.vertexArray.size() == 0)
 		{
-			Vector edgeVector = (*mesh.vertexArray)[edge.j] - (*mesh.vertexArray)[edge.i];
-			Vector normalVector = this->EvaluateGradient((*mesh.vertexArray)[edge.i]);
-			Vector tangentVector = normalVector.Cross(edgeVector);
+			
 			double length = approximateEdgeLength * ::sqrt(3.0) / 2.0;
 			Vector point = (*mesh.vertexArray)[edge.i] + (edgeVector / 2.0) + (tangentVector.Normalized() * length);
 			ray = Ray(point, normalVector);
@@ -147,20 +151,6 @@ bool AlgebraicSurface::GenerateMesh(ConvexPolygonMesh& mesh, const Ray& initialC
 		}
 
 		mesh.facetArray->push_back(newFacet);
-
-#if defined MESH_NINJA_DEBUG
-		static int count = 37;
-		if (count == mesh.facetArray->size())
-		{
-			static bool debug = true;
-			if (debug)
-			{
-				ObjFileFormat fileFormat;
-				fileFormat.SaveMesh("Meshes/DebugMesh.obj", mesh);
-				debug = false;
-			}
-		}
-#endif
 
 		for (const Edge& newEdge : newEdgeArray)
 		{
