@@ -86,7 +86,6 @@ int main(int argc, char** argv)
 	mesh.GeneratePolyhedron(ConvexPolygonMesh::Polyhedron::RHOMBICOSIDODECAHEDRON);
 	mesh.UntessellateFaces();
 	fileFormat.SaveMesh("Meshes/Rhombicosidodecahedron.obj", mesh);
-
 #endif
 
 	QuadraticSurface surface;

@@ -126,7 +126,6 @@ bool AlgebraicSurface::GenerateMesh(ConvexPolygonMesh& mesh, const Ray& initialC
 		// Okay, we should have enough room to create a new flap.
 		if (newFacet.vertexArray.size() == 0)
 		{
-			
 			double length = approximateEdgeLength * ::sqrt(3.0) / 2.0;
 			Vector point = (*mesh.vertexArray)[edge.i] + (edgeVector / 2.0) + (tangentVector.Normalized() * length);
 			ray = Ray(point, normalVector);
