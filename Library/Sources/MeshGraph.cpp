@@ -32,7 +32,7 @@ void MeshGraph::Clear()
 	this->edgeArray->clear();
 }
 
-void MeshGraph::Generate(const ConvexPolygonMesh& givenMesh)
+bool MeshGraph::Generate(const ConvexPolygonMesh& givenMesh)
 {
 	this->Clear();
 
@@ -79,6 +79,8 @@ void MeshGraph::Generate(const ConvexPolygonMesh& givenMesh)
 			}
 		}
 	}
+
+	return true;
 }
 
 /*virtual*/ MeshGraph::Node* MeshGraph::CreateNode()

@@ -713,3 +713,12 @@ bool ConvexPolygonMesh::Facet::CalcInteriorAngleStats(AngleStats& angleStats, co
 
 	return true;
 }
+
+bool ConvexPolygonMesh::Facet::HasVertex(int i) const
+{
+	for (int j : this->vertexArray)
+		if (i == j)
+			return true;
+
+	return false;
+}

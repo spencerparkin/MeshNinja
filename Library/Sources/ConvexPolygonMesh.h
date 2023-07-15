@@ -64,6 +64,7 @@ namespace MeshNinja
 			bool Merge(const Facet& facetA, const Facet& facetB, const ConvexPolygonMesh* mesh);
 			bool Split(Facet& facetA, Facet& facetB, const ConvexPolygonMesh* mesh) const;
 			bool CalcInteriorAngleStats(AngleStats& angleStats, const ConvexPolygonMesh* mesh) const;
+			bool HasVertex(int i) const;
 
 			std::vector<int> vertexArray;
 		};
