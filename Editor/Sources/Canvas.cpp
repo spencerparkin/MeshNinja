@@ -98,6 +98,9 @@ void Canvas::RenderScene(GLint renderMode)
 	glClearColor(255, 255, 255, 0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_LINE_SMOOTH);
+
 	this->camera->PreRender(renderMode);
 
 	if (renderMode == GL_RENDER)

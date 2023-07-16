@@ -8,9 +8,54 @@ Mesh::Mesh()
 {
 	this->isSelected = false;
 	this->renderMeshDirty = true;
-	this->color.x = 1.0;
-	this->color.y = 0.0;
-	this->color.z = 0.0;
+
+	static int i = 0;
+	i = (i + 1) % 6;
+	switch (i)
+	{
+		case 0:
+		{
+			this->color.x = 1.0;
+			this->color.y = 0.0;
+			this->color.z = 0.0;
+			break;
+		}
+		case 1:
+		{
+			this->color.x = 0.0;
+			this->color.y = 1.0;
+			this->color.z = 0.0;
+			break;
+		}
+		case 2:
+		{
+			this->color.x = 0.0;
+			this->color.y = 0.0;
+			this->color.z = 1.0;
+			break;
+		}
+		case 3:
+		{
+			this->color.x = 1.0;
+			this->color.y = 1.0;
+			this->color.z = 0.0;
+			break;
+		}
+		case 4:
+		{
+			this->color.x = 1.0;
+			this->color.y = 0.0;
+			this->color.z = 1.0;
+			break;
+		}
+		case 5:
+		{
+			this->color.x = 0.0;
+			this->color.y = 1.0;
+			this->color.z = 1.0;
+			break;
+		}
+	}
 }
 
 /*virtual*/ Mesh::~Mesh()
@@ -24,6 +69,7 @@ void Mesh::Render(GLint renderMode, const Camera* camera) const
 		this->renderMeshDirty = false;
 		this->renderMesh.Copy(this->mesh);
 		this->renderMesh.TessellateFaces();
+		this->renderMeshGraph.Generate(this->mesh);
 	}
 
 	glBegin(GL_TRIANGLES);
@@ -54,30 +100,13 @@ void Mesh::Render(GLint renderMode, const Camera* camera) const
 	glBegin(GL_LINES);
 	glColor3f(0.0f, 0.0f, 0.0f);
 
-	for (const MeshNinja::ConvexPolygonMesh::Facet& facet : *this->mesh.facetArray)
+	for (const MeshNinja::MeshGraph::Edge* edge : *this->renderMeshGraph.edgeArray)
 	{
-		for (int i = 0; i < (signed)facet.vertexArray->size(); i++)
-		{
-			int j = (i + 1) % facet.vertexArray->size();
+		const MeshNinja::Vector& vertexA = (*this->mesh.vertexArray)[edge->pair.i];
+		const MeshNinja::Vector& vertexB = (*this->mesh.vertexArray)[edge->pair.j];
 
-			MeshNinja::ConvexPolygon polygon;
-			facet.MakePolygon(polygon, &this->mesh);
-
-			MeshNinja::Plane plane;
-			polygon.CalcPlane(plane);
-
-			MeshNinja::Vector center = polygon.CalcCenter();
-
-			// I don't know why lines aren't being Z-tested, so do our own test here.
-			if (plane.normal.AngleBetweenThisAnd(center - camera->position) > MESH_NINJA_PI / 2.0)
-			{
-				const MeshNinja::Vector& vertexA = (*this->mesh.vertexArray)[(*facet.vertexArray)[i]];
-				const MeshNinja::Vector& vertexB = (*this->mesh.vertexArray)[(*facet.vertexArray)[j]];
-
-				glVertex3d(vertexA.x, vertexA.y, vertexA.z);
-				glVertex3d(vertexB.x, vertexB.y, vertexB.z);
-			}
-		}
+		glVertex3d(vertexA.x, vertexA.y, vertexA.z);
+		glVertex3d(vertexB.x, vertexB.y, vertexB.z);
 	}
 
 	glEnd();

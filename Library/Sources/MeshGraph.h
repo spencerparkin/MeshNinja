@@ -51,8 +51,6 @@ namespace MeshNinja
 			Node* node[2];
 		};
 
-	protected:
-
 		std::vector<Node*>* nodeArray;
 		std::vector<Edge*>* edgeArray;
 
