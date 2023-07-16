@@ -5,6 +5,8 @@
 #include "ConvexPolygonMesh.h"
 #include "MeshFileFormat.h"
 
+class Camera;
+
 class Mesh
 {
 public:
@@ -14,11 +16,14 @@ public:
 	bool Load();
 	bool Save();
 
-	void Render(GLint renderMode);
+	void Render(GLint renderMode, const Camera* camera) const;
 
+	MeshNinja::Vector color;
 	MeshNinja::ConvexPolygonMesh mesh;
+	mutable MeshNinja::ConvexPolygonMesh renderMesh;
 	wxString fileSource;
 	bool isSelected;
+	mutable bool renderMeshDirty;
 
 	MeshNinja::MeshFileFormat* MakeFileFormatObject();
 };

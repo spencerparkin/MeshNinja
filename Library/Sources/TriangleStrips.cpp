@@ -26,7 +26,7 @@ bool TriangleStrips::Generate(const ConvexPolygonMesh* mesh)
 
 	// Verify that the given mesh is a triangle mesh.
 	for (const ConvexPolygonMesh::Facet& facet : *mesh->facetArray)
-		if (facet.vertexArray.size() != 3)
+		if (facet.vertexArray->size() != 3)
 			return false;
 
 	// Generate a graph of the mesh that we can traverse to build the strips.
@@ -135,9 +135,9 @@ bool TriangleStrips::Generate(const ConvexPolygonMesh* mesh)
 		if (facetSequence.size() == 1)
 		{
 			const ConvexPolygonMesh::Facet* facet = facetSequence[0];
-			triStripArray.push_back(facet->vertexArray[0]);
-			triStripArray.push_back(facet->vertexArray[1]);
-			triStripArray.push_back(facet->vertexArray[2]);
+			triStripArray.push_back((*facet->vertexArray)[0]);
+			triStripArray.push_back((*facet->vertexArray)[1]);
+			triStripArray.push_back((*facet->vertexArray)[2]);
 		}
 		else
 		{
@@ -146,10 +146,10 @@ bool TriangleStrips::Generate(const ConvexPolygonMesh* mesh)
 
 			for (int i = 0; i < 3; i++)
 			{
-				if (!facetB->HasVertex(facetA->vertexArray[i]))
+				if (!facetB->HasVertex((*facetA->vertexArray)[i]))
 				{
 					for (int j = 0; j < 3; j++)
-						triStripArray.push_back(facetA->vertexArray[(i + j) % 3]);
+						triStripArray.push_back((*facetA->vertexArray)[(i + j) % 3]);
 					break;
 				}
 			}
@@ -161,9 +161,9 @@ bool TriangleStrips::Generate(const ConvexPolygonMesh* mesh)
 
 				for (int j = 0; j < 3; j++)
 				{
-					if (!facetA->HasVertex(facetB->vertexArray[j]))
+					if (!facetA->HasVertex((*facetB->vertexArray)[j]))
 					{
-						triStripArray.push_back(facetB->vertexArray[j]);
+						triStripArray.push_back((*facetB->vertexArray)[j]);
 						break;
 					}
 				}

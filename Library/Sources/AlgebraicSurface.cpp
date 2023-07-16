@@ -99,9 +99,9 @@ bool AlgebraicSurface::GenerateMesh(ConvexPolygonMesh& mesh, const Ray& initialC
 				if (angle < MESH_NINJA_PI / 2.0)
 				{
 					newEdgeArray.push_back(Edge{ adjacentEdge.i, edge.j });
-					newFacet.vertexArray.push_back(adjacentEdge.i);
-					newFacet.vertexArray.push_back(edge.i);
-					newFacet.vertexArray.push_back(edge.j);
+					newFacet.vertexArray->push_back(adjacentEdge.i);
+					newFacet.vertexArray->push_back(edge.i);
+					newFacet.vertexArray->push_back(edge.j);
 					edgeQueue.erase(iter);
 					break;
 				}
@@ -114,9 +114,9 @@ bool AlgebraicSurface::GenerateMesh(ConvexPolygonMesh& mesh, const Ray& initialC
 				if (angle < MESH_NINJA_PI / 2.0)
 				{
 					newEdgeArray.push_back(Edge{ edge.i, adjacentEdge.j });
-					newFacet.vertexArray.push_back(adjacentEdge.j);
-					newFacet.vertexArray.push_back(edge.i);
-					newFacet.vertexArray.push_back(edge.j);
+					newFacet.vertexArray->push_back(adjacentEdge.j);
+					newFacet.vertexArray->push_back(edge.i);
+					newFacet.vertexArray->push_back(edge.j);
 					edgeQueue.erase(iter);
 					break;
 				}
@@ -124,7 +124,7 @@ bool AlgebraicSurface::GenerateMesh(ConvexPolygonMesh& mesh, const Ray& initialC
 		}
 
 		// Okay, we should have enough room to create a new flap.
-		if (newFacet.vertexArray.size() == 0)
+		if (newFacet.vertexArray->size() == 0)
 		{
 			double length = approximateEdgeLength * ::sqrt(3.0) / 2.0;
 			Vector point = (*mesh.vertexArray)[edge.i] + (edgeVector / 2.0) + (tangentVector.Normalized() * length);
@@ -141,9 +141,9 @@ bool AlgebraicSurface::GenerateMesh(ConvexPolygonMesh& mesh, const Ray& initialC
 				mesh.vertexArray->push_back(surfacePointC);
 			}
 
-			newFacet.vertexArray.push_back(edge.i);
-			newFacet.vertexArray.push_back(edge.j);
-			newFacet.vertexArray.push_back(i);
+			newFacet.vertexArray->push_back(edge.i);
+			newFacet.vertexArray->push_back(edge.j);
+			newFacet.vertexArray->push_back(i);
 
 			newEdgeArray.push_back(Edge{ i, edge.j });
 			newEdgeArray.push_back(Edge{ edge.i, i });

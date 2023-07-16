@@ -11,7 +11,7 @@ public:
 	MeshCollectionScene();
 	virtual ~MeshCollectionScene();
 
-	virtual void Render(GLint renderMode) override;
+	virtual void Render(GLint renderMode, const Camera* camera) const override;
 
 	void Clear();
 

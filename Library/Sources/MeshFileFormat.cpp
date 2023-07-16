@@ -91,7 +91,7 @@ void ObjFileFormat::ProcessLine(const std::vector<std::string>& tokenArray, Conv
 			else if (i >= (signed)mesh.vertexArray->size())
 				i = (int)mesh.vertexArray->size() - 1;
 
-			facet.vertexArray.push_back(i);
+			facet.vertexArray->push_back(i);
 		}
 
 		mesh.facetArray->push_back(facet);
@@ -118,11 +118,11 @@ void ObjFileFormat::ProcessLine(const std::vector<std::string>& tokenArray, Conv
 	{
 		fileStream << "f ";
 
-		for(int i = 0; i < (signed)facet.vertexArray.size(); i++)
+		for(int i = 0; i < (signed)facet.vertexArray->size(); i++)
 		{
-			int j = facet.vertexArray[i] + 1;
+			int j = (*facet.vertexArray)[i] + 1;
 			fileStream << j;
-			if (i < (signed)facet.vertexArray.size() - 1)
+			if (i < (signed)facet.vertexArray->size() - 1)
 				fileStream << " ";
 			else
 				fileStream << "\n";

@@ -95,7 +95,7 @@ void Canvas::SetScene(Scene* scene)
 
 void Canvas::RenderScene(GLint renderMode)
 {
-	glClearColor(0, 0, 0, 0);
+	glClearColor(255, 255, 255, 0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	this->camera->PreRender(renderMode);
@@ -120,7 +120,7 @@ void Canvas::RenderScene(GLint renderMode)
 	}
 
 	if (this->scene)
-		this->scene->Render(renderMode);
+		this->scene->Render(renderMode, this->camera);
 
 	this->camera->PostRender(renderMode);
 
@@ -142,6 +142,8 @@ void Canvas::OnSize(wxSizeEvent& event)
 
 	wxSize size = event.GetSize();
 	glViewport(0, 0, size.GetWidth(), size.GetHeight());
+
+	this->camera->aspectRatio = double(size.GetWidth()) / double(size.GetHeight());
 
 	this->Refresh();
 }

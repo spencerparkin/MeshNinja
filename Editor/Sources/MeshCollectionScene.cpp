@@ -18,10 +18,15 @@ void MeshCollectionScene::Clear()
 	this->meshList.clear();
 }
 
-/*virtual*/ void MeshCollectionScene::Render(GLint renderMode)
+/*virtual*/ void MeshCollectionScene::Render(GLint renderMode, const Camera* camera) const
 {
+	glEnable(GL_CULL_FACE);
+	glFrontFace(GL_CCW);
+	glCullFace(GL_BACK);
+	glLineWidth(1.5f);
+
 	for (Mesh* mesh : this->meshList)
-		mesh->Render(renderMode);
+		mesh->Render(renderMode, camera);
 }
 
 const Mesh* MeshCollectionScene::FindFirstSelectedMesh() const

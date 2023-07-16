@@ -24,6 +24,12 @@ void ConvexPolygonMesh::Clear()
 	this->vertexArray->clear();
 }
 
+void ConvexPolygonMesh::Copy(const ConvexPolygonMesh& mesh)
+{
+	*this->vertexArray = *mesh.vertexArray;
+	*this->facetArray = *mesh.facetArray;
+}
+
 bool ConvexPolygonMesh::IsConvex(double eps /*= MESH_NINJA_EPS*/) const
 {
 	for (const Facet& facet : *this->facetArray)
@@ -121,11 +127,11 @@ void ConvexPolygonMesh::NormalizeEdges(double eps /*= MESH_NINJA_EPS*/)
 	for (Facet& facet : *this->facetArray)
 	{
 		int i = 0;
-		while (i < (signed)facet.vertexArray.size())
+		while (i < (signed)facet.vertexArray->size())
 		{
-			int j = (i + 1) % facet.vertexArray.size();
+			int j = (i + 1) % facet.vertexArray->size();
 
-			LineSegment edge((*this->vertexArray)[facet.vertexArray[i]], (*this->vertexArray)[facet.vertexArray[j]]);
+			LineSegment edge((*this->vertexArray)[(*facet.vertexArray)[i]], (*this->vertexArray)[(*facet.vertexArray)[j]]);
 
 			bool foundInteriorPoint = false;
 			for (int k = 0; k < (signed)this->vertexArray->size(); k++)
@@ -134,7 +140,7 @@ void ConvexPolygonMesh::NormalizeEdges(double eps /*= MESH_NINJA_EPS*/)
 				if (edge.IsInteriorPoint(vertex, eps))
 				{
 					foundInteriorPoint = true;
-					facet.vertexArray.insert(facet.vertexArray.begin() + j, k);
+					facet.vertexArray->insert(facet.vertexArray->begin() + j, k);
 					break;
 				}
 			}
@@ -176,7 +182,7 @@ void ConvexPolygonMesh::FromConvexPolygonArray(const std::vector<ConvexPolygon>&
 				iter = pointMap.find(vertex);
 			}
 
-			facet.vertexArray.push_back(iter->second);
+			facet.vertexArray->push_back(iter->second);
 		}
 
 		this->facetArray->push_back(facet);
@@ -517,16 +523,24 @@ void ConvexPolygonMesh::Triangle::MakePlane(Plane& plane, const std::vector<Vect
 
 ConvexPolygonMesh::Facet::Facet()
 {
+	this->vertexArray = new std::vector<int>();
+}
+
+ConvexPolygonMesh::Facet::Facet(const Facet& facet)
+{
+	this->vertexArray = new std::vector<int>();
+	*this->vertexArray = *facet.vertexArray;
 }
 
 /*virtual*/ ConvexPolygonMesh::Facet::~Facet()
 {
+	delete this->vertexArray;
 }
 
 void ConvexPolygonMesh::Facet::MakePolygon(ConvexPolygon& polygon, const ConvexPolygonMesh* mesh) const
 {
 	polygon.vertexArray->clear();
-	for (int i : this->vertexArray)
+	for (int i : *this->vertexArray)
 		polygon.vertexArray->push_back((*mesh->vertexArray)[i]);
 }
 
@@ -579,37 +593,37 @@ bool ConvexPolygonMesh::Facet::Merge(const Facet& facetA, const Facet& facetB, c
 		edgeList.push_back(newEdge);
 	};
 
-	for (int i = 0; i < (signed)facetA.vertexArray.size(); i++)
+	for (int i = 0; i < (signed)facetA.vertexArray->size(); i++)
 	{
-		int j = (i + 1) % facetA.vertexArray.size();
-		integrateEdge(Edge{ facetA.vertexArray[i], facetA.vertexArray[j] });
+		int j = (i + 1) % facetA.vertexArray->size();
+		integrateEdge(Edge{ (*facetA.vertexArray)[i], (*facetA.vertexArray)[j] });
 	}
 
-	for (int i = 0; i < (signed)facetB.vertexArray.size(); i++)
+	for (int i = 0; i < (signed)facetB.vertexArray->size(); i++)
 	{
-		int j = (i + 1) % facetB.vertexArray.size();
-		integrateEdge(Edge{ facetB.vertexArray[i], facetB.vertexArray[j] });
+		int j = (i + 1) % facetB.vertexArray->size();
+		integrateEdge(Edge{ (*facetB.vertexArray)[i], (*facetB.vertexArray)[j] });
 	}
 
 	// Reject the merge if no cancelation occurred, which indicates that the two facets don't share at least one edge.
 	if (cancelationCount == 0)
 		return false;
 
-	this->vertexArray.clear();
+	this->vertexArray->clear();
 
 	if (edgeList.size() > 0)
 	{
-		this->vertexArray.push_back((*edgeList.begin()).i);
+		this->vertexArray->push_back((*edgeList.begin()).i);
 		bool polygonComplete = false;
 		while (!polygonComplete)
 		{
-			int i = this->vertexArray[this->vertexArray.size() - 1];
+			int i = (*this->vertexArray)[this->vertexArray->size() - 1];
 			for (const Edge& edge : edgeList)
 			{
 				if (edge.i == i)
 				{
-					if (edge.j != this->vertexArray[0])
-						this->vertexArray.push_back(edge.j);
+					if (edge.j != (*this->vertexArray)[0])
+						this->vertexArray->push_back(edge.j);
 					else
 						polygonComplete = true;
 					break;
@@ -617,7 +631,7 @@ bool ConvexPolygonMesh::Facet::Merge(const Facet& facetA, const Facet& facetB, c
 			}
 
 			// Something has gone wrong in this case.
-			if (this->vertexArray.size() > edgeList.size())
+			if (this->vertexArray->size() > edgeList.size())
 				return false;
 		}
 	}
@@ -627,7 +641,7 @@ bool ConvexPolygonMesh::Facet::Merge(const Facet& facetA, const Facet& facetB, c
 
 bool ConvexPolygonMesh::Facet::Split(Facet& facetA, Facet& facetB, const ConvexPolygonMesh* mesh) const
 {
-	if (this->vertexArray.size() <= 3)
+	if (this->vertexArray->size() <= 3)
 		return false;
 
 	struct SplitCase
@@ -637,32 +651,36 @@ bool ConvexPolygonMesh::Facet::Split(Facet& facetA, Facet& facetB, const ConvexP
 
 	auto formulateSplit = [this, &facetA, &facetB](const SplitCase& splitCase)
 	{
-		facetA.vertexArray.clear();
-		facetB.vertexArray.clear();
+		facetA.vertexArray->clear();
+		facetB.vertexArray->clear();
 
 		int k = splitCase.i;
 
-		while (k != splitCase.j)
+		while (true)
 		{
-			facetA.vertexArray.push_back(this->vertexArray[k]);
-			k = (k + 1) % this->vertexArray.size();
+			facetA.vertexArray->push_back((*this->vertexArray)[k]);
+			if (k == splitCase.j)
+				break;
+			k = (k + 1) % this->vertexArray->size();
 		}
 
-		while (k != splitCase.i)
+		while (true)
 		{
-			facetB.vertexArray.push_back(this->vertexArray[k]);
-			k = (k + 1) % this->vertexArray.size();
+			facetB.vertexArray->push_back((*this->vertexArray)[k]);
+			if (k == splitCase.i)
+				break;
+			k = (k + 1) % this->vertexArray->size();
 		}
 	};
 
 	double largestSmallestInteriorAngle = -DBL_MAX;
 	SplitCase bestSplitCase{ -1, -1 };
 
-	for (int i = 0; i < (signed)this->vertexArray.size(); i++)
+	for (int i = 0; i < (signed)this->vertexArray->size(); i++)
 	{
-		for (int j = 0; j < (signed)this->vertexArray.size(); j++)
+		for (int j = 0; j < (signed)this->vertexArray->size(); j++)
 		{
-			if (i < j && i != (j + 1) % this->vertexArray.size() && j != (i + 1) % this->vertexArray.size())
+			if (i < j && i != (j + 1) % this->vertexArray->size() && j != (i + 1) % this->vertexArray->size())
 			{
 				SplitCase splitCase{ i, j };
 				formulateSplit(splitCase);
@@ -691,16 +709,16 @@ bool ConvexPolygonMesh::Facet::Split(Facet& facetA, Facet& facetB, const ConvexP
 
 bool ConvexPolygonMesh::Facet::CalcInteriorAngleStats(AngleStats& angleStats, const ConvexPolygonMesh* mesh) const
 {
-	if (this->vertexArray.size() < 3)
+	if (this->vertexArray->size() < 3)
 		return false;
 
 	angleStats.smallestInteriorAngle = DBL_MAX;
 	angleStats.largestInteriorAngle = -DBL_MAX;
 
-	for (int i = 0; i < (signed)this->vertexArray.size(); i++)
+	for (int i = 0; i < (signed)this->vertexArray->size(); i++)
 	{
-		int j = (i + 1) % this->vertexArray.size();
-		int k = (i + 2) % this->vertexArray.size();
+		int j = (i + 1) % this->vertexArray->size();
+		int k = (i + 2) % this->vertexArray->size();
 
 		const Vector& edgeA = (*mesh->vertexArray)[i] - (*mesh->vertexArray)[j];
 		const Vector& edgeB = (*mesh->vertexArray)[k] - (*mesh->vertexArray)[j];
@@ -716,7 +734,7 @@ bool ConvexPolygonMesh::Facet::CalcInteriorAngleStats(AngleStats& angleStats, co
 
 bool ConvexPolygonMesh::Facet::HasVertex(int i) const
 {
-	for (int j : this->vertexArray)
+	for (int j : *this->vertexArray)
 		if (i == j)
 			return true;
 

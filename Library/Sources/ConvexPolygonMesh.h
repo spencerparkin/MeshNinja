@@ -38,8 +38,9 @@ namespace MeshNinja
 		bool GenerateConvexHull(const std::vector<Vector>& pointArray, double eps = MESH_NINJA_EPS);
 		bool GeneratePolyhedron(Polyhedron polyhedron, double eps = MESH_NINJA_EPS);
 		int FindClosestPointTo(const Vector& point, double* smallestDistance = nullptr) const;
+		void Copy(const ConvexPolygonMesh& mesh);
 
-		struct Triangle
+		struct MESH_NINJA_API Triangle
 		{
 			int vertex[3];
 
@@ -48,10 +49,11 @@ namespace MeshNinja
 			void MakePlane(Plane& plane, const std::vector<Vector>& pointArray) const;
 		};
 
-		class Facet
+		class MESH_NINJA_API Facet
 		{
 		public:
 			Facet();
+			Facet(const Facet& facet);
 			virtual ~Facet();
 
 			struct AngleStats
@@ -66,7 +68,12 @@ namespace MeshNinja
 			bool CalcInteriorAngleStats(AngleStats& angleStats, const ConvexPolygonMesh* mesh) const;
 			bool HasVertex(int i) const;
 
-			std::vector<int> vertexArray;
+			int operator[](int i) const		// TODO: Edit code to use this to make the code easier to read.
+			{
+				return (*this->vertexArray)[i];
+			}
+
+			std::vector<int>* vertexArray;
 		};
 
 		std::vector<Facet>* facetArray;

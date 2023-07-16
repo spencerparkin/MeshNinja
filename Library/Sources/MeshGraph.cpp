@@ -50,14 +50,14 @@ bool MeshGraph::Generate(const ConvexPolygonMesh& givenMesh)
 	// We're assuming here that an edge is shared by at most two polygons.
 	for (Node* nodeA : *this->nodeArray)
 	{
-		for (int i = 0; i < (signed)nodeA->facet->vertexArray.size(); i++)
+		for (int i = 0; i < (signed)nodeA->facet->vertexArray->size(); i++)
 		{
-			int j = (i + 1) % nodeA->facet->vertexArray.size();
+			int j = (i + 1) % nodeA->facet->vertexArray->size();
 
 			VertexPair pair;
 
-			pair.i = nodeA->facet->vertexArray[i];
-			pair.j = nodeA->facet->vertexArray[j];
+			pair.i = (*nodeA->facet->vertexArray)[i];
+			pair.j = (*nodeA->facet->vertexArray)[j];
 
 			std::map<VertexPair, Node*>::iterator iter = nodeMap.find(pair);
 			if (iter == nodeMap.end())
