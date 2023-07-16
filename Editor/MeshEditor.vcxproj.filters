@@ -10,67 +10,73 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Application.h">
+    <ClCompile Include="Sources\Application.cpp">
       <Filter>Sources</Filter>
-    </ClInclude>
-    <ClInclude Include="Frame.h">
+    </ClCompile>
+    <ClCompile Include="Sources\Canvas.cpp">
       <Filter>Sources</Filter>
-    </ClInclude>
-    <ClInclude Include="Panel.h">
+    </ClCompile>
+    <ClCompile Include="Sources\Frame.cpp">
       <Filter>Sources</Filter>
-    </ClInclude>
-    <ClInclude Include="Canvas.h">
+    </ClCompile>
+    <ClCompile Include="Sources\Mesh.cpp">
       <Filter>Sources</Filter>
-    </ClInclude>
-    <ClInclude Include="SceneViewPanel.h">
+    </ClCompile>
+    <ClCompile Include="Sources\MeshCollectionScene.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\MeshListControl.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Panel.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Scene.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\SceneListPanel.cpp">
       <Filter>Sources\Panels</Filter>
-    </ClInclude>
-    <ClInclude Include="Scene.h">
-      <Filter>Sources</Filter>
-    </ClInclude>
-    <ClInclude Include="Mesh.h">
-      <Filter>Sources</Filter>
-    </ClInclude>
-    <ClInclude Include="MeshCollectionScene.h">
-      <Filter>Sources</Filter>
-    </ClInclude>
-    <ClInclude Include="SceneListPanel.h">
+    </ClCompile>
+    <ClCompile Include="Sources\SceneViewPanel.cpp">
       <Filter>Sources\Panels</Filter>
-    </ClInclude>
-    <ClInclude Include="MeshListControl.h">
+    </ClCompile>
+    <ClCompile Include="Sources\Camera.cpp">
       <Filter>Sources</Filter>
-    </ClInclude>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Application.cpp">
+    <ClInclude Include="Sources\Application.h">
       <Filter>Sources</Filter>
-    </ClCompile>
-    <ClCompile Include="Frame.cpp">
+    </ClInclude>
+    <ClInclude Include="Sources\Camera.h">
       <Filter>Sources</Filter>
-    </ClCompile>
-    <ClCompile Include="Panel.cpp">
+    </ClInclude>
+    <ClInclude Include="Sources\Canvas.h">
       <Filter>Sources</Filter>
-    </ClCompile>
-    <ClCompile Include="Canvas.cpp">
+    </ClInclude>
+    <ClInclude Include="Sources\Frame.h">
       <Filter>Sources</Filter>
-    </ClCompile>
-    <ClCompile Include="SceneViewPanel.cpp">
+    </ClInclude>
+    <ClInclude Include="Sources\Mesh.h">
+      <Filter>Sources</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\MeshCollectionScene.h">
+      <Filter>Sources</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\MeshListControl.h">
+      <Filter>Sources</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Panel.h">
+      <Filter>Sources</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Scene.h">
+      <Filter>Sources</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\SceneListPanel.h">
       <Filter>Sources\Panels</Filter>
-    </ClCompile>
-    <ClCompile Include="Scene.cpp">
-      <Filter>Sources</Filter>
-    </ClCompile>
-    <ClCompile Include="Mesh.cpp">
-      <Filter>Sources</Filter>
-    </ClCompile>
-    <ClCompile Include="MeshCollectionScene.cpp">
-      <Filter>Sources</Filter>
-    </ClCompile>
-    <ClCompile Include="SceneListPanel.cpp">
+    </ClInclude>
+    <ClInclude Include="Sources\SceneViewPanel.h">
       <Filter>Sources\Panels</Filter>
-    </ClCompile>
-    <ClCompile Include="MeshListControl.cpp">
-      <Filter>Sources</Filter>
-    </ClCompile>
+    </ClInclude>
   </ItemGroup>
 </Project>

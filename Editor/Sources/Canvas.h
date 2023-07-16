@@ -1,6 +1,7 @@
 #pragma once
 
 #include <wx/glcanvas.h>
+#include "Camera.h"
 
 class Scene;
 
@@ -12,6 +13,10 @@ public:
 
 	void OnPaint(wxPaintEvent& event);
 	void OnSize(wxSizeEvent& event);
+	void OnKeyDown(wxKeyEvent& event);
+	void OnLeftMouseDown(wxMouseEvent& event);
+	void OnLeftMouseUp(wxMouseEvent& event);
+	void OnMouseMove(wxMouseEvent& event);
 
 	void SetScene(Scene* scene);
 	Scene* GetScene() { return this->scene; }
@@ -24,4 +29,7 @@ private:
 	wxGLContext* context;
 	static int attributeList[];
 	Scene* scene;
+	Camera* camera;
+	bool dragging;
+	wxPoint lastMousePos;
 };

@@ -44,10 +44,10 @@ namespace MeshNinja
 		double x, y, z;
 	};
 
-	Vector operator+(const Vector& vectorA, const Vector& vectorB);
-	Vector operator-(const Vector& vectorA, const Vector& vectorB);
-	Vector operator*(const Vector& vector, double scale);
-	Vector operator*(double scale, const Vector& vector);
-	Vector operator/(const Vector& vector, double scale);
-	bool operator<(const Vector& vectorA, const Vector& vectorB);
+	Vector MESH_NINJA_API operator+(const Vector& vectorA, const Vector& vectorB);
+	Vector MESH_NINJA_API operator-(const Vector& vectorA, const Vector& vectorB);
+	Vector MESH_NINJA_API operator*(const Vector& vector, double scale);
+	Vector MESH_NINJA_API operator*(double scale, const Vector& vector);
+	Vector MESH_NINJA_API operator/(const Vector& vector, double scale);
+	bool MESH_NINJA_API operator<(const Vector& vectorA, const Vector& vectorB);
 }

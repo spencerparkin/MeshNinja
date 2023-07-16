@@ -186,9 +186,6 @@ void Matrix3x3::GetTranspose(Matrix3x3& matrix) const
 
 void Matrix3x3::SetProduct(const Matrix3x3& matrixA, const Matrix3x3& matrixB)
 {
-	MESH_NINJA_ASSERT(this != &matrixA);
-	MESH_NINJA_ASSERT(this != &matrixB);
-
 	Vector row[3], col[3];
 	for (int i = 0; i < 3; i++)
 	{
@@ -227,6 +224,23 @@ void Matrix3x3::MultiplyRight(const Vector& inVector, Vector& outVector) const
 	outVector.z = inVector.Dot(row[2]);
 }
 
+void Matrix3x3::operator=(const Matrix3x3& matrix)
+{
+	this->SetCopy(matrix);
+}
+
+void Matrix3x3::operator*=(const Matrix3x3& matrix)
+{
+	this->SetProduct(*this, matrix);
+}
+
+void Matrix3x3::operator/=(const Matrix3x3& matrix)
+{
+	Matrix3x3 matrixInv;
+	if (matrix.GetInverse(matrixInv))
+		this->SetProduct(*this, matrixInv);
+}
+
 Vector Matrix3x3::operator*(const Vector& vector) const
 {
 	Vector result;
@@ -252,4 +266,14 @@ void Matrix3x3::Scale(double scale)
 	for (int i = 0; i < 3; i++)
 		for (int j = 0; j < 3; j++)
 			this->ele[i][j] *= scale;
+}
+
+namespace MeshNinja
+{
+	Matrix3x3 operator*(const Matrix3x3& matrixA, const Matrix3x3& matrixB)
+	{
+		Matrix3x3 product;
+		product.SetProduct(matrixA, matrixB);
+		return product;
+	}
 }

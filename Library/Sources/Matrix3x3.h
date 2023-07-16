@@ -42,6 +42,9 @@ namespace MeshNinja
 		void MultiplyLeft(const Vector& inVector, Vector& outVector) const;
 		void MultiplyRight(const Vector& inVector, Vector& outVector) const;
 
+		void operator=(const Matrix3x3& matrix);
+		void operator*=(const Matrix3x3& matrix);
+		void operator/=(const Matrix3x3& matrix);
 		Vector operator*(const Vector& vector) const;
 
 		double Determinant(void) const;
@@ -51,4 +54,6 @@ namespace MeshNinja
 
 		double ele[3][3];
 	};
+
+	Matrix3x3 MESH_NINJA_API operator*(const Matrix3x3& matrixA, const Matrix3x3& matrixB);
 }

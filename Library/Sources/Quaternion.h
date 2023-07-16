@@ -33,6 +33,6 @@ namespace MeshNinja
 		double x, y, z, w;
 	};
 
-	Quaternion operator+(const Quaternion& leftQuat, const Quaternion& rightQuat);
-	Quaternion operator*(const Quaternion& leftQuat, const Quaternion& rightQuat);
+	Quaternion MESH_NINJA_API operator+(const Quaternion& leftQuat, const Quaternion& rightQuat);
+	Quaternion MESH_NINJA_API operator*(const Quaternion& leftQuat, const Quaternion& rightQuat);
 }

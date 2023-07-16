@@ -19,28 +19,30 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Application.h" />
-    <ClInclude Include="Canvas.h" />
-    <ClInclude Include="Frame.h" />
-    <ClInclude Include="Mesh.h" />
-    <ClInclude Include="MeshCollectionScene.h" />
-    <ClInclude Include="MeshListControl.h" />
-    <ClInclude Include="Panel.h" />
-    <ClInclude Include="Scene.h" />
-    <ClInclude Include="SceneListPanel.h" />
-    <ClInclude Include="SceneViewPanel.h" />
+    <ClCompile Include="Sources\Application.cpp" />
+    <ClCompile Include="Sources\Camera.cpp" />
+    <ClCompile Include="Sources\Canvas.cpp" />
+    <ClCompile Include="Sources\Frame.cpp" />
+    <ClCompile Include="Sources\Mesh.cpp" />
+    <ClCompile Include="Sources\MeshCollectionScene.cpp" />
+    <ClCompile Include="Sources\MeshListControl.cpp" />
+    <ClCompile Include="Sources\Panel.cpp" />
+    <ClCompile Include="Sources\Scene.cpp" />
+    <ClCompile Include="Sources\SceneListPanel.cpp" />
+    <ClCompile Include="Sources\SceneViewPanel.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Application.cpp" />
-    <ClCompile Include="Canvas.cpp" />
-    <ClCompile Include="Frame.cpp" />
-    <ClCompile Include="Mesh.cpp" />
-    <ClCompile Include="MeshCollectionScene.cpp" />
-    <ClCompile Include="MeshListControl.cpp" />
-    <ClCompile Include="Panel.cpp" />
-    <ClCompile Include="Scene.cpp" />
-    <ClCompile Include="SceneListPanel.cpp" />
-    <ClCompile Include="SceneViewPanel.cpp" />
+    <ClInclude Include="Sources\Application.h" />
+    <ClInclude Include="Sources\Camera.h" />
+    <ClInclude Include="Sources\Canvas.h" />
+    <ClInclude Include="Sources\Frame.h" />
+    <ClInclude Include="Sources\Mesh.h" />
+    <ClInclude Include="Sources\MeshCollectionScene.h" />
+    <ClInclude Include="Sources\MeshListControl.h" />
+    <ClInclude Include="Sources\Panel.h" />
+    <ClInclude Include="Sources\Scene.h" />
+    <ClInclude Include="Sources\SceneListPanel.h" />
+    <ClInclude Include="Sources\SceneViewPanel.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

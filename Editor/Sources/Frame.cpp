@@ -89,6 +89,8 @@ void Frame::OnImportMesh(wxCommandEvent& event)
 	wxFileDialog fileDialog(this, "Choose mesh file to open.", wxEmptyString, wxEmptyString, "Mesh file (*.*)|*.*", wxFD_OPEN | wxFD_FILE_MUST_EXIST);
 	if (wxID_OK == fileDialog.ShowModal())
 	{
+		wxBusyCursor busyCursor;
+
 		Mesh* mesh = new Mesh();
 		mesh->fileSource = fileDialog.GetPath();
 		if (mesh->Load())
@@ -121,8 +123,12 @@ void Frame::OnExportMesh(wxCommandEvent& event)
 			mesh->fileSource = fileDialog.GetPath();
 	}
 
+	wxBusyCursor busyCursor;
+
 	if (!mesh->Save())
 		wxMessageBox("Failed to write file: " + mesh->fileSource, "Error", wxICON_ERROR | wxOK, this);
+	else
+		wxMessageBox("Mesh file (" + mesh->fileSource + ") saved!", "Success", wxICON_INFORMATION | wxOK, this);
 }
 
 void Frame::OnExit(wxCommandEvent& event)
