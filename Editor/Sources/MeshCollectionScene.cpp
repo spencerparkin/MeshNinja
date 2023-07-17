@@ -23,7 +23,7 @@ void MeshCollectionScene::Clear()
 	glEnable(GL_CULL_FACE);
 	glFrontFace(GL_CCW);
 	glCullFace(GL_BACK);
-	glLineWidth(1.5f);
+	glLineWidth(1.0f);
 
 	for (Mesh* mesh : this->meshList)
 		mesh->Render(renderMode, camera);

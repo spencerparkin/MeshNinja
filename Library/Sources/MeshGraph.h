@@ -57,5 +57,5 @@ namespace MeshNinja
 		const ConvexPolygonMesh* mesh;
 	};
 
-	bool operator<(const MeshGraph::VertexPair& pairA, const MeshGraph::VertexPair& pairB);
+	bool MESH_NINJA_API operator<(const MeshGraph::VertexPair& pairA, const MeshGraph::VertexPair& pairB);
 }

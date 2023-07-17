@@ -4,7 +4,6 @@
 #include <wx/glcanvas.h>
 #include "ConvexPolygonMesh.h"
 #include "MeshFileFormat.h"
-#include "MeshGraph.h"
 
 class Camera;
 
@@ -22,7 +21,6 @@ public:
 	MeshNinja::Vector color;
 	MeshNinja::ConvexPolygonMesh mesh;
 	mutable MeshNinja::ConvexPolygonMesh renderMesh;
-	mutable MeshNinja::MeshGraph renderMeshGraph;
 	wxString fileSource;
 	bool isSelected;
 	mutable bool renderMeshDirty;

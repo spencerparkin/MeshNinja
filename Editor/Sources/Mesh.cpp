@@ -3,6 +3,7 @@
 #include "ConvexPolygonMesh.h"
 #include "Plane.h"
 #include "Camera.h"
+#include "MeshGraph.h"
 
 Mesh::Mesh()
 {
@@ -10,7 +11,6 @@ Mesh::Mesh()
 	this->renderMeshDirty = true;
 
 	static int i = 0;
-	i = (i + 1) % 6;
 	switch (i)
 	{
 		case 0:
@@ -56,6 +56,8 @@ Mesh::Mesh()
 			break;
 		}
 	}
+
+	i = (i + 1) % 6;
 }
 
 /*virtual*/ Mesh::~Mesh()
@@ -69,7 +71,6 @@ void Mesh::Render(GLint renderMode, const Camera* camera) const
 		this->renderMeshDirty = false;
 		this->renderMesh.Copy(this->mesh);
 		this->renderMesh.TessellateFaces();
-		this->renderMeshGraph.Generate(this->mesh);
 	}
 
 	glBegin(GL_TRIANGLES);
@@ -96,17 +97,46 @@ void Mesh::Render(GLint renderMode, const Camera* camera) const
 
 	glEnd();
 
-	// This will draw each edge twice, but whatever.
 	glBegin(GL_LINES);
 	glColor3f(0.0f, 0.0f, 0.0f);
 
-	for (const MeshNinja::MeshGraph::Edge* edge : *this->renderMeshGraph.edgeArray)
-	{
-		const MeshNinja::Vector& vertexA = (*this->mesh.vertexArray)[edge->pair.i];
-		const MeshNinja::Vector& vertexB = (*this->mesh.vertexArray)[edge->pair.j];
+	std::set<MeshNinja::MeshGraph::VertexPair> vertexPairSet;
 
-		glVertex3d(vertexA.x, vertexA.y, vertexA.z);
-		glVertex3d(vertexB.x, vertexB.y, vertexB.z);
+	for (const MeshNinja::ConvexPolygonMesh::Facet& facet : *this->mesh.facetArray)
+	{
+		for (int i = 0; i < (signed)facet.vertexArray->size(); i++)
+		{
+			int j = (i + 1) % facet.vertexArray->size();
+
+			MeshNinja::MeshGraph::VertexPair pair{ (*facet.vertexArray)[i], (*facet.vertexArray)[j] };
+			if (vertexPairSet.find(pair) == vertexPairSet.end())
+			{
+				vertexPairSet.insert(pair);
+
+				MeshNinja::ConvexPolygon polygon;
+				facet.MakePolygon(polygon, &this->mesh);
+
+				MeshNinja::Plane plane;
+				polygon.CalcPlane(plane);
+
+				MeshNinja::Vector center = polygon.CalcCenter();
+
+				MeshNinja::Vector lineOfSightDirection = center - camera->position;
+				if (plane.normal.AngleBetweenThisAnd(lineOfSightDirection) > MESH_NINJA_PI / 2.0)
+				{
+					MeshNinja::Vector vertexA = (*this->mesh.vertexArray)[(*facet.vertexArray)[i]];
+					MeshNinja::Vector vertexB = (*this->mesh.vertexArray)[(*facet.vertexArray)[j]];
+
+					MeshNinja::Vector offset = lineOfSightDirection.Normalized() * -0.05;
+
+					vertexA += offset;
+					vertexB += offset;
+
+					glVertex3d(vertexA.x, vertexA.y, vertexA.z);
+					glVertex3d(vertexB.x, vertexB.y, vertexB.z);
+				}
+			}
+		}
 	}
 
 	glEnd();
