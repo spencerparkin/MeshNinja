@@ -3,6 +3,8 @@
 #include <wx/frame.h>
 #include <wx/aui/aui.h>
 
+wxDECLARE_EVENT(EVT_SCENE_CHANGED, wxCommandEvent);
+
 class Frame : public wxFrame
 {
 public:
@@ -13,6 +15,7 @@ public:
 	void OnAbout(wxCommandEvent& event);
 	void OnImportMesh(wxCommandEvent& event);
 	void OnExportMesh(wxCommandEvent& event);
+	void OnSceneChanged(wxCommandEvent& event);
 
 	enum
 	{

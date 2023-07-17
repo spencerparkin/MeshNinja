@@ -8,6 +8,8 @@
 #include <wx/filedlg.h>
 #include <wx/msgdlg.h>
 
+wxDEFINE_EVENT(EVT_SCENE_CHANGED, wxCommandEvent);
+
 Frame::Frame(wxWindow* parent, const wxPoint& pos, const wxSize& size) : wxFrame(parent, wxID_ANY, "Mesh Editor", pos, size)
 {
 	this->auiManager.SetManagedWindow(this);
@@ -33,6 +35,7 @@ Frame::Frame(wxWindow* parent, const wxPoint& pos, const wxSize& size) : wxFrame
 	this->Bind(wxEVT_MENU, &Frame::OnAbout, this, ID_About);
 	this->Bind(wxEVT_MENU, &Frame::OnImportMesh, this, ID_ImportMesh);
 	this->Bind(wxEVT_MENU, &Frame::OnExportMesh, this, ID_ExportMesh);
+	this->Bind(EVT_SCENE_CHANGED, &Frame::OnSceneChanged, this);
 
 	this->MakePanels();
 	this->UpdatePanels();
@@ -43,6 +46,11 @@ Frame::Frame(wxWindow* parent, const wxPoint& pos, const wxSize& size) : wxFrame
 /*virtual*/ Frame::~Frame()
 {
 	this->auiManager.UnInit();
+}
+
+void Frame::OnSceneChanged(wxCommandEvent& event)
+{
+	this->UpdatePanels();
 }
 
 void Frame::MakePanels()
@@ -102,7 +110,8 @@ void Frame::OnImportMesh(wxCommandEvent& event)
 		}
 	}
 
-	this->UpdatePanels();
+	wxCommandEvent sceneChangedEvent(EVT_SCENE_CHANGED);
+	wxPostEvent(this, sceneChangedEvent);
 }
 
 void Frame::OnExportMesh(wxCommandEvent& event)

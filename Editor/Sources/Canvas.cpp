@@ -95,7 +95,7 @@ void Canvas::SetScene(Scene* scene)
 
 void Canvas::RenderScene(GLint renderMode)
 {
-	glClearColor(255, 255, 255, 0);
+	glClearColor(0, 0, 0, 0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glEnable(GL_DEPTH_TEST);
