@@ -34,5 +34,6 @@ SceneListPanel::SceneListPanel()
 /*virtual*/ void SceneListPanel::Update()
 {
 	this->listControl->SetItemCount(wxGetApp().GetMeshScene()->GetMeshList().size());
+	this->listControl->Update();
 	this->listControl->Refresh();
 }
