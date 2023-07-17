@@ -13,6 +13,6 @@ public:
 	void OnListItemSelected(wxListEvent& event);
 	void OnListItemUnselected(wxListEvent& event);
 
-	void UpdateSelectionState(const wxListItem& listItem, long item);
-	void Update();
+	void PushControlSelectionToScene();
+	void PullControlSelectionFromScene();
 };
