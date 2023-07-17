@@ -21,3 +21,7 @@ Panel::Panel()
 /*virtual*/ void Panel::Update()
 {
 }
+
+/*virtual*/ void Panel::Tick()
+{
+}

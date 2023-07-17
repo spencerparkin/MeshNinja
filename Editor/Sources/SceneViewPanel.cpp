@@ -37,3 +37,8 @@ SceneViewPanel::SceneViewPanel()
 	this->canvas->SetScene(wxGetApp().GetMeshScene());
 	this->canvas->Refresh();
 }
+
+/*virtual*/ void SceneViewPanel::Tick()
+{
+	this->canvas->Tick();
+}

@@ -1,5 +1,6 @@
 #include "Canvas.h"
 #include "Scene.h"
+#include <wx/kbdstate.h>
 
 int Canvas::attributeList[] = { WX_GL_RGBA, WX_GL_DOUBLEBUFFER, 0 };
 
@@ -23,6 +24,38 @@ Canvas::Canvas(wxWindow* parent) : wxGLCanvas(parent, wxID_ANY, attributeList, w
 {
 	delete this->context;
 	delete this->camera;
+}
+
+void Canvas::Tick()
+{
+	bool refreshNeeded = false;
+
+	if (wxGetKeyState(wxKeyCode::WXK_UP))
+	{
+		this->camera->MoveForwardBackward(-0.5);
+		refreshNeeded = true;
+	}
+
+	if (wxGetKeyState(wxKeyCode::WXK_DOWN))
+	{
+		this->camera->MoveForwardBackward(0.5);
+		refreshNeeded = true;
+	}
+
+	if (wxGetKeyState(wxKeyCode::WXK_LEFT))
+	{
+		this->camera->StrafeLeftRight(-0.5);
+		refreshNeeded = true;
+	}
+
+	if (wxGetKeyState(wxKeyCode::WXK_RIGHT))
+	{
+		this->camera->StrafeLeftRight(0.5);
+		refreshNeeded = true;
+	}
+
+	if (refreshNeeded)
+		this->Refresh();
 }
 
 void Canvas::OnKeyDown(wxKeyEvent& event)

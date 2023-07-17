@@ -14,4 +14,5 @@ public:
 	virtual void MakePaneInfo(wxAuiPaneInfo& paneInfo);
 	virtual void MakeControls();
 	virtual void Update();
+	virtual void Tick();
 };

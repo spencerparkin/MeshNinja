@@ -18,6 +18,8 @@ public:
 	void OnLeftMouseUp(wxMouseEvent& event);
 	void OnMouseMove(wxMouseEvent& event);
 
+	void Tick();
+
 	void SetScene(Scene* scene);
 	Scene* GetScene() { return this->scene; }
 

@@ -10,8 +10,10 @@
 
 wxDEFINE_EVENT(EVT_SCENE_CHANGED, wxCommandEvent);
 
-Frame::Frame(wxWindow* parent, const wxPoint& pos, const wxSize& size) : wxFrame(parent, wxID_ANY, "Mesh Editor", pos, size)
+Frame::Frame(wxWindow* parent, const wxPoint& pos, const wxSize& size) : wxFrame(parent, wxID_ANY, "Mesh Editor", pos, size), timer(this)
 {
+	this->inTimerTick = false;
+
 	this->auiManager.SetManagedWindow(this);
 	this->auiManager.SetFlags(wxAUI_MGR_LIVE_RESIZE | wxAUI_MGR_DEFAULT);
 
@@ -36,11 +38,14 @@ Frame::Frame(wxWindow* parent, const wxPoint& pos, const wxSize& size) : wxFrame
 	this->Bind(wxEVT_MENU, &Frame::OnImportMesh, this, ID_ImportMesh);
 	this->Bind(wxEVT_MENU, &Frame::OnExportMesh, this, ID_ExportMesh);
 	this->Bind(EVT_SCENE_CHANGED, &Frame::OnSceneChanged, this);
+	this->Bind(wxEVT_TIMER, &Frame::OnTimerTick, this);
 
 	this->MakePanels();
 	this->UpdatePanels();
 
 	this->auiManager.Update();
+
+	this->timer.Start(0);
 }
 
 /*virtual*/ Frame::~Frame()
@@ -51,6 +56,21 @@ Frame::Frame(wxWindow* parent, const wxPoint& pos, const wxSize& size) : wxFrame
 void Frame::OnSceneChanged(wxCommandEvent& event)
 {
 	this->UpdatePanels();
+}
+
+void Frame::OnTimerTick(wxTimerEvent& event)
+{
+	if (this->inTimerTick)
+		return;
+
+	this->inTimerTick = true;
+
+	this->ForAllPanels([](Panel* panel)
+		{
+			panel->Tick();
+		});
+
+	this->inTimerTick = false;
 }
 
 void Frame::MakePanels()
@@ -79,7 +99,7 @@ void Frame::MakePanels()
 	}
 }
 
-void Frame::UpdatePanels()
+void Frame::ForAllPanels(std::function<void(Panel*)> callback)
 {
 	wxAuiPaneInfoArray& paneInfoArray = this->auiManager.GetAllPanes();
 
@@ -88,8 +108,16 @@ void Frame::UpdatePanels()
 		wxAuiPaneInfo& paneInfo = paneInfoArray[i];
 		Panel* panel = wxDynamicCast(paneInfo.window, Panel);
 		if (panel)
-			panel->Update();
+			callback(panel);
 	}
+}
+
+void Frame::UpdatePanels()
+{
+	this->ForAllPanels([](Panel* panel)
+		{
+			panel->Update();
+		});
 }
 
 void Frame::OnImportMesh(wxCommandEvent& event)
