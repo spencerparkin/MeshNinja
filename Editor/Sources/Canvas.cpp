@@ -13,6 +13,7 @@ Canvas::Canvas(wxWindow* parent) : wxGLCanvas(parent, wxID_ANY, attributeList, w
 	this->Bind(wxEVT_PAINT, &Canvas::OnPaint, this);
 	this->Bind(wxEVT_SIZE, &Canvas::OnSize, this);
 	this->Bind(wxEVT_KEY_DOWN, &Canvas::OnKeyDown, this);
+	this->Bind(wxEVT_RIGHT_DOWN, &Canvas::OnRightMouseDown, this);
 	this->Bind(wxEVT_LEFT_DOWN, &Canvas::OnLeftMouseDown, this);
 	this->Bind(wxEVT_LEFT_UP, &Canvas::OnLeftMouseUp, this);
 	this->Bind(wxEVT_MOTION, &Canvas::OnMouseMove, this);
@@ -57,6 +58,13 @@ void Canvas::OnKeyDown(wxKeyEvent& event)
 	this->Refresh();
 }
 
+void Canvas::OnRightMouseDown(wxMouseEvent& event)
+{
+	wxPoint pickingPoint = event.GetPosition();
+	const Scene::Object* object = this->RenderScene(GL_SELECT, &pickingPoint);
+	this->scene->HandlePick(object, event.ShiftDown());
+}
+
 void Canvas::OnLeftMouseDown(wxMouseEvent& event)
 {
 	this->dragging = true;
@@ -93,7 +101,7 @@ void Canvas::SetScene(Scene* scene)
 	this->scene = scene;
 }
 
-void Canvas::RenderScene(GLint renderMode)
+const Scene::Object* Canvas::RenderScene(GLint renderMode, const wxPoint* pickingPoint /*= nullptr*/)
 {
 	glClearColor(0, 0, 0, 0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -101,7 +109,7 @@ void Canvas::RenderScene(GLint renderMode)
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_LINE_SMOOTH);
 
-	this->camera->PreRender(renderMode);
+	this->camera->PreRender(renderMode, pickingPoint);
 
 	if (renderMode == GL_RENDER)
 	{
@@ -125,9 +133,7 @@ void Canvas::RenderScene(GLint renderMode)
 	if (this->scene)
 		this->scene->Render(renderMode, this->camera);
 
-	this->camera->PostRender(renderMode);
-
-	glFlush();
+	return this->camera->PostRender(renderMode, this->scene);
 }
 
 void Canvas::OnPaint(wxPaintEvent& event)

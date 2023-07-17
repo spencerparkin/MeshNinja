@@ -12,6 +12,9 @@ public:
 	virtual ~MeshCollectionScene();
 
 	virtual void Render(GLint renderMode, const Camera* camera) const override;
+	virtual void HandlePick(const Object* object, bool shiftDown) override;
+	virtual int GetSceneObjectCount() const override;
+	virtual const Object* GetSceneObject(int i) const override;
 
 	void Clear();
 

@@ -2,8 +2,7 @@
 
 #include <wx/glcanvas.h>
 #include "Camera.h"
-
-class Scene;
+#include "Scene.h"
 
 class Canvas : public wxGLCanvas
 {
@@ -14,6 +13,7 @@ public:
 	void OnPaint(wxPaintEvent& event);
 	void OnSize(wxSizeEvent& event);
 	void OnKeyDown(wxKeyEvent& event);
+	void OnRightMouseDown(wxMouseEvent& event);
 	void OnLeftMouseDown(wxMouseEvent& event);
 	void OnLeftMouseUp(wxMouseEvent& event);
 	void OnMouseMove(wxMouseEvent& event);
@@ -24,7 +24,7 @@ public:
 private:
 
 	void BindContext();
-	void RenderScene(GLint renderMode);
+	const Scene::Object* RenderScene(GLint renderMode, const wxPoint* pickingPoint = nullptr);
 
 	wxGLContext* context;
 	static int attributeList[];

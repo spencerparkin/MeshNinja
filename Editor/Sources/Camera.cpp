@@ -1,4 +1,5 @@
 #include "Camera.h"
+#include "Scene.h"
 #include <wx/glcanvas.h>
 #include <gl/GLU.h>
 
@@ -14,34 +15,61 @@ Camera::Camera()
 
 	this->foviAngle = 60.0f;
 	this->aspectRatio = 1.0f;
+
+	this->hitBuffer = nullptr;
+	this->hitBufferSize = 0;
 }
 
 /*virtual*/ Camera::~Camera()
 {
 }
 
-/*virtual*/ void Camera::PreRender(int renderMode)
+/*virtual*/ void Camera::PreRender(int renderMode, const wxPoint* pickingPoint)
 {
+	if (renderMode == GL_SELECT)
+	{
+		this->hitBufferSize = 512;
+		this->hitBuffer = new GLuint[this->hitBufferSize];
+		glSelectBuffer(hitBufferSize, this->hitBuffer);
+		glRenderMode(GL_SELECT);
+		glInitNames();
+	}
+
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	gluPerspective(this->foviAngle, this->aspectRatio, 0.1, 10000.0);
 
 	if (renderMode == GL_SELECT)
 	{
-		//...
+		GLint viewport[4];
+		glGetIntegerv(GL_VIEWPORT, viewport);
+		gluPickMatrix(double(pickingPoint->x), double(viewport[3]) - double(pickingPoint->y), 2.0, 2.0, viewport);
 	}
+
+	gluPerspective(this->foviAngle, this->aspectRatio, 0.1, 10000.0);
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	gluLookAt(this->position.x, this->position.y, this->position.z, this->target.x, this->target.y, this->target.z, 0.0, 1.0, 0.0);
 }
 
-/*virtual*/ void Camera::PostRender(int renderMode)
+/*virtual*/ const Scene::Object* Camera::PostRender(int renderMode, const Scene* scene)
 {
+	glFlush();
+
+	const Scene::Object* object = nullptr;
+
 	if (renderMode == GL_SELECT)
 	{
-		//...
+		GLuint hitCount = glRenderMode(GL_RENDER);
+
+		object = scene->ProcessHitBuffer(this->hitBuffer, this->hitBufferSize, hitCount);
+
+		delete[] this->hitBuffer;
+		this->hitBuffer = nullptr;
+		this->hitBufferSize = 0;
 	}
+
+	return object;
 }
 
 void Camera::MakeFrame(MeshNinja::Vector& xAxis, MeshNinja::Vector& yAxis, MeshNinja::Vector& zAxis) const

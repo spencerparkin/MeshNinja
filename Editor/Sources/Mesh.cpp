@@ -64,7 +64,7 @@ Mesh::Mesh()
 {
 }
 
-void Mesh::Render(GLint renderMode, const Camera* camera) const
+/*virtual*/ void Mesh::Render(GLint renderMode, const Camera* camera) const
 {
 	if (this->renderMeshDirty)
 	{
@@ -72,6 +72,9 @@ void Mesh::Render(GLint renderMode, const Camera* camera) const
 		this->renderMesh.Copy(this->mesh);
 		this->renderMesh.TessellateFaces();
 	}
+
+	if (renderMode == GL_SELECT)
+		glPushName(this->id);
 
 	glBegin(GL_TRIANGLES);
 	glColor3d(this->color.x, this->color.y, this->color.z);
@@ -96,39 +99,50 @@ void Mesh::Render(GLint renderMode, const Camera* camera) const
 	}
 
 	glEnd();
-	glBegin(GL_LINES);
-	glColor3f(1.0f, 1.0f, 1.0f);
 
-	std::set<MeshNinja::MeshGraph::VertexPair> vertexPairSet;
+	if (renderMode == GL_SELECT)
+		glPopName();
 
-	for (const MeshNinja::ConvexPolygonMesh::Facet& facet : *this->mesh.facetArray)
+	if (renderMode == GL_RENDER)
 	{
-		for (int i = 0; i < (signed)facet.vertexArray->size(); i++)
+		glBegin(GL_LINES);
+
+		if (this->isSelected)
+			glColor3f(1.0f, 1.0f, 1.0f);
+		else
+			glColor3f(0.3f, 0.3f, 0.3f);
+
+		std::set<MeshNinja::MeshGraph::VertexPair> vertexPairSet;
+
+		for (const MeshNinja::ConvexPolygonMesh::Facet& facet : *this->mesh.facetArray)
 		{
-			int j = (i + 1) % facet.vertexArray->size();
-
-			MeshNinja::MeshGraph::VertexPair pair{ (*facet.vertexArray)[i], (*facet.vertexArray)[j] };
-			if (vertexPairSet.find(pair) == vertexPairSet.end())
+			for (int i = 0; i < (signed)facet.vertexArray->size(); i++)
 			{
-				vertexPairSet.insert(pair);
+				int j = (i + 1) % facet.vertexArray->size();
 
-				MeshNinja::Vector vertexA = (*this->mesh.vertexArray)[(*facet.vertexArray)[i]];
-				MeshNinja::Vector vertexB = (*this->mesh.vertexArray)[(*facet.vertexArray)[j]];
+				MeshNinja::MeshGraph::VertexPair pair{ (*facet.vertexArray)[i], (*facet.vertexArray)[j] };
+				if (vertexPairSet.find(pair) == vertexPairSet.end())
+				{
+					vertexPairSet.insert(pair);
 
-				MeshNinja::Vector lineOfSightDirection = (vertexA + vertexB) / 2.0 - camera->position;
-				MeshNinja::Vector offset = lineOfSightDirection.Normalized() * -0.05;
+					MeshNinja::Vector vertexA = (*this->mesh.vertexArray)[(*facet.vertexArray)[i]];
+					MeshNinja::Vector vertexB = (*this->mesh.vertexArray)[(*facet.vertexArray)[j]];
 
-				// This is to prevent Z-fighting.
-				vertexA += offset;
-				vertexB += offset;
+					MeshNinja::Vector lineOfSightDirection = (vertexA + vertexB) / 2.0 - camera->position;
+					MeshNinja::Vector offset = lineOfSightDirection.Normalized() * -0.05;
 
-				glVertex3d(vertexA.x, vertexA.y, vertexA.z);
-				glVertex3d(vertexB.x, vertexB.y, vertexB.z);
+					// This is to prevent Z-fighting.
+					vertexA += offset;
+					vertexB += offset;
+
+					glVertex3d(vertexA.x, vertexA.y, vertexA.z);
+					glVertex3d(vertexB.x, vertexB.y, vertexB.z);
+				}
 			}
 		}
-	}
 
-	glEnd();
+		glEnd();
+	}
 }
 
 bool Mesh::Load()
