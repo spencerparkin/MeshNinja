@@ -38,10 +38,10 @@ void MeshCollectionScene::Clear()
 	const Mesh* mesh = dynamic_cast<const Mesh*>(object);
 	if (!mesh || !shiftDown)
 		for (int i = 0; i < (signed)this->meshList.size(); i++)
-			this->meshList[i]->isSelected = false;
+			this->meshList[i]->SetSelected(false);
 	
 	if (mesh)
-		mesh->isSelected = !mesh->isSelected;
+		mesh->SetSelected(!mesh->GetSelected());
 
 	wxCommandEvent sceneChangedEvent(EVT_SCENE_CHANGED);
 	wxPostEvent(wxGetApp().GetFrame(), sceneChangedEvent);
@@ -54,8 +54,25 @@ void MeshCollectionScene::Clear()
 			if (transform.translation != MeshNinja::Vector(0.0, 0.0, 0.0))
 				mesh->transform = transform * mesh->transform;
 			else
+			{
+				// Conjugation makes more sense in this case, but for some reason I failed to make that work.
 				mesh->transform.matrix = transform.matrix * mesh->transform.matrix;
+			}
 		}, true);
+}
+
+/*virtual*/ void MeshCollectionScene::HandleKey(char key)
+{
+	if (key == ' ')
+	{
+		this->ForAllMeshes([](Mesh* mesh)
+			{
+				mesh->SetVisible(!mesh->GetVisible());
+			}, true);
+
+		wxCommandEvent sceneChangedEvent(EVT_SCENE_CHANGED);
+		wxPostEvent(wxGetApp().GetFrame(), sceneChangedEvent);
+	}
 }
 
 /*virtual*/ void MeshCollectionScene::Render(GLint renderMode, const Camera* camera) const
@@ -82,7 +99,7 @@ const Mesh* MeshCollectionScene::FindFirstSelectedMesh() const
 Mesh* MeshCollectionScene::FindFirstSelectedMesh()
 {
 	for (Mesh* mesh : this->meshList)
-		if (mesh->isSelected)
+		if (mesh->GetSelected())
 			return mesh;
 
 	return nullptr;
@@ -91,6 +108,6 @@ Mesh* MeshCollectionScene::FindFirstSelectedMesh()
 void MeshCollectionScene::ForAllMeshes(std::function<void(Mesh*)> callback, bool mustBeSelected /*= false*/)
 {
 	for (Mesh* mesh : this->meshList)
-		if (!mustBeSelected || mesh->isSelected)
+		if (!mustBeSelected || mesh->GetSelected())
 			callback(mesh);
 }

@@ -190,3 +190,25 @@ MeshNinja::MeshFileFormat* Mesh::MakeFileFormatObject()
 	// TODO: Look at extension to know what to return here.
 	return new MeshNinja::ObjFileFormat();
 }
+
+void Mesh::SetSelected(bool selected) const
+{
+	this->isSelected = selected;
+	if (selected)
+		this->selectionTime = wxDateTime::Now();
+}
+
+bool Mesh::GetSelected() const
+{
+	return this->isSelected;
+}
+
+void Mesh::SetVisible(bool visible) const
+{
+	this->isVisible = visible;
+}
+
+bool Mesh::GetVisible() const
+{
+	return this->isVisible;
+}

@@ -45,9 +45,9 @@ void MeshListControl::PushControlSelectionToScene()
 
 		int state = this->GetItemState(item, wxLIST_STATE_SELECTED);
 		if ((state & wxLIST_STATE_SELECTED) != 0)
-			mesh->isSelected = true;
+			mesh->SetSelected(true);
 		else
-			mesh->isSelected = false;
+			mesh->SetSelected(false);
 	}
 
 	wxCommandEvent sceneChangedEvent(EVT_SCENE_CHANGED);
@@ -103,7 +103,7 @@ void MeshListControl::PullControlSelectionFromScene()
 				}
 				case 3:
 				{
-					if (mesh->isVisible)
+					if (mesh->GetVisible())
 						return wxString("Yes");
 					else
 						return wxString("No");

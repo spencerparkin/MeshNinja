@@ -22,14 +22,24 @@ public:
 
 	void BakeTransform();
 
+	void SetSelected(bool selected) const;
+	bool GetSelected() const;
+
+	void SetVisible(bool visible) const;
+	bool GetVisible() const;
+
 	MeshNinja::MeshFileFormat* MakeFileFormatObject();
 
 	MeshNinja::Vector color;
 	MeshNinja::ConvexPolygonMesh mesh;
 	MeshNinja::Transform transform;
-	mutable MeshNinja::ConvexPolygonMesh renderMesh;
 	wxString fileSource;
+
+private:
+
+	mutable MeshNinja::ConvexPolygonMesh renderMesh;
 	mutable bool isSelected;
 	mutable bool isVisible;
 	mutable bool renderMeshDirty;
+	mutable wxDateTime selectionTime;
 };

@@ -87,6 +87,11 @@ void Canvas::OnKeyDown(wxKeyEvent& event)
 			this->camera->MoveForwardBackward(0.5);
 			break;
 		}
+		default:
+		{
+			this->scene->HandleKey(event.GetKeyCode());
+			break;
+		}
 	}
 
 	this->Refresh();
