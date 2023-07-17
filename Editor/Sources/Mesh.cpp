@@ -8,7 +8,9 @@
 Mesh::Mesh()
 {
 	this->isSelected = false;
+	this->isVisible = true;
 	this->renderMeshDirty = true;
+	this->transform.SetIdentity();
 
 	static int i = 0;
 	switch (i)
@@ -66,6 +68,9 @@ Mesh::Mesh()
 
 /*virtual*/ void Mesh::Render(GLint renderMode, const Camera* camera) const
 {
+	if (!this->isVisible)
+		return;
+
 	if (this->renderMeshDirty)
 	{
 		this->renderMeshDirty = false;
@@ -91,9 +96,13 @@ Mesh::Mesh()
 
 			for (int i : *facet.vertexArray)
 			{
-				const MeshNinja::Vector& vertex = (*this->renderMesh.vertexArray)[i];
-				glVertex3d(vertex.x, vertex.y, vertex.z);
-				glNormal3d(plane.normal.x, plane.normal.y, plane.normal.z);
+				MeshNinja::Vector vertex = (*this->renderMesh.vertexArray)[i];
+
+				MeshNinja::Vector point = this->transform.TransformPosition(vertex);
+				MeshNinja::Vector normal = this->transform.TransformVector(plane.normal);
+
+				glVertex3d(point.x, point.y, point.z);
+				glNormal3d(normal.x, normal.y, normal.z);
 			}
 		}
 	}
@@ -127,6 +136,9 @@ Mesh::Mesh()
 
 					MeshNinja::Vector vertexA = (*this->mesh.vertexArray)[(*facet.vertexArray)[i]];
 					MeshNinja::Vector vertexB = (*this->mesh.vertexArray)[(*facet.vertexArray)[j]];
+
+					vertexA = this->transform.TransformPosition(vertexA);
+					vertexB = this->transform.TransformPosition(vertexB);
 
 					MeshNinja::Vector lineOfSightDirection = (vertexA + vertexB) / 2.0 - camera->position;
 					MeshNinja::Vector offset = lineOfSightDirection.Normalized() * -0.05;
@@ -165,6 +177,12 @@ bool Mesh::Save()
 	bool success = fileFormat->SaveMesh((const char*)this->fileSource.c_str(), this->mesh);
 	delete fileFormat;
 	return success;
+}
+
+void Mesh::BakeTransform()
+{
+	this->mesh.ApplyTransform(this->transform);
+	this->transform.SetIdentity();
 }
 
 MeshNinja::MeshFileFormat* Mesh::MakeFileFormatObject()

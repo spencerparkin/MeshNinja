@@ -18,6 +18,10 @@ Scene::Scene()
 {
 }
 
+/*virtual*/ void Scene::HandleTransform(const MeshNinja::Transform& transform)
+{
+}
+
 const Scene::Object* Scene::ProcessHitBuffer(const GLuint* hitBuffer, GLuint hitBufferSize, GLuint hitCount) const
 {
 	const GLuint* hitRecord = hitBuffer;

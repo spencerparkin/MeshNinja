@@ -2,6 +2,7 @@
 
 #include "Common.h"
 #include "Vector.h"
+#include "Transform.h"
 #include "ConvexPolygon.h"
 
 namespace MeshNinja
@@ -39,6 +40,7 @@ namespace MeshNinja
 		bool GeneratePolyhedron(Polyhedron polyhedron, double eps = MESH_NINJA_EPS);
 		int FindClosestPointTo(const Vector& point, double* smallestDistance = nullptr) const;
 		void Copy(const ConvexPolygonMesh& mesh);
+		void ApplyTransform(const Transform& transform);
 
 		struct MESH_NINJA_API Triangle
 		{

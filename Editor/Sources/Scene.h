@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Transform.h"
 #include <wx/glcanvas.h>
 
 class Camera;
@@ -14,6 +15,7 @@ public:
 
 	virtual void Render(GLint renderMode, const Camera* camera) const;
 	virtual void HandlePick(const Object* object, bool shiftDown);
+	virtual void HandleTransform(const MeshNinja::Transform& transform);
 	virtual int GetSceneObjectCount() const = 0;
 	virtual const Object* GetSceneObject(int i) const = 0;
 

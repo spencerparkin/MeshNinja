@@ -13,6 +13,7 @@ public:
 
 	virtual void Render(GLint renderMode, const Camera* camera) const override;
 	virtual void HandlePick(const Object* object, bool shiftDown) override;
+	virtual void HandleTransform(const MeshNinja::Transform& transform) override;
 	virtual int GetSceneObjectCount() const override;
 	virtual const Object* GetSceneObject(int i) const override;
 
@@ -25,6 +26,8 @@ public:
 
 	const Mesh* FindFirstSelectedMesh() const;
 	Mesh* FindFirstSelectedMesh();
+
+	void ForAllMeshes(std::function<void(Mesh*)> callback, bool mustBeSelected = false);
 
 private:
 	MeshList meshList;

@@ -47,6 +47,17 @@ void MeshCollectionScene::Clear()
 	wxPostEvent(wxGetApp().GetFrame(), sceneChangedEvent);
 }
 
+/*virtual*/ void MeshCollectionScene::HandleTransform(const MeshNinja::Transform& transform)
+{
+	this->ForAllMeshes([&transform](Mesh* mesh)
+		{
+			if (transform.translation != MeshNinja::Vector(0.0, 0.0, 0.0))
+				mesh->transform = transform * mesh->transform;
+			else
+				mesh->transform.matrix = transform.matrix * mesh->transform.matrix;
+		}, true);
+}
+
 /*virtual*/ void MeshCollectionScene::Render(GLint renderMode, const Camera* camera) const
 {
 	if (renderMode == GL_SELECT)
@@ -75,4 +86,11 @@ Mesh* MeshCollectionScene::FindFirstSelectedMesh()
 			return mesh;
 
 	return nullptr;
+}
+
+void MeshCollectionScene::ForAllMeshes(std::function<void(Mesh*)> callback, bool mustBeSelected /*= false*/)
+{
+	for (Mesh* mesh : this->meshList)
+		if (!mustBeSelected || mesh->isSelected)
+			callback(mesh);
 }

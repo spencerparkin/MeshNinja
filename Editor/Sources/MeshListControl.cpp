@@ -10,6 +10,7 @@ MeshListControl::MeshListControl(wxWindow* parent) : wxListCtrl(parent, wxID_ANY
 	this->AppendColumn("File");
 	this->AppendColumn("# Verts");
 	this->AppendColumn("# Facets");
+	this->AppendColumn("Visible");
 
 	this->Bind(wxEVT_LIST_ITEM_SELECTED, &MeshListControl::OnListItemSelected, this);
 	this->Bind(wxEVT_LIST_ITEM_DESELECTED, &MeshListControl::OnListItemUnselected, this);
@@ -85,9 +86,6 @@ void MeshListControl::PullControlSelectionFromScene()
 		const Mesh* mesh = meshScene->GetMeshList()[item];
 		if (mesh)
 		{
-			// I'm not sure where else to do this; so do it here.
-			const_cast<MeshListControl*>(this)->SetItemPtrData(item, wxUIntPtr(this));
-
 			switch (column)
 			{
 				case 0:
@@ -102,6 +100,13 @@ void MeshListControl::PullControlSelectionFromScene()
 				case 2:
 				{
 					return wxString::Format("%d", mesh->mesh.facetArray->size());
+				}
+				case 3:
+				{
+					if (mesh->isVisible)
+						return wxString("Yes");
+					else
+						return wxString("No");
 				}
 			}
 		}

@@ -26,5 +26,5 @@ namespace MeshNinja
 		Vector translation;
 	};
 
-	Transform operator*(const Transform& transformA, const Transform& transformB);
+	Transform MESH_NINJA_API operator*(const Transform& transformA, const Transform& transformB);
 }

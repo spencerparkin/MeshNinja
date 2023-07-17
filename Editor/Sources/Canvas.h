@@ -17,6 +17,7 @@ public:
 	void OnLeftMouseDown(wxMouseEvent& event);
 	void OnLeftMouseUp(wxMouseEvent& event);
 	void OnMouseMove(wxMouseEvent& event);
+	void OnMouseWheel(wxMouseEvent& event);
 
 	void Tick();
 

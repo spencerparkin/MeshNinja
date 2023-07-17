@@ -18,6 +18,7 @@ Canvas::Canvas(wxWindow* parent) : wxGLCanvas(parent, wxID_ANY, attributeList, w
 	this->Bind(wxEVT_LEFT_DOWN, &Canvas::OnLeftMouseDown, this);
 	this->Bind(wxEVT_LEFT_UP, &Canvas::OnLeftMouseUp, this);
 	this->Bind(wxEVT_MOTION, &Canvas::OnMouseMove, this);
+	this->Bind(wxEVT_MOUSEWHEEL, &Canvas::OnMouseWheel, this);
 }
 
 /*virtual*/ Canvas::~Canvas()
@@ -93,6 +94,8 @@ void Canvas::OnKeyDown(wxKeyEvent& event)
 
 void Canvas::OnRightMouseDown(wxMouseEvent& event)
 {
+	this->SetFocus();
+
 	wxPoint pickingPoint = event.GetPosition();
 	const Scene::Object* object = this->RenderScene(GL_SELECT, &pickingPoint);
 	this->scene->HandlePick(object, event.ShiftDown());
@@ -100,6 +103,8 @@ void Canvas::OnRightMouseDown(wxMouseEvent& event)
 
 void Canvas::OnLeftMouseDown(wxMouseEvent& event)
 {
+	this->SetFocus();
+
 	this->dragging = true;
 	this->lastMousePos = event.GetPosition();
 }
@@ -117,14 +122,61 @@ void Canvas::OnMouseMove(wxMouseEvent& event)
 		wxPoint mouseDelta = curMousePos - this->lastMousePos;
 		this->lastMousePos = curMousePos;
 
-		double motionFactor = 0.01;
+		if (event.ShiftDown())
+		{
+			double sensativityFactor = 0.1;
+			
+			MeshNinja::Vector xAxis, yAxis, zAxis;
+			this->camera->MakeFrame(xAxis, yAxis, zAxis);
 
-		double angleDeltaY = motionFactor * double(-mouseDelta.y);
-		this->camera->LookUpDown(angleDeltaY);
+			MeshNinja::Transform transform;
+			transform.SetIdentity();
+			transform.translation = (xAxis * double(mouseDelta.x) + yAxis * double(-mouseDelta.y)) * sensativityFactor;
+			this->scene->HandleTransform(transform);
+		}
+		else
+		{
+			double sensativityFactor = 0.01;
 
-		double angleDeltaX = motionFactor * double(-mouseDelta.x);
-		this->camera->LookLeftRight(angleDeltaX);
+			double angleDeltaY = sensativityFactor * double(-mouseDelta.y);
+			this->camera->LookUpDown(angleDeltaY);
 
+			double angleDeltaX = sensativityFactor * double(-mouseDelta.x);
+			this->camera->LookLeftRight(angleDeltaX);
+		}
+
+		this->Refresh();
+	}
+}
+
+void Canvas::OnMouseWheel(wxMouseEvent& event)
+{
+	if (event.ShiftDown())
+	{
+		int rotation = event.GetWheelRotation() / 120;		// Multiples of 120 are used.  I'm not sure why.
+
+		MeshNinja::Transform transform;
+		transform.SetIdentity();
+
+		if (event.AltDown())
+		{
+			double scale = 1.0 + double(rotation) * 0.1;
+
+			transform.matrix.SetCol(0, MeshNinja::Vector(scale, 0.0, 0.0));
+			transform.matrix.SetCol(1, MeshNinja::Vector(0.0, scale, 0.0));
+			transform.matrix.SetCol(2, MeshNinja::Vector(0.0, 0.0, scale));
+		}
+		else
+		{
+			double angle = double(-rotation) * (MESH_NINJA_PI / 180.0);
+
+			MeshNinja::Vector xAxis, yAxis, zAxis;
+			this->camera->MakeFrame(xAxis, yAxis, zAxis);
+
+			transform.matrix.SetFromAxisAngle(xAxis, angle);
+		}
+
+		this->scene->HandleTransform(transform);
 		this->Refresh();
 	}
 }

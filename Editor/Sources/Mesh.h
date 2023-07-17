@@ -5,6 +5,7 @@
 #include "ConvexPolygonMesh.h"
 #include "MeshFileFormat.h"
 #include "Scene.h"
+#include "Transform.h"
 
 class Camera;
 
@@ -19,12 +20,16 @@ public:
 
 	virtual void Render(GLint renderMode, const Camera* camera) const override;
 
+	void BakeTransform();
+
+	MeshNinja::MeshFileFormat* MakeFileFormatObject();
+
 	MeshNinja::Vector color;
 	MeshNinja::ConvexPolygonMesh mesh;
+	MeshNinja::Transform transform;
 	mutable MeshNinja::ConvexPolygonMesh renderMesh;
 	wxString fileSource;
 	mutable bool isSelected;
+	mutable bool isVisible;
 	mutable bool renderMeshDirty;
-
-	MeshNinja::MeshFileFormat* MakeFileFormatObject();
 };
