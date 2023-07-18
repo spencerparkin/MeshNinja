@@ -136,8 +136,6 @@ void Frame::OnAddMesh(wxCommandEvent& event)
 			delete mesh;
 			return;
 		}
-
-		mesh->mesh.UntessellateFaces();
 	}
 	else
 	{
@@ -159,6 +157,8 @@ void Frame::OnAddMesh(wxCommandEvent& event)
 		delete mesh;
 		return;
 	}
+
+	mesh->mesh.UntessellateFaces();
 
 	MeshCollectionScene* meshScene = wxGetApp().GetMeshScene();
 	meshScene->GetMeshList().push_back(mesh);
