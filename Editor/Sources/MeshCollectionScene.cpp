@@ -63,15 +63,37 @@ void MeshCollectionScene::Clear()
 
 /*virtual*/ void MeshCollectionScene::HandleKey(char key)
 {
-	if (key == ' ')
+	switch (key)
 	{
-		this->ForAllMeshes([](Mesh* mesh)
-			{
-				mesh->SetVisible(!mesh->GetVisible());
-			}, true);
+		case ' ':
+		{
+			this->ForAllMeshes([](Mesh* mesh)
+				{
+					mesh->SetVisible(!mesh->GetVisible());
+				}, true);
 
-		wxCommandEvent sceneChangedEvent(EVT_SCENE_CHANGED);
-		wxPostEvent(wxGetApp().GetFrame(), sceneChangedEvent);
+			wxCommandEvent sceneChangedEvent(EVT_SCENE_CHANGED);
+			wxPostEvent(wxGetApp().GetFrame(), sceneChangedEvent);
+			break;
+		}
+		case WXK_DELETE:
+		{
+			for (int i = this->meshList.size() - 1; i >= 0; i--)
+			{
+				Mesh* mesh = this->meshList[i];
+				if (mesh->GetSelected())
+				{
+					delete mesh;
+					if (i != this->meshList.size() - 1)
+						this->meshList[i] = this->meshList[this->meshList.size() - 1];
+					this->meshList.pop_back();		
+				}
+			}
+
+			wxCommandEvent sceneChangedEvent(EVT_SCENE_CHANGED);
+			wxPostEvent(wxGetApp().GetFrame(), sceneChangedEvent);
+			break;
+		}
 	}
 }
 
@@ -110,4 +132,23 @@ void MeshCollectionScene::ForAllMeshes(std::function<void(Mesh*)> callback, bool
 	for (Mesh* mesh : this->meshList)
 		if (!mustBeSelected || mesh->GetSelected())
 			callback(mesh);
+}
+
+bool MeshCollectionScene::GetSelectedMeshes(std::list<Mesh*>& selectedMeshList, bool sortedByTimeStamp)
+{
+	selectedMeshList.clear();
+
+	for (Mesh* mesh : this->meshList)
+		if (mesh->GetSelected())
+			selectedMeshList.push_back(mesh);
+
+	if (sortedByTimeStamp)
+	{
+		selectedMeshList.sort([](Mesh* meshA, Mesh* meshB) -> bool
+			{
+				return meshA->GetSelectionTime() < meshB->GetSelectionTime();
+			});
+	}
+
+	return selectedMeshList.size() > 0;
 }

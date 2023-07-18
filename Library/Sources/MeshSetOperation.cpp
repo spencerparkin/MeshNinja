@@ -366,6 +366,9 @@ bool MeshSetOperation::Graph::ColorEdges(const std::vector<LineSegment>& lineSeg
 bool MeshSetOperation::Graph::ColorNodes(const Graph* otherGraph)
 {
 	MeshSetOperation::Node* node = this->FindInitialOutsideNode(otherGraph);
+	if (!node)
+		return false;
+
 	node->side = MeshSetOperation::Node::Side::OUTSIDE;
 
 	std::list<MeshSetOperation::Node*> nodeQueue;

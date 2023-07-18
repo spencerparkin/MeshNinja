@@ -183,6 +183,7 @@ void Mesh::BakeTransform()
 {
 	this->mesh.ApplyTransform(this->transform);
 	this->transform.SetIdentity();
+	this->renderMeshDirty = true;
 }
 
 MeshNinja::MeshFileFormat* Mesh::MakeFileFormatObject()

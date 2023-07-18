@@ -3,10 +3,12 @@
 #include "Application.h"
 #include "MeshCollectionScene.h"
 #include "Mesh.h"
+#include "MeshSetOperation.h"
 #include <wx/aboutdlg.h>
 #include <wx/menu.h>
 #include <wx/filedlg.h>
 #include <wx/msgdlg.h>
+#include <wx/toolbar.h>
 
 wxDEFINE_EVENT(EVT_SCENE_CHANGED, wxCommandEvent);
 
@@ -33,12 +35,28 @@ Frame::Frame(wxWindow* parent, const wxPoint& pos, const wxSize& size) : wxFrame
 
 	this->SetStatusBar(new wxStatusBar(this));
 
+	wxBitmap unionBitmap, intersectionBitmap, subtractionBitmap;
+
+	intersectionBitmap.LoadFile(wxGetCwd() + "/Textures/IntersectionIcon.png", wxBITMAP_TYPE_PNG);
+	unionBitmap.LoadFile(wxGetCwd() + "/Textures/UnionIcon.png", wxBITMAP_TYPE_PNG);
+	subtractionBitmap.LoadFile(wxGetCwd() + "/Textures/SubtractionIcon.png", wxBITMAP_TYPE_PNG);
+
+	wxToolBar* toolBar = this->CreateToolBar();
+	toolBar->AddTool(ID_IntersectMeshes, "Intersect Meshes", intersectionBitmap, "Take the intersection of two meshes.");
+	toolBar->AddTool(ID_UnionMeshes, "Union Meshes", unionBitmap, "Take the union of two meshes.");
+	toolBar->AddTool(ID_SubtractMeshes, "Subtract Meshes", subtractionBitmap, "Subtract one mesh from another.");
+
+	toolBar->Realize();
+
 	this->Bind(wxEVT_MENU, &Frame::OnExit, this, ID_Exit);
 	this->Bind(wxEVT_MENU, &Frame::OnAbout, this, ID_About);
 	this->Bind(wxEVT_MENU, &Frame::OnImportMesh, this, ID_ImportMesh);
 	this->Bind(wxEVT_MENU, &Frame::OnExportMesh, this, ID_ExportMesh);
 	this->Bind(EVT_SCENE_CHANGED, &Frame::OnSceneChanged, this);
 	this->Bind(wxEVT_TIMER, &Frame::OnTimerTick, this);
+	this->Bind(wxEVT_MENU, &Frame::OnMeshSetOperation, this, ID_IntersectMeshes);
+	this->Bind(wxEVT_MENU, &Frame::OnMeshSetOperation, this, ID_UnionMeshes);
+	this->Bind(wxEVT_MENU, &Frame::OnMeshSetOperation, this, ID_SubtractMeshes);
 
 	this->MakePanels();
 	this->UpdatePanels();
@@ -56,6 +74,59 @@ Frame::Frame(wxWindow* parent, const wxPoint& pos, const wxSize& size) : wxFrame
 void Frame::OnSceneChanged(wxCommandEvent& event)
 {
 	this->UpdatePanels();
+}
+
+void Frame::OnMeshSetOperation(wxCommandEvent& event)
+{
+	MeshCollectionScene* meshScene = wxGetApp().GetMeshScene();
+	
+	std::list<Mesh*> selectedMeshesList;
+	if (!meshScene->GetSelectedMeshes(selectedMeshesList, true) || selectedMeshesList.size() != 2)
+	{
+		wxMessageBox("You must select exactly two meshes.", "Error", wxICON_ERROR | wxOK, this);
+		return;
+	}
+
+	MeshNinja::MeshSetOperation* operation = nullptr;
+
+	switch (event.GetId())
+	{
+	case ID_IntersectMeshes:
+		operation = new MeshNinja::MeshIntersection();
+		break;
+	case ID_UnionMeshes:
+		operation = new MeshNinja::MeshUnion();
+		break;
+	case ID_SubtractMeshes:
+		operation = new MeshNinja::MeshSubtraction();
+		break;
+	}
+
+	Mesh* meshA = *selectedMeshesList.begin();
+	Mesh* meshB = selectedMeshesList.back();
+
+	meshA->BakeTransform();
+	meshB->BakeTransform();
+
+	Mesh* mesh = new Mesh();
+
+	if (!operation->Perform(meshA->mesh, meshB->mesh, mesh->mesh))
+	{
+		wxMessageBox("Mesh operation failed: " + wxString(operation->error->c_str()), "Error", wxICON_ERROR | wxOK, this);
+		delete mesh;
+	}
+	else
+	{
+		meshScene->GetMeshList().push_back(mesh);
+
+		meshA->SetVisible(false);
+		meshB->SetVisible(false);
+
+		wxCommandEvent sceneChangedEvent(EVT_SCENE_CHANGED);
+		wxPostEvent(this, sceneChangedEvent);
+	}
+
+	delete operation;
 }
 
 void Frame::OnTimerTick(wxTimerEvent& event)

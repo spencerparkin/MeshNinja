@@ -13,6 +13,7 @@ namespace MeshNinja
 	{
 	public:
 		ConvexPolygonMesh();
+		ConvexPolygonMesh(const ConvexPolygonMesh& mesh);
 		virtual ~ConvexPolygonMesh();
 
 		enum class Polyhedron

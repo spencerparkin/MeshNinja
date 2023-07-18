@@ -28,6 +28,8 @@ public:
 	const Mesh* FindFirstSelectedMesh() const;
 	Mesh* FindFirstSelectedMesh();
 
+	bool GetSelectedMeshes(std::list<Mesh*>& selectedMeshList, bool sortedByTimeStamp);
+
 	void ForAllMeshes(std::function<void(Mesh*)> callback, bool mustBeSelected = false);
 
 private:

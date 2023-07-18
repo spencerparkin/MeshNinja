@@ -2,6 +2,7 @@
 
 #include <wx/string.h>
 #include <wx/glcanvas.h>
+#include <wx/datetime.h>
 #include "ConvexPolygonMesh.h"
 #include "MeshFileFormat.h"
 #include "Scene.h"
@@ -27,6 +28,8 @@ public:
 
 	void SetVisible(bool visible) const;
 	bool GetVisible() const;
+
+	const wxDateTime& GetSelectionTime() const { return this->selectionTime; }
 
 	MeshNinja::MeshFileFormat* MakeFileFormatObject();
 

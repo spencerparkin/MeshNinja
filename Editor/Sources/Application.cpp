@@ -20,6 +20,8 @@ Application::Application()
 	if (!wxApp::OnInit())
 		return false;
 
+	wxInitAllImageHandlers();
+
 	this->frame = new Frame(nullptr, wxDefaultPosition, wxSize(1600, 800));
 	this->frame->Show();
 

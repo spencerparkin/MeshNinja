@@ -20,13 +20,17 @@ public:
 	void OnExportMesh(wxCommandEvent& event);
 	void OnSceneChanged(wxCommandEvent& event);
 	void OnTimerTick(wxTimerEvent& event);
+	void OnMeshSetOperation(wxCommandEvent& event);
 
 	enum
 	{
 		ID_Exit = wxID_HIGHEST,
 		ID_About,
 		ID_ImportMesh,
-		ID_ExportMesh
+		ID_ExportMesh,
+		ID_IntersectMeshes,
+		ID_UnionMeshes,
+		ID_SubtractMeshes
 	};
 
 private:
