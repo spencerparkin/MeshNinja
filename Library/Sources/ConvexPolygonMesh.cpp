@@ -371,7 +371,7 @@ bool ConvexPolygonMesh::GenerateConvexHull(const std::vector<Vector>& pointArray
 						Vector zAxis = vertexD - vertexA;
 
 						double determinant = xAxis.Cross(yAxis).Dot(zAxis);
-						if (determinant > 0.0)
+						if (determinant > MESH_NINJA_EPS)
 						{
 							triangleList.push_back(Triangle{ i, k, j });
 							triangleList.push_back(Triangle{ i, j, l });
