@@ -218,6 +218,8 @@ const Scene::Object* Canvas::RenderScene(GLint renderMode, const wxPoint* pickin
 		glVertex3f(0.0f, 0.0f, 10.0f);
 
 		glEnd();
+
+		// TODO: Add lighting option that can be used to highlight facets without drawing the edges.
 	}
 
 	if (this->scene)
