@@ -506,7 +506,14 @@ int ConvexPolygonMesh::FindClosestPointTo(const Vector& point, double* smallestD
 
 bool ConvexPolygonMesh::GenerateSphere(double radius, int segments, int slices)
 {
-	std::vector<Vector> pointArray;
+	if (segments < 3 || slices < 3)
+		return false;
+
+	std::vector<ConvexPolygon> polygonArray;
+
+	Vector** pointMatrix = new Vector*[segments + 1];
+	for (int i = 0; i <= segments; i++)
+		pointMatrix[i] = new Vector[slices];
 
 	for (int i = 0; i <= segments; i++)
 	{
@@ -530,19 +537,62 @@ bool ConvexPolygonMesh::GenerateSphere(double radius, int segments, int slices)
 			vertex.y = segmentRadius * sinTheta;
 			vertex.z = radius * cosPhi;
 
-			pointArray.push_back(vertex);
-
-			if (i == 0 || i == segments)
-				break;
+			pointMatrix[i][j] = vertex;
 		}
 	}
 
-	return this->GenerateConvexHull(pointArray);
+	for (int j = 0; j < slices; j++)
+	{
+		ConvexPolygon polygon;
+
+		polygon.vertexArray->push_back(pointMatrix[0][0]);
+		polygon.vertexArray->push_back(pointMatrix[1][j]);
+		polygon.vertexArray->push_back(pointMatrix[1][(j + 1) % slices]);
+
+		polygonArray.push_back(polygon);
+
+		polygon.Clear();
+
+		polygon.vertexArray->push_back(pointMatrix[segments][0]);
+		polygon.vertexArray->push_back(pointMatrix[segments - 1][(j + 1) % slices]);
+		polygon.vertexArray->push_back(pointMatrix[segments - 1][j]);
+
+		polygonArray.push_back(polygon);
+	}
+
+	for (int i = 1; i < segments - 1; i++)
+	{
+		for (int j = 0; j < slices; j++)
+		{
+			ConvexPolygon polygon;
+
+			polygon.vertexArray->push_back(pointMatrix[i][j]);
+			polygon.vertexArray->push_back(pointMatrix[i + 1][j]);
+			polygon.vertexArray->push_back(pointMatrix[i + 1][(j + 1) % slices]);
+			polygon.vertexArray->push_back(pointMatrix[i][(j + 1) % slices]);
+
+			polygonArray.push_back(polygon);
+		}
+	}
+
+	for (int i = 0; i <= segments; i++)
+		delete[] pointMatrix[i];
+	delete[] pointMatrix;
+
+	this->FromConvexPolygonArray(polygonArray);
+	return true;
 }
 
 bool ConvexPolygonMesh::GenerateCylinder(double length, double radius, int segments, int slices)
 {
-	std::vector<Vector> pointArray;
+	if (segments < 3 || slices < 3)
+		return false;
+
+	std::vector<ConvexPolygon> polygonArray;
+
+	Vector** pointMatrix = new Vector*[segments + 1];
+	for (int i = 0; i <= segments; i++)
+		pointMatrix[i] = new Vector[slices];
 
 	for (int i = 0; i <= segments; i++)
 	{
@@ -559,11 +609,41 @@ bool ConvexPolygonMesh::GenerateCylinder(double length, double radius, int segme
 			vertex.y = radius * sinTheta;
 			vertex.z = -length / 2.0 + length * double(i) / double(segments);
 
-			pointArray.push_back(vertex);
+			pointMatrix[i][j] = vertex;
 		}
 	}
 
-	return this->GenerateConvexHull(pointArray);
+	ConvexPolygon polygonCapA;
+	for (int j = slices - 1; j >= 0; j--)
+		polygonCapA.vertexArray->push_back(pointMatrix[0][j]);
+	polygonArray.push_back(polygonCapA);
+
+	ConvexPolygon polygonCapB;
+	for (int j = 0; j < slices; j++)
+		polygonCapB.vertexArray->push_back(pointMatrix[segments][j]);
+	polygonArray.push_back(polygonCapB);
+
+	for (int i = 0; i < segments; i++)
+	{
+		for (int j = 0; j < slices; j++)
+		{
+			ConvexPolygon polygon;
+
+			polygon.vertexArray->push_back(pointMatrix[i][(j + 1) % slices]);
+			polygon.vertexArray->push_back(pointMatrix[i + 1][(j + 1) % slices]);
+			polygon.vertexArray->push_back(pointMatrix[i + 1][j]);
+			polygon.vertexArray->push_back(pointMatrix[i][j]);
+
+			polygonArray.push_back(polygon);
+		}
+	}
+
+	for (int i = 0; i <= segments; i++)
+		delete[] pointMatrix[i];
+	delete[] pointMatrix;
+
+	this->FromConvexPolygonArray(polygonArray);
+	return true;
 }
 
 bool ConvexPolygonMesh::GenerateTorus(double innerRadius, double outerRadius, int segments, int slices)
@@ -656,10 +736,20 @@ bool ConvexPolygonMesh::GenerateMobiusStrip(double width, double radius, int seg
 	{
 		ConvexPolygon polygon;
 
-		polygon.vertexArray->push_back(pointMatrix[i][0]);
-		polygon.vertexArray->push_back(pointMatrix[(i + 1) % segments][0]);
-		polygon.vertexArray->push_back(pointMatrix[(i + 1) % segments][1]);
-		polygon.vertexArray->push_back(pointMatrix[i][1]);
+		if (i < segments - 1)
+		{
+			polygon.vertexArray->push_back(pointMatrix[i][0]);
+			polygon.vertexArray->push_back(pointMatrix[i + 1][0]);
+			polygon.vertexArray->push_back(pointMatrix[i + 1][1]);
+			polygon.vertexArray->push_back(pointMatrix[i][1]);
+		}
+		else
+		{
+			polygon.vertexArray->push_back(pointMatrix[i][0]);
+			polygon.vertexArray->push_back(pointMatrix[0][1]);
+			polygon.vertexArray->push_back(pointMatrix[0][0]);
+			polygon.vertexArray->push_back(pointMatrix[i][1]);
+		}
 
 		polygonArray.push_back(polygon);
 	}

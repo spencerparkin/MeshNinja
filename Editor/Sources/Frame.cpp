@@ -105,6 +105,8 @@ void Frame::OnSceneChanged(wxCommandEvent& event)
 
 void Frame::OnAddMesh(wxCommandEvent& event)
 {
+	wxBusyCursor busyCursor;
+
 	Mesh* mesh = new Mesh();
 
 	int i = this->meshComboBox->GetSelection();
