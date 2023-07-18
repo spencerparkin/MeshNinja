@@ -648,6 +648,9 @@ bool ConvexPolygonMesh::GenerateCylinder(double length, double radius, int segme
 
 bool ConvexPolygonMesh::GenerateTorus(double innerRadius, double outerRadius, int segments, int slices)
 {
+	if (segments < 3 || slices < 3)
+		return false;
+
 	std::vector<ConvexPolygon> polygonArray;
 
 	double majorRadius = (outerRadius + innerRadius) / 2.0;
@@ -705,6 +708,9 @@ bool ConvexPolygonMesh::GenerateTorus(double innerRadius, double outerRadius, in
 
 bool ConvexPolygonMesh::GenerateMobiusStrip(double width, double radius, int segments)
 {
+	if (segments < 3)
+		return false;
+
 	std::vector<ConvexPolygon> polygonArray;
 
 	Vector** pointMatrix = new Vector*[segments];
