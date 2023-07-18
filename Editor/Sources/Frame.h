@@ -3,6 +3,7 @@
 #include <wx/frame.h>
 #include <wx/aui/aui.h>
 #include <wx/timer.h>
+#include <wx/combobox.h>
 
 wxDECLARE_EVENT(EVT_SCENE_CHANGED, wxCommandEvent);
 
@@ -21,6 +22,7 @@ public:
 	void OnSceneChanged(wxCommandEvent& event);
 	void OnTimerTick(wxTimerEvent& event);
 	void OnMeshSetOperation(wxCommandEvent& event);
+	void OnAddMesh(wxCommandEvent& event);
 
 	enum
 	{
@@ -30,7 +32,8 @@ public:
 		ID_ExportMesh,
 		ID_IntersectMeshes,
 		ID_UnionMeshes,
-		ID_SubtractMeshes
+		ID_SubtractMeshes,
+		ID_AddMesh
 	};
 
 private:
@@ -39,6 +42,7 @@ private:
 	void UpdatePanels();
 	void ForAllPanels(std::function<void(Panel*)> callback);
 
+	wxComboBox* meshComboBox;
 	wxAuiManager auiManager;
 	wxTimer timer;
 	bool inTimerTick;

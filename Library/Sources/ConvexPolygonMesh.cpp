@@ -504,6 +504,180 @@ int ConvexPolygonMesh::FindClosestPointTo(const Vector& point, double* smallestD
 	return j;
 }
 
+bool ConvexPolygonMesh::GenerateSphere(double radius, int segments, int slices)
+{
+	std::vector<Vector> pointArray;
+
+	for (int i = 0; i <= segments; i++)
+	{
+		double phi = MESH_NINJA_PI * double(i) / double(segments);
+
+		double cosPhi = ::cos(phi);
+		double sinPhi = ::sin(phi);
+
+		for (int j = 0; j < slices; j++)
+		{
+			double theta = 2.0 * MESH_NINJA_PI * double(j) / double(slices);
+
+			double cosTheta = ::cos(theta);
+			double sinTheta = ::sin(theta);
+
+			Vector vertex;
+
+			double segmentRadius = radius * sinPhi;
+
+			vertex.x = segmentRadius * cosTheta;
+			vertex.y = segmentRadius * sinTheta;
+			vertex.z = radius * cosPhi;
+
+			pointArray.push_back(vertex);
+
+			if (i == 0 || i == segments)
+				break;
+		}
+	}
+
+	return this->GenerateConvexHull(pointArray);
+}
+
+bool ConvexPolygonMesh::GenerateCylinder(double length, double radius, int segments, int slices)
+{
+	std::vector<Vector> pointArray;
+
+	for (int i = 0; i <= segments; i++)
+	{
+		for (int j = 0; j < slices; j++)
+		{
+			double theta = 2.0 * MESH_NINJA_PI * double(j) / double(slices);
+
+			double cosTheta = ::cos(theta);
+			double sinTheta = ::sin(theta);
+
+			Vector vertex;
+
+			vertex.x = radius * cosTheta;
+			vertex.y = radius * sinTheta;
+			vertex.z = -length / 2.0 + length * double(i) / double(segments);
+
+			pointArray.push_back(vertex);
+		}
+	}
+
+	return this->GenerateConvexHull(pointArray);
+}
+
+bool ConvexPolygonMesh::GenerateTorus(double innerRadius, double outerRadius, int segments, int slices)
+{
+	std::vector<ConvexPolygon> polygonArray;
+
+	double majorRadius = (outerRadius + innerRadius) / 2.0;
+	double minorRadius = (outerRadius - innerRadius) / 2.0;
+
+	Vector** pointMatrix = new Vector*[slices];
+	for (int i = 0; i < slices; i++)
+		pointMatrix[i] = new Vector[segments];
+
+	for (int i = 0; i < slices; i++)
+	{
+		double phi = 2.0 * MESH_NINJA_PI * double(i) / double(slices);
+
+		Vector majorVector;
+
+		majorVector.x = majorRadius * ::cos(phi);
+		majorVector.y = majorRadius * ::sin(phi);
+		majorVector.z = 0.0;
+
+		for (int j = 0; j < segments; j++)
+		{
+			double theta = 2.0 * MESH_NINJA_PI * double(j) / double(segments);
+
+			Vector xAxis = majorVector.Normalized();
+			Vector yAxis(0.0, 0.0, 1.0);
+
+			Vector minorVector = xAxis * minorRadius * ::cos(theta) + yAxis * minorRadius * ::sin(theta);
+
+			pointMatrix[i][j] = majorVector + minorVector;
+		}
+	}
+
+	for (int i = 0; i < slices; i++)
+	{
+		for (int j = 0; j < segments; j++)
+		{
+			ConvexPolygon polygon;
+
+			polygon.vertexArray->push_back(pointMatrix[i][j]);
+			polygon.vertexArray->push_back(pointMatrix[(i + 1) % slices][j]);
+			polygon.vertexArray->push_back(pointMatrix[(i + 1) % slices][(j + 1) % segments]);
+			polygon.vertexArray->push_back(pointMatrix[i][(j + 1) % segments]);
+
+			polygonArray.push_back(polygon);
+		}
+	}
+
+	for (int i = 0; i < slices; i++)
+		delete[] pointMatrix[i];
+	delete[] pointMatrix;
+
+	this->FromConvexPolygonArray(polygonArray);
+	return true;
+}
+
+bool ConvexPolygonMesh::GenerateMobiusStrip(double width, double radius, int segments)
+{
+	std::vector<ConvexPolygon> polygonArray;
+
+	Vector** pointMatrix = new Vector*[segments];
+	for (int i = 0; i < segments; i++)
+		pointMatrix[i] = new Vector[2];
+
+	for (int i = 0; i < segments; i++)
+	{
+		double theta = 2.0 * MESH_NINJA_PI * double(i) / double(segments);
+
+		Vector majorVector;
+
+		majorVector.x = radius * ::cos(theta);
+		majorVector.y = radius * ::sin(theta);
+		majorVector.z = 0.0;
+
+		double phi = MESH_NINJA_PI * double(i) / double(segments);
+
+		Vector xAxis = majorVector.Normalized();
+		Vector yAxis(0.0, 0.0, 1.0);
+
+		Vector minorVector = xAxis * width * ::cos(phi) + yAxis * width * ::sin(phi);
+
+		pointMatrix[i][0] = majorVector + minorVector;
+		pointMatrix[i][1] = majorVector - minorVector;
+	}
+
+	for (int i = 0; i < segments; i++)
+	{
+		ConvexPolygon polygon;
+
+		polygon.vertexArray->push_back(pointMatrix[i][0]);
+		polygon.vertexArray->push_back(pointMatrix[(i + 1) % segments][0]);
+		polygon.vertexArray->push_back(pointMatrix[(i + 1) % segments][1]);
+		polygon.vertexArray->push_back(pointMatrix[i][1]);
+
+		polygonArray.push_back(polygon);
+	}
+
+	for (int i = 0; i < segments; i++)
+		delete[] pointMatrix[i];
+	delete[] pointMatrix;
+
+	this->FromConvexPolygonArray(polygonArray);
+	return true;
+}
+
+bool ConvexPolygonMesh::GenerateKleinBottle(int segments)
+{
+	// TODO: Skin a spline to accomplish this?
+	return false;
+}
+
 //----------------------------------- ConvexPolygonMesh::Triangle -----------------------------------
 
 bool ConvexPolygonMesh::Triangle::IsCanceledBy(const Triangle& triangle) const

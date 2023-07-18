@@ -174,7 +174,10 @@ bool Mesh::Save()
 	if (!fileFormat)
 		return false;
 
-	bool success = fileFormat->SaveMesh((const char*)this->fileSource.c_str(), this->mesh);
+	MeshNinja::ConvexPolygonMesh transformedMesh(this->mesh);
+	transformedMesh.ApplyTransform(this->transform);
+
+	bool success = fileFormat->SaveMesh((const char*)this->fileSource.c_str(), transformedMesh);
 	delete fileFormat;
 	return success;
 }

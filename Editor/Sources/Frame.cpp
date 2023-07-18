@@ -4,6 +4,7 @@
 #include "MeshCollectionScene.h"
 #include "Mesh.h"
 #include "MeshSetOperation.h"
+#include "ConvexPolygonMesh.h"
 #include <wx/aboutdlg.h>
 #include <wx/menu.h>
 #include <wx/filedlg.h>
@@ -36,15 +37,40 @@ Frame::Frame(wxWindow* parent, const wxPoint& pos, const wxSize& size) : wxFrame
 	this->SetStatusBar(new wxStatusBar(this));
 
 	wxBitmap unionBitmap, intersectionBitmap, subtractionBitmap;
+	wxBitmap addMeshBitmap;
 
 	intersectionBitmap.LoadFile(wxGetCwd() + "/Textures/IntersectionIcon.png", wxBITMAP_TYPE_PNG);
 	unionBitmap.LoadFile(wxGetCwd() + "/Textures/UnionIcon.png", wxBITMAP_TYPE_PNG);
 	subtractionBitmap.LoadFile(wxGetCwd() + "/Textures/SubtractionIcon.png", wxBITMAP_TYPE_PNG);
+	addMeshBitmap.LoadFile(wxGetCwd() + "/Textures/AddMeshIcon.png", wxBITMAP_TYPE_PNG);
 
 	wxToolBar* toolBar = this->CreateToolBar();
 	toolBar->AddTool(ID_IntersectMeshes, "Intersect Meshes", intersectionBitmap, "Take the intersection of two meshes.");
 	toolBar->AddTool(ID_UnionMeshes, "Union Meshes", unionBitmap, "Take the union of two meshes.");
 	toolBar->AddTool(ID_SubtractMeshes, "Subtract Meshes", subtractionBitmap, "Subtract one mesh from another.");
+
+	wxArrayString meshComboBoxChoices;
+
+	meshComboBoxChoices.Add("Tetrahedron");
+	meshComboBoxChoices.Add("Octahedron");
+	meshComboBoxChoices.Add("Hexadron");
+	meshComboBoxChoices.Add("Icosahedron");
+	meshComboBoxChoices.Add("Dodecahedron");
+	meshComboBoxChoices.Add("Icosidodecahedron");
+	meshComboBoxChoices.Add("Cuboctahedron");
+	meshComboBoxChoices.Add("Rhombicosidodecahedron");
+	meshComboBoxChoices.Add("Plane");
+	meshComboBoxChoices.Add("Sphere");
+	meshComboBoxChoices.Add("Cylinder");
+	meshComboBoxChoices.Add("Torus");
+	meshComboBoxChoices.Add("Mobius Strip");
+	meshComboBoxChoices.Add("Klein Bottle");
+
+	this->meshComboBox = new wxComboBox(toolBar, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, meshComboBoxChoices, wxCB_READONLY | wxCB_SORT | wxCB_DROPDOWN);
+
+	toolBar->AddSeparator();
+	toolBar->AddControl(this->meshComboBox, "Mesh:");
+	toolBar->AddTool(ID_AddMesh, "Add Mesh", addMeshBitmap, "Add the mesh specified in the drop-down to the scene.");
 
 	toolBar->Realize();
 
@@ -57,6 +83,7 @@ Frame::Frame(wxWindow* parent, const wxPoint& pos, const wxSize& size) : wxFrame
 	this->Bind(wxEVT_MENU, &Frame::OnMeshSetOperation, this, ID_IntersectMeshes);
 	this->Bind(wxEVT_MENU, &Frame::OnMeshSetOperation, this, ID_UnionMeshes);
 	this->Bind(wxEVT_MENU, &Frame::OnMeshSetOperation, this, ID_SubtractMeshes);
+	this->Bind(wxEVT_MENU, &Frame::OnAddMesh, this, ID_AddMesh);
 
 	this->MakePanels();
 	this->UpdatePanels();
@@ -76,8 +103,74 @@ void Frame::OnSceneChanged(wxCommandEvent& event)
 	this->UpdatePanels();
 }
 
+void Frame::OnAddMesh(wxCommandEvent& event)
+{
+	Mesh* mesh = new Mesh();
+
+	int i = this->meshComboBox->GetSelection();
+	wxString meshName = this->meshComboBox->GetString(i);
+
+	int polyhedron = -1;
+	if (meshName == "Tetrahedron")
+		polyhedron = int(MeshNinja::ConvexPolygonMesh::Polyhedron::TETRAHEDRON);
+	else if (meshName == "Octahedron")
+		polyhedron = int(MeshNinja::ConvexPolygonMesh::Polyhedron::OCTAHEDRON);
+	else if (meshName == "Hexadron")
+		polyhedron = int(MeshNinja::ConvexPolygonMesh::Polyhedron::HEXADRON);
+	else if (meshName == "Icosahedron")
+		polyhedron = int(MeshNinja::ConvexPolygonMesh::Polyhedron::ICOSAHEDRON);
+	else if (meshName == "Dodecahedron")
+		polyhedron = int(MeshNinja::ConvexPolygonMesh::Polyhedron::DODECAHEDRON);
+	else if (meshName == "Icosidodecahedron")
+		polyhedron = int(MeshNinja::ConvexPolygonMesh::Polyhedron::ICOSIDODECAHEDRON);
+	else if (meshName == "Cuboctahedron")
+		polyhedron = int(MeshNinja::ConvexPolygonMesh::Polyhedron::CUBOCTAHEDRON);
+	else if (meshName == "Rhombicosidodecahedron")
+		polyhedron = int(MeshNinja::ConvexPolygonMesh::Polyhedron::RHOMBICOSIDODECAHEDRON);
+
+	if (polyhedron >= 0)
+	{
+		if (!mesh->mesh.GeneratePolyhedron(MeshNinja::ConvexPolygonMesh::Polyhedron(polyhedron)))
+		{
+			wxMessageBox("Failed to generate polyhedron!", "Error", wxICON_ERROR | wxOK, this);
+			delete mesh;
+			return;
+		}
+
+		mesh->mesh.UntessellateFaces();
+	}
+	else
+	{
+		if (meshName == "Sphere")
+			mesh->mesh.GenerateSphere(5.0, 16, 16);
+		else if (meshName == "Cylinder")
+			mesh->mesh.GenerateCylinder(10.0, 5.0, 16, 16);
+		else if (meshName == "Torus")
+			mesh->mesh.GenerateTorus(5.0, 10.0, 16, 16);
+		else if (meshName == "Mobius Strip")
+			mesh->mesh.GenerateMobiusStrip(1.0, 5.0, 16);
+		else if (meshName == "Klein Bottle")
+			mesh->mesh.GenerateKleinBottle(16);
+	}
+
+	if (mesh->mesh.vertexArray->size() == 0)
+	{
+		wxMessageBox("Failed to generate mesh!", "Error", wxICON_ERROR | wxOK, this);
+		delete mesh;
+		return;
+	}
+
+	MeshCollectionScene* meshScene = wxGetApp().GetMeshScene();
+	meshScene->GetMeshList().push_back(mesh);
+
+	wxCommandEvent sceneChangedEvent(EVT_SCENE_CHANGED);
+	wxPostEvent(this, sceneChangedEvent);
+}
+
 void Frame::OnMeshSetOperation(wxCommandEvent& event)
 {
+	wxBusyCursor busyCursor;
+
 	MeshCollectionScene* meshScene = wxGetApp().GetMeshScene();
 	
 	std::list<Mesh*> selectedMeshesList;
@@ -105,19 +198,22 @@ void Frame::OnMeshSetOperation(wxCommandEvent& event)
 	Mesh* meshA = *selectedMeshesList.begin();
 	Mesh* meshB = selectedMeshesList.back();
 
-	meshA->BakeTransform();
-	meshB->BakeTransform();
+	MeshNinja::ConvexPolygonMesh transformedMeshA(meshA->mesh);
+	MeshNinja::ConvexPolygonMesh transformedMeshB(meshB->mesh);
 
-	Mesh* mesh = new Mesh();
+	transformedMeshA.ApplyTransform(meshA->transform);
+	transformedMeshB.ApplyTransform(meshB->transform);
 
-	if (!operation->Perform(meshA->mesh, meshB->mesh, mesh->mesh))
+	Mesh* meshResult = new Mesh();
+
+	if (!operation->Perform(transformedMeshA, transformedMeshB, meshResult->mesh))
 	{
 		wxMessageBox("Mesh operation failed: " + wxString(operation->error->c_str()), "Error", wxICON_ERROR | wxOK, this);
-		delete mesh;
+		delete meshResult;
 	}
 	else
 	{
-		meshScene->GetMeshList().push_back(mesh);
+		meshScene->GetMeshList().push_back(meshResult);
 
 		meshA->SetVisible(false);
 		meshB->SetVisible(false);

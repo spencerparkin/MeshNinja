@@ -39,6 +39,11 @@ namespace MeshNinja
 		void FromConvexPolygonArray(const std::vector<ConvexPolygon>& convexPolygonArray);
 		bool GenerateConvexHull(const std::vector<Vector>& pointArray, double eps = MESH_NINJA_EPS);
 		bool GeneratePolyhedron(Polyhedron polyhedron, double eps = MESH_NINJA_EPS);
+		bool GenerateSphere(double radius, int segments, int slices);
+		bool GenerateCylinder(double length, double radius, int segments, int slices);
+		bool GenerateTorus(double innerRadius, double outerRadius, int segments, int slices);
+		bool GenerateMobiusStrip(double width, double radius, int segments);
+		bool GenerateKleinBottle(int segments);
 		int FindClosestPointTo(const Vector& point, double* smallestDistance = nullptr) const;
 		void Copy(const ConvexPolygonMesh& mesh);
 		void ApplyTransform(const Transform& transform);
