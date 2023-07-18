@@ -348,7 +348,7 @@ void Frame::OnAbout(wxCommandEvent& event)
 
 	aboutDialogInfo.SetName("Mesh Editor");
 	aboutDialogInfo.SetVersion("1.0");
-	aboutDialogInfo.SetDescription("This is just a basic mesh editing program.  Whoopy-freakin'-do.");
+	aboutDialogInfo.SetDescription("This is not a serious mesh editor.  It's just a testing-area/sandbox for the MeshNinja C++ library.");
 	aboutDialogInfo.SetCopyright("Copyright (C) 2023 -- Spencer T. Parkin <SpencerTParkin@gmail.com>");
 
 	wxAboutBox(aboutDialogInfo);
