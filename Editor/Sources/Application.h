@@ -18,6 +18,16 @@ public:
 	Frame* GetFrame() { return this->frame; }
 	MeshCollectionScene* GetMeshScene() { return this->meshScene; }
 
+	enum class LightingMode
+	{
+		UNLIT,
+		LIT
+	};
+
+	LightingMode lightingMode;
+	bool renderEdges;
+	bool renderFaceNormals;
+
 private:
 
 	Frame* frame;

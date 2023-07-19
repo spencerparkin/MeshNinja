@@ -774,6 +774,21 @@ bool ConvexPolygonMesh::GenerateKleinBottle(int segments)
 	return false;
 }
 
+Vector ConvexPolygonMesh::CalcCenter() const
+{
+	Vector center(0.0, 0.0, 0.0);
+
+	if (this->vertexArray->size() > 0)
+	{
+		for (const Vector& vertex : *this->vertexArray)
+			center += vertex;
+
+		center /= double(this->vertexArray->size());
+	}
+
+	return center;
+}
+
 //----------------------------------- ConvexPolygonMesh::Triangle -----------------------------------
 
 bool ConvexPolygonMesh::Triangle::IsCanceledBy(const Triangle& triangle) const

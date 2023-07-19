@@ -17,10 +17,12 @@ public:
 
 	void StrafeLeftRight(double delta);
 	void MoveForwardBackward(double delta);
-	void LookLeftRight(double angleDelta);
-	void LookUpDown(double angleDelta);
+	void LookLeftRight(double angleDelta, bool pivotAboutTarget);
+	void LookUpDown(double angleDelta, bool pivotAboutTarget);
+	void Zoom(double zoomFactor);
 
 	void MakeFrame(MeshNinja::Vector& xAxis, MeshNinja::Vector& yAxis, MeshNinja::Vector& zAxis) const;
+	void RotateLookDirection(const MeshNinja::Vector& axis, double angleDelta, bool pivotAboutTarget);
 
 	MeshNinja::Vector position;
 	MeshNinja::Vector target;

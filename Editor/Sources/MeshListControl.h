@@ -2,6 +2,8 @@
 
 #include <wx/listctrl.h>
 
+class Mesh;
+
 class MeshListControl : public wxListCtrl
 {
 public:
@@ -10,9 +12,22 @@ public:
 
 	virtual wxString OnGetItemText(long item, long column) const override;
 
-	void OnListItemSelected(wxListEvent& event);
-	void OnListItemUnselected(wxListEvent& event);
-
 	void PushControlSelectionToScene();
 	void PullControlSelectionFromScene();
+
+private:
+
+	void OnListItemSelected(wxListEvent& event);
+	void OnListItemUnselected(wxListEvent& event);
+	void OnListItemRightClick(wxListEvent& event);
+	void OnToggleVisibility(wxCommandEvent& event);
+	void OnMakeDual(wxCommandEvent& event);
+
+	enum
+	{
+		ID_ToggleVisibility = wxID_HIGHEST + 500,
+		ID_MakeDual
+	};
+
+	Mesh* GetSelectedMesh();
 };

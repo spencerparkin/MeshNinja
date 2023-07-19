@@ -37,17 +37,24 @@ Frame::Frame(wxWindow* parent, const wxPoint& pos, const wxSize& size) : wxFrame
 	this->SetStatusBar(new wxStatusBar(this));
 
 	wxBitmap unionBitmap, intersectionBitmap, subtractionBitmap;
-	wxBitmap addMeshBitmap;
+	wxBitmap addMeshBitmap, lightingBitmap, faceNormalsBitmap, edgesBitmap;
 
 	intersectionBitmap.LoadFile(wxGetCwd() + "/Textures/IntersectionIcon.png", wxBITMAP_TYPE_PNG);
 	unionBitmap.LoadFile(wxGetCwd() + "/Textures/UnionIcon.png", wxBITMAP_TYPE_PNG);
 	subtractionBitmap.LoadFile(wxGetCwd() + "/Textures/SubtractionIcon.png", wxBITMAP_TYPE_PNG);
 	addMeshBitmap.LoadFile(wxGetCwd() + "/Textures/AddMeshIcon.png", wxBITMAP_TYPE_PNG);
+	lightingBitmap.LoadFile(wxGetCwd() + "/Textures/LightingIcon.png", wxBITMAP_TYPE_PNG);
+	faceNormalsBitmap.LoadFile(wxGetCwd() + "/Textures/FaceNormalsIcon.png", wxBITMAP_TYPE_PNG);
+	edgesBitmap.LoadFile(wxGetCwd() + "/Textures/EdgesIcon.png", wxBITMAP_TYPE_PNG);
 
 	wxToolBar* toolBar = this->CreateToolBar();
 	toolBar->AddTool(ID_IntersectMeshes, "Intersect Meshes", intersectionBitmap, "Take the intersection of two meshes.");
 	toolBar->AddTool(ID_UnionMeshes, "Union Meshes", unionBitmap, "Take the union of two meshes.");
 	toolBar->AddTool(ID_SubtractMeshes, "Subtract Meshes", subtractionBitmap, "Subtract one mesh from another.");
+	toolBar->AddSeparator();
+	toolBar->AddTool(ID_ToggleLighting, "Toggle Lighting", lightingBitmap, "Turn lighting on/off.", wxITEM_CHECK);
+	toolBar->AddTool(ID_ToggleEdgeRender, "Toggle Edges", edgesBitmap, "Turn edge rendering on/off", wxITEM_CHECK);
+	toolBar->AddTool(ID_ToggleFaceNormalRender, "Toggle Normals", faceNormalsBitmap, "Turn face normal rendering on/off", wxITEM_CHECK);
 
 	wxArrayString meshComboBoxChoices;
 
@@ -84,6 +91,12 @@ Frame::Frame(wxWindow* parent, const wxPoint& pos, const wxSize& size) : wxFrame
 	this->Bind(wxEVT_MENU, &Frame::OnMeshSetOperation, this, ID_UnionMeshes);
 	this->Bind(wxEVT_MENU, &Frame::OnMeshSetOperation, this, ID_SubtractMeshes);
 	this->Bind(wxEVT_MENU, &Frame::OnAddMesh, this, ID_AddMesh);
+	this->Bind(wxEVT_MENU, &Frame::OnToggle, this, ID_ToggleLighting);
+	this->Bind(wxEVT_MENU, &Frame::OnToggle, this, ID_ToggleEdgeRender);
+	this->Bind(wxEVT_MENU, &Frame::OnToggle, this, ID_ToggleFaceNormalRender);
+	this->Bind(wxEVT_UPDATE_UI, &Frame::OnUpdateUI, this, ID_ToggleLighting);
+	this->Bind(wxEVT_UPDATE_UI, &Frame::OnUpdateUI, this, ID_ToggleEdgeRender);
+	this->Bind(wxEVT_UPDATE_UI, &Frame::OnUpdateUI, this, ID_ToggleFaceNormalRender);
 
 	this->MakePanels();
 	this->UpdatePanels();
@@ -101,6 +114,56 @@ Frame::Frame(wxWindow* parent, const wxPoint& pos, const wxSize& size) : wxFrame
 void Frame::OnSceneChanged(wxCommandEvent& event)
 {
 	this->UpdatePanels();
+}
+
+void Frame::OnToggle(wxCommandEvent& event)
+{
+	switch (event.GetId())
+	{
+		case ID_ToggleLighting:
+		{
+			if (wxGetApp().lightingMode == Application::LightingMode::LIT)
+				wxGetApp().lightingMode = Application::LightingMode::UNLIT;
+			else
+				wxGetApp().lightingMode = Application::LightingMode::LIT;
+			break;
+		}
+		case ID_ToggleEdgeRender:
+		{
+			wxGetApp().renderEdges = !wxGetApp().renderEdges;
+			break;
+		}
+		case ID_ToggleFaceNormalRender:
+		{
+			wxGetApp().renderFaceNormals = !wxGetApp().renderFaceNormals;
+			break;
+		}
+	}
+
+	wxCommandEvent sceneChangedEvent(EVT_SCENE_CHANGED);
+	wxPostEvent(this, sceneChangedEvent);
+}
+
+void Frame::OnUpdateUI(wxUpdateUIEvent& event)
+{
+	switch (event.GetId())
+	{
+		case ID_ToggleLighting:
+		{
+			event.Check(wxGetApp().lightingMode == Application::LightingMode::LIT);
+			break;
+		}
+		case ID_ToggleEdgeRender:
+		{
+			event.Check(wxGetApp().renderEdges);
+			break;
+		}
+		case ID_ToggleFaceNormalRender:
+		{
+			event.Check(wxGetApp().renderFaceNormals);
+			break;
+		}
+	}
 }
 
 void Frame::OnAddMesh(wxCommandEvent& event)

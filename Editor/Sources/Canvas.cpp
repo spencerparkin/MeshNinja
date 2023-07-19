@@ -104,6 +104,14 @@ void Canvas::OnRightMouseDown(wxMouseEvent& event)
 	wxPoint pickingPoint = event.GetPosition();
 	const Scene::Object* object = this->RenderScene(GL_SELECT, &pickingPoint);
 	this->scene->HandlePick(object, event.ShiftDown());
+
+	if (event.AltDown())
+	{
+		if (object)
+			this->camera->target = object->GetPosition();
+		else
+			this->camera->target = MeshNinja::Vector(0.0, 0.0, 0.0);
+	}
 }
 
 void Canvas::OnLeftMouseDown(wxMouseEvent& event)
@@ -144,10 +152,10 @@ void Canvas::OnMouseMove(wxMouseEvent& event)
 			double sensativityFactor = 0.01;
 
 			double angleDeltaY = sensativityFactor * double(-mouseDelta.y);
-			this->camera->LookUpDown(angleDeltaY);
+			this->camera->LookUpDown(angleDeltaY, event.AltDown());
 
 			double angleDeltaX = sensativityFactor * double(-mouseDelta.x);
-			this->camera->LookLeftRight(angleDeltaX);
+			this->camera->LookLeftRight(angleDeltaX, event.AltDown());
 		}
 
 		this->Refresh();
@@ -156,16 +164,16 @@ void Canvas::OnMouseMove(wxMouseEvent& event)
 
 void Canvas::OnMouseWheel(wxMouseEvent& event)
 {
+	int mouseWheelTicks = event.GetWheelRotation() / 120;		// Multiples of 120 are used.  I'm not sure why.
+
 	if (event.ShiftDown())
 	{
-		int rotation = event.GetWheelRotation() / 120;		// Multiples of 120 are used.  I'm not sure why.
-
 		MeshNinja::Transform transform;
 		transform.SetIdentity();
 
 		if (event.AltDown())
 		{
-			double scale = 1.0 + double(rotation) * 0.1;
+			double scale = 1.0 + double(mouseWheelTicks) * 0.1;
 
 			transform.matrix.SetCol(0, MeshNinja::Vector(scale, 0.0, 0.0));
 			transform.matrix.SetCol(1, MeshNinja::Vector(0.0, scale, 0.0));
@@ -173,7 +181,7 @@ void Canvas::OnMouseWheel(wxMouseEvent& event)
 		}
 		else
 		{
-			double angle = double(-rotation) * (MESH_NINJA_PI / 180.0);
+			double angle = double(-mouseWheelTicks) * (MESH_NINJA_PI / 180.0);
 
 			MeshNinja::Vector xAxis, yAxis, zAxis;
 			this->camera->MakeFrame(xAxis, yAxis, zAxis);
@@ -182,8 +190,14 @@ void Canvas::OnMouseWheel(wxMouseEvent& event)
 		}
 
 		this->scene->HandleTransform(transform);
-		this->Refresh();
 	}
+	else
+	{
+		double zoomFactor = 1.0 + 0.1 * double(mouseWheelTicks);
+		this->camera->Zoom(zoomFactor);
+	}
+
+	this->Refresh();
 }
 
 void Canvas::SetScene(Scene* scene)
@@ -198,6 +212,10 @@ const Scene::Object* Canvas::RenderScene(GLint renderMode, const wxPoint* pickin
 
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_LINE_SMOOTH);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glHint(GL_LINE_SMOOTH_HINT, GL_DONT_CARE);
+	glShadeModel(GL_SMOOTH);
 
 	this->camera->PreRender(renderMode, pickingPoint);
 
@@ -218,8 +236,6 @@ const Scene::Object* Canvas::RenderScene(GLint renderMode, const wxPoint* pickin
 		glVertex3f(0.0f, 0.0f, 10.0f);
 
 		glEnd();
-
-		// TODO: Add lighting option that can be used to highlight facets without drawing the edges.
 	}
 
 	if (this->scene)

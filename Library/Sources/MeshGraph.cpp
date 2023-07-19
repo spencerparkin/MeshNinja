@@ -93,6 +93,12 @@ bool MeshGraph::Generate(const ConvexPolygonMesh& givenMesh)
 	return new Edge();
 }
 
+bool MeshGraph::GenerateDual(ConvexPolygonMesh& mesh) const
+{
+	// TODO: Generate the dual mesh here.
+	return false;
+}
+
 //----------------------------------- MeshGraph::VertexPair -----------------------------------
 
 uint64_t MeshGraph::VertexPair::CalcKey() const

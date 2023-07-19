@@ -47,6 +47,7 @@ namespace MeshNinja
 		int FindClosestPointTo(const Vector& point, double* smallestDistance = nullptr) const;
 		void Copy(const ConvexPolygonMesh& mesh);
 		void ApplyTransform(const Transform& transform);
+		Vector CalcCenter() const;
 
 		struct MESH_NINJA_API Triangle
 		{

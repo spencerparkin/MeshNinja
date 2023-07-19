@@ -20,6 +20,7 @@ public:
 	bool Save();
 
 	virtual void Render(GLint renderMode, const Camera* camera) const override;
+	virtual MeshNinja::Vector GetPosition() const override;
 
 	void BakeTransform();
 

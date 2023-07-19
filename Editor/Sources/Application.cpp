@@ -8,6 +8,9 @@ Application::Application()
 {
 	this->frame = nullptr;
 	this->meshScene = new MeshCollectionScene();
+	this->lightingMode = LightingMode::UNLIT;
+	this->renderEdges = false;
+	this->renderFaceNormals = false;
 }
 
 /*virtual*/ Application::~Application()

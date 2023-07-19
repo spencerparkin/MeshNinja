@@ -23,6 +23,8 @@ public:
 	void OnTimerTick(wxTimerEvent& event);
 	void OnMeshSetOperation(wxCommandEvent& event);
 	void OnAddMesh(wxCommandEvent& event);
+	void OnToggle(wxCommandEvent& event);
+	void OnUpdateUI(wxUpdateUIEvent& event);
 
 	enum
 	{
@@ -33,7 +35,10 @@ public:
 		ID_IntersectMeshes,
 		ID_UnionMeshes,
 		ID_SubtractMeshes,
-		ID_AddMesh
+		ID_AddMesh,
+		ID_ToggleLighting,
+		ID_ToggleEdgeRender,
+		ID_ToggleFaceNormalRender
 	};
 
 private:

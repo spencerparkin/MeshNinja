@@ -18,6 +18,7 @@ namespace MeshNinja
 
 		void Clear();
 		bool Generate(const ConvexPolygonMesh& givenMesh);
+		bool GenerateDual(ConvexPolygonMesh& mesh) const;
 
 		virtual Node* CreateNode();
 		virtual Edge* CreateEdge();

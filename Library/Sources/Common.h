@@ -11,11 +11,11 @@
 #define MESH_NINJA_EPS				1e-3 //1e-4
 #define MESH_NINJA_PHI				1.618033988749
 #define MESH_NINJA_PI				3.1415926536
-#define MESH_NINJA_TWO_PI			(2.0 * MW_PI)
+#define MESH_NINJA_TWO_PI			(2.0 * MESH_NINJA_PI)
 #define MESH_NINJA_MIN(a, b)		((a) < (b) ? (a) : (b))
 #define MESH_NINJA_MAX(a, b)		((a) > (b) ? (a) : (b))
 #define MESH_NINJA_SIGN(a)			((a) < 0.0 ? -1.0 : 1.0)
-#define MESH_NINJA_CLAMP(x, a, b)	MW_MIN(MW_MAX(x, a), b)
+#define MESH_NINJA_CLAMP(x, a, b)	MESH_NINJA_MIN(MESH_NINJA_MAX(x, a), b)
 #define MESH_NINJA_SQUARED(x)		((x) * (x))
 #define MESH_NINJA_CUBED(x)			((x) * (x) * (x))
 #define MESH_NINJA_SWAP(a, b) \

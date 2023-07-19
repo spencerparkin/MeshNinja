@@ -3,7 +3,9 @@
 #include "MeshCollectionScene.h"
 #include "Mesh.h"
 #include "Frame.h"
+#include "MeshGraph.h"
 #include <wx/filename.h>
+#include <wx/msgdlg.h>
 
 MeshListControl::MeshListControl(wxWindow* parent) : wxListCtrl(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_VIRTUAL | wxLC_REPORT)
 {
@@ -14,10 +16,79 @@ MeshListControl::MeshListControl(wxWindow* parent) : wxListCtrl(parent, wxID_ANY
 
 	this->Bind(wxEVT_LIST_ITEM_SELECTED, &MeshListControl::OnListItemSelected, this);
 	this->Bind(wxEVT_LIST_ITEM_DESELECTED, &MeshListControl::OnListItemUnselected, this);
+	this->Bind(wxEVT_LIST_ITEM_RIGHT_CLICK, &MeshListControl::OnListItemRightClick, this);
 }
 
 /*virtual*/ MeshListControl::~MeshListControl()
 {
+}
+
+void MeshListControl::OnListItemRightClick(wxListEvent& event)
+{
+	wxMenu contextMenu;
+
+	contextMenu.Append(new wxMenuItem(&contextMenu, ID_ToggleVisibility, "Toggle Visibility", "Turn the visibility of the mesh on/off."));
+	contextMenu.AppendSeparator();
+	contextMenu.Append(new wxMenuItem(&contextMenu, ID_MakeDual, "Make Dual", "Add the dual of this mesh to the scene."));
+
+	contextMenu.Bind(wxEVT_MENU, &MeshListControl::OnToggleVisibility, this, ID_ToggleVisibility);
+	contextMenu.Bind(wxEVT_MENU, &MeshListControl::OnMakeDual, this, ID_MakeDual);
+
+	this->PopupMenu(&contextMenu);
+}
+
+void MeshListControl::OnToggleVisibility(wxCommandEvent& event)
+{
+	Mesh* mesh = this->GetSelectedMesh();
+	if (mesh)
+	{
+		mesh->SetVisible(!mesh->GetVisible());
+
+		wxCommandEvent sceneChangedEvent(EVT_SCENE_CHANGED);
+		wxPostEvent(wxGetApp().GetFrame(), sceneChangedEvent);
+	}
+}
+
+void MeshListControl::OnMakeDual(wxCommandEvent& event)
+{
+	Mesh* mesh = this->GetSelectedMesh();
+	if (mesh)
+	{
+		MeshNinja::MeshGraph meshGraph;
+		
+		if (!meshGraph.Generate(mesh->mesh))
+		{
+			wxMessageBox("Failed to generate mesh graph!", "Error", wxICON_ERROR | wxOK, this);
+			return;
+		}
+
+		Mesh* dualMesh = new Mesh();
+
+		if (!meshGraph.GenerateDual(dualMesh->mesh))
+		{
+			wxMessageBox("Failed to generate dual mesh!", "Error", wxICON_ERROR | wxOK, this);
+			delete dualMesh;
+			return;
+		}
+
+		wxGetApp().GetMeshScene()->GetMeshList().push_back(dualMesh);
+
+		wxCommandEvent sceneChangedEvent(EVT_SCENE_CHANGED);
+		wxPostEvent(wxGetApp().GetFrame(), sceneChangedEvent);
+	}
+}
+
+Mesh* MeshListControl::GetSelectedMesh()
+{
+	long selectedItem = this->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
+	if (selectedItem < 0)
+		return nullptr;
+
+	const MeshCollectionScene* meshScene = wxGetApp().GetMeshScene();
+	if (selectedItem >= (signed)meshScene->GetMeshList().size())
+		return nullptr;
+
+	return meshScene->GetMeshList()[selectedItem];
 }
 
 void MeshListControl::OnListItemSelected(wxListEvent& event)
@@ -91,7 +162,10 @@ void MeshListControl::PullControlSelectionFromScene()
 				case 0:
 				{
 					wxFileName fileName(mesh->fileSource);
-					return fileName.GetName();
+					wxString name = fileName.GetName();
+					if (name.Len() > 0)
+						return name;
+					return "<no name>";
 				}
 				case 1:
 				{

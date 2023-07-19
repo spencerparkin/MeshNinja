@@ -99,24 +99,41 @@ void Camera::MoveForwardBackward(double delta)
 	this->target += zAxis * delta;
 }
 
-void Camera::LookLeftRight(double angleDelta)
+void Camera::LookLeftRight(double angleDelta, bool pivotAboutTarget)
 {
 	MeshNinja::Vector xAxis, yAxis, zAxis;
 	this->MakeFrame(xAxis, yAxis, zAxis);
-
-	MeshNinja::Vector lookDirection = this->target - this->position;
-	lookDirection.RotateAbout(yAxis, angleDelta);
-
-	this->target = this->position + lookDirection;
+	this->RotateLookDirection(yAxis, angleDelta, pivotAboutTarget);
 }
 
-void Camera::LookUpDown(double angleDelta)
+void Camera::LookUpDown(double angleDelta, bool pivotAboutTarget)
 {
 	MeshNinja::Vector xAxis, yAxis, zAxis;
 	this->MakeFrame(xAxis, yAxis, zAxis);
+	this->RotateLookDirection(xAxis, angleDelta, pivotAboutTarget);
+}
 
+void Camera::RotateLookDirection(const MeshNinja::Vector& axis, double angleDelta, bool pivotAboutTarget)
+{
 	MeshNinja::Vector lookDirection = this->target - this->position;
-	lookDirection.RotateAbout(xAxis, angleDelta);
+	lookDirection.RotateAbout(axis, angleDelta);
 
-	this->target = this->position + lookDirection;
+	if (pivotAboutTarget)
+	{
+		this->position = this->target - lookDirection;
+	}
+	else
+	{
+		this->target = this->position + lookDirection;
+	}
+}
+
+void Camera::Zoom(double zoomFactor)
+{
+	MeshNinja::Vector lookVector = this->target - this->position;
+	double length = lookVector.Length();
+	length *= zoomFactor;
+	lookVector.Normalize();
+	lookVector *= length;
+	this->position = this->target - lookVector;
 }

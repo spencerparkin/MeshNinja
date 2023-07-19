@@ -107,6 +107,19 @@ void MeshCollectionScene::Clear()
 	glCullFace(GL_BACK);
 	glLineWidth(1.0f);
 
+	if (renderMode == GL_RENDER)
+	{
+		if (wxGetApp().lightingMode == Application::LightingMode::LIT)
+		{
+			GLfloat matSpec[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+			static MeshNinja::Vector lightPos(100.0, 100.0, 100.0);
+			glMaterialf(GL_LIGHT0, GL_SHININESS, 25.0);
+			glMaterialfv(GL_FRONT, GL_SPECULAR, matSpec);
+			glColorMaterial(GL_FRONT, GL_DIFFUSE);
+			glLightfv(GL_LIGHT0, GL_POSITION, (const GLfloat*)&lightPos.x);
+		}
+	}
+
 	Scene::Render(renderMode, camera);
 
 	if (renderMode == GL_SELECT)

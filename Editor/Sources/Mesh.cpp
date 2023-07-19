@@ -4,6 +4,8 @@
 #include "Plane.h"
 #include "Camera.h"
 #include "MeshGraph.h"
+#include "Application.h"
+#include "Ray.h"
 
 Mesh::Mesh()
 {
@@ -66,6 +68,11 @@ Mesh::Mesh()
 {
 }
 
+/*virtual*/ MeshNinja::Vector Mesh::GetPosition() const
+{
+	return this->transform.TransformPosition(this->mesh.CalcCenter());
+}
+
 /*virtual*/ void Mesh::Render(GLint renderMode, const Camera* camera) const
 {
 	if (!this->isVisible)
@@ -81,8 +88,26 @@ Mesh::Mesh()
 	if (renderMode == GL_SELECT)
 		glPushName(this->id);
 
+	if (wxGetApp().lightingMode == Application::LightingMode::LIT)
+	{
+		glEnable(GL_LIGHTING);
+		glEnable(GL_LIGHT0);
+	}
+
 	glBegin(GL_TRIANGLES);
-	glColor3d(this->color.x, this->color.y, this->color.z);
+
+	MeshNinja::Vector renderedColor(color);
+	if (this->isSelected)
+	{
+		renderedColor *= 1.1;
+		renderedColor.x = MESH_NINJA_CLAMP(renderedColor.x, 0.0, 1.0);
+		renderedColor.y = MESH_NINJA_CLAMP(renderedColor.y, 0.0, 1.0);
+		renderedColor.z = MESH_NINJA_CLAMP(renderedColor.z, 0.0, 1.0);
+	}
+	
+	glColor3d(renderedColor.x, renderedColor.y, renderedColor.z);
+
+	std::vector<MeshNinja::Ray> faceNormalArray;
 
 	for (const MeshNinja::ConvexPolygonMesh::Facet& facet : *this->renderMesh.facetArray)
 	{
@@ -103,16 +128,42 @@ Mesh::Mesh()
 
 				glVertex3d(point.x, point.y, point.z);
 				glNormal3d(normal.x, normal.y, normal.z);
+
+				if (wxGetApp().renderFaceNormals)
+					faceNormalArray.push_back(MeshNinja::Ray(polygon.CalcCenter(), normal));
 			}
 		}
 	}
 
 	glEnd();
 
+	if (wxGetApp().lightingMode == Application::LightingMode::LIT)
+	{
+		glDisable(GL_LIGHTING);
+		glDisable(GL_LIGHT0);
+	}
+
 	if (renderMode == GL_SELECT)
 		glPopName();
 
-	if (renderMode == GL_RENDER)
+	if (renderMode == GL_RENDER && wxGetApp().renderFaceNormals)
+	{
+		glBegin(GL_LINES);
+		glColor3f(1.0f, 1.0f, 1.0f);
+
+		for (const MeshNinja::Ray& ray : faceNormalArray)
+		{
+			MeshNinja::Vector pointA = ray.origin;
+			MeshNinja::Vector pointB = ray.origin + ray.direction;
+
+			glVertex3dv(&pointA.x);
+			glVertex3dv(&pointB.x);
+		}
+
+		glEnd();
+	}
+
+	if (renderMode == GL_RENDER && wxGetApp().renderEdges)
 	{
 		glBegin(GL_LINES);
 
