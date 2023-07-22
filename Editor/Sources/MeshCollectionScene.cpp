@@ -109,14 +109,16 @@ void MeshCollectionScene::Clear()
 
 	if (renderMode == GL_RENDER)
 	{
-		if (wxGetApp().lightingMode == Application::LightingMode::LIT)
+		if (wxGetApp().lightingMode != Application::LightingMode::UNLIT)
 		{
-			GLfloat matSpec[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-			static MeshNinja::Vector lightPos(100.0, 100.0, 100.0);
-			glMaterialf(GL_LIGHT0, GL_SHININESS, 25.0);
-			glMaterialfv(GL_FRONT, GL_SPECULAR, matSpec);
-			glColorMaterial(GL_FRONT, GL_DIFFUSE);
-			glLightfv(GL_LIGHT0, GL_POSITION, (const GLfloat*)&lightPos.x);
+			GLfloat lightColor[] = { 1.f, 1.f, 1.f, 1.f };
+			GLfloat lightPos[] = { 1000.f, 1000.f, 500.f };
+			GLfloat lightSpec[] = { 0.3f, 0.3f, 0.3f, 0.3f };
+			glEnable(GL_LIGHTING);
+			glEnable(GL_LIGHT0);
+			glLightfv(GL_LIGHT0, GL_DIFFUSE, lightColor);
+			glLightfv(GL_LIGHT0, GL_POSITION, lightPos);
+			glLightfv(GL_LIGHT0, GL_SPECULAR, lightSpec);
 		}
 	}
 

@@ -3,7 +3,7 @@
 #include <wx/string.h>
 #include <wx/glcanvas.h>
 #include <wx/datetime.h>
-#include "ConvexPolygonMesh.h"
+#include "RenderMesh.h"
 #include "MeshFileFormat.h"
 #include "Scene.h"
 #include "Transform.h"
@@ -41,7 +41,7 @@ public:
 
 private:
 
-	mutable MeshNinja::ConvexPolygonMesh renderMesh;
+	mutable MeshNinja::RenderMesh renderMesh;
 	mutable bool isSelected;
 	mutable bool isVisible;
 	mutable bool renderMeshDirty;

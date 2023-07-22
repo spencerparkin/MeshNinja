@@ -21,12 +21,14 @@ public:
 	enum class LightingMode
 	{
 		UNLIT,
-		LIT
+		FACE_LIT,
+		VERTEX_LIT
 	};
 
 	LightingMode lightingMode;
 	bool renderEdges;
 	bool renderFaceNormals;
+	bool renderVertexNormals;
 
 private:
 

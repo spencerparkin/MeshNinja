@@ -46,8 +46,9 @@ namespace MeshNinja
 		bool GenerateKleinBottle(int segments);
 		int FindClosestPointTo(const Vector& point, double* smallestDistance = nullptr) const;
 		void Copy(const ConvexPolygonMesh& mesh);
-		void ApplyTransform(const Transform& transform);
 		Vector CalcCenter() const;
+
+		virtual void ApplyTransform(const Transform& transform);
 
 		struct MESH_NINJA_API Triangle
 		{

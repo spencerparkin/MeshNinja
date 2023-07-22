@@ -36,9 +36,12 @@ public:
 		ID_UnionMeshes,
 		ID_SubtractMeshes,
 		ID_AddMesh,
-		ID_ToggleLighting,
+		ID_RenderUnlit,
+		ID_RenderFaceLit,
+		ID_RenderVertexLit,
 		ID_ToggleEdgeRender,
-		ID_ToggleFaceNormalRender
+		ID_ToggleFaceNormalRender,
+		ID_ToggleVertexNormalRender
 	};
 
 private:

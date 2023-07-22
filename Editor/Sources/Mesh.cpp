@@ -5,7 +5,6 @@
 #include "Camera.h"
 #include "MeshGraph.h"
 #include "Application.h"
-#include "Ray.h"
 
 Mesh::Mesh()
 {
@@ -83,12 +82,13 @@ Mesh::Mesh()
 		this->renderMeshDirty = false;
 		this->renderMesh.Copy(this->mesh);
 		this->renderMesh.TessellateFaces();
+		this->renderMesh.RegenerateNormals();
 	}
 
 	if (renderMode == GL_SELECT)
 		glPushName(this->id);
 
-	if (wxGetApp().lightingMode == Application::LightingMode::LIT)
+	if (wxGetApp().lightingMode != Application::LightingMode::UNLIT)
 	{
 		glEnable(GL_LIGHTING);
 		glEnable(GL_LIGHT0);
@@ -99,45 +99,64 @@ Mesh::Mesh()
 	MeshNinja::Vector renderedColor(color);
 	if (this->isSelected)
 	{
-		renderedColor *= 1.1;
+		renderedColor += MeshNinja::Vector(0.2, 0.2, 0.2);
 		renderedColor.x = MESH_NINJA_CLAMP(renderedColor.x, 0.0, 1.0);
 		renderedColor.y = MESH_NINJA_CLAMP(renderedColor.y, 0.0, 1.0);
 		renderedColor.z = MESH_NINJA_CLAMP(renderedColor.z, 0.0, 1.0);
 	}
 	
-	glColor3d(renderedColor.x, renderedColor.y, renderedColor.z);
-
-	std::vector<MeshNinja::Ray> faceNormalArray;
-
-	for (const MeshNinja::ConvexPolygonMesh::Facet& facet : *this->renderMesh.facetArray)
+	if (wxGetApp().lightingMode == Application::LightingMode::UNLIT)
+		glColor3d(renderedColor.x, renderedColor.y, renderedColor.z);
+	else
 	{
+		GLfloat diffuseColor[] = { (GLfloat)renderedColor.x, (GLfloat)renderedColor.y, (GLfloat)renderedColor.z, 1.0f };
+		GLfloat specularColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+		GLfloat ambientColor[] = { (GLfloat)renderedColor.x, (GLfloat)renderedColor.y, (GLfloat)renderedColor.z, 1.0f };
+		GLfloat shininess[] = { 30.0f };
+
+		glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuseColor);
+		glMaterialfv(GL_FRONT, GL_SPECULAR, specularColor);
+		glMaterialfv(GL_FRONT, GL_AMBIENT, ambientColor);
+		glMaterialfv(GL_FRONT, GL_SHININESS, shininess);
+
+		glMaterialfv(GL_BACK, GL_DIFFUSE, diffuseColor);
+		glMaterialfv(GL_BACK, GL_SPECULAR, specularColor);
+		glMaterialfv(GL_BACK, GL_AMBIENT, ambientColor);
+		glMaterialfv(GL_BACK, GL_SHININESS, shininess);
+	}
+
+	for(int i = 0; i < (signed)this->renderMesh.facetArray->size(); i++)
+	{
+		const MeshNinja::RenderMesh::Facet& facet = (*this->renderMesh.facetArray)[i];
+		const MeshNinja::RenderMesh::ExtraFaceData& faceData = (*this->renderMesh.extraFaceDataArray)[i];
+
 		if (facet.vertexArray->size() == 3)
 		{
-			MeshNinja::ConvexPolygon polygon;
-			facet.MakePolygon(polygon, &this->mesh);
-
-			MeshNinja::Plane plane;
-			polygon.CalcPlane(plane);
-
-			for (int i : *facet.vertexArray)
+			if (wxGetApp().lightingMode == Application::LightingMode::FACE_LIT)
 			{
-				MeshNinja::Vector vertex = (*this->renderMesh.vertexArray)[i];
+				const MeshNinja::Vector faceNormal = this->transform.TransformVector(faceData.normal);
+				glNormal3d(faceNormal.x, faceNormal.y, faceNormal.z);
+			}
 
-				MeshNinja::Vector point = this->transform.TransformPosition(vertex);
-				MeshNinja::Vector normal = this->transform.TransformVector(plane.normal);
+			for (int j : *facet.vertexArray)
+			{
+				const MeshNinja::Vector vertex = this->transform.TransformPosition((*this->renderMesh.vertexArray)[j]);
+				const MeshNinja::RenderMesh::ExtraVertexData& vertexData = (*this->renderMesh.extraVertexDataArray)[j];
 
-				glVertex3d(point.x, point.y, point.z);
-				glNormal3d(normal.x, normal.y, normal.z);
+				if (wxGetApp().lightingMode == Application::LightingMode::VERTEX_LIT)
+				{
+					const MeshNinja::Vector vertexNormal = this->transform.TransformVector(vertexData.normal);
+					glNormal3d(vertexNormal.x, vertexNormal.y, vertexNormal.z);
+				}
 
-				if (wxGetApp().renderFaceNormals)
-					faceNormalArray.push_back(MeshNinja::Ray(polygon.CalcCenter(), normal));
+				glVertex3d(vertex.x, vertex.y, vertex.z);
 			}
 		}
 	}
 
 	glEnd();
 
-	if (wxGetApp().lightingMode == Application::LightingMode::LIT)
+	if (wxGetApp().lightingMode != Application::LightingMode::UNLIT)
 	{
 		glDisable(GL_LIGHTING);
 		glDisable(GL_LIGHT0);
@@ -151,10 +170,29 @@ Mesh::Mesh()
 		glBegin(GL_LINES);
 		glColor3f(1.0f, 1.0f, 1.0f);
 
-		for (const MeshNinja::Ray& ray : faceNormalArray)
+		for (const MeshNinja::RenderMesh::ExtraFaceData& faceData : *this->renderMesh.extraFaceDataArray)
 		{
-			MeshNinja::Vector pointA = ray.origin;
-			MeshNinja::Vector pointB = ray.origin + ray.direction;
+			const MeshNinja::Vector pointA = this->transform.TransformPosition(faceData.center);
+			const MeshNinja::Vector pointB = pointA + this->transform.TransformVector(faceData.normal);
+
+			glVertex3dv(&pointA.x);
+			glVertex3dv(&pointB.x);
+		}
+
+		glEnd();
+	}
+
+	if (renderMode == GL_RENDER && wxGetApp().renderVertexNormals)
+	{
+		glBegin(GL_LINES);
+		glColor3f(1.0f, 1.0f, 1.0f);
+
+		for (int i = 0; i < (signed)this->renderMesh.vertexArray->size(); i++)
+		{
+			const MeshNinja::RenderMesh::ExtraVertexData& vertexData = (*this->renderMesh.extraVertexDataArray)[i];
+
+			const MeshNinja::Vector pointA = this->transform.TransformPosition((*this->renderMesh.vertexArray)[i]);
+			const MeshNinja::Vector pointB = pointA + this->transform.TransformVector(vertexData.normal);
 
 			glVertex3dv(&pointA.x);
 			glVertex3dv(&pointB.x);

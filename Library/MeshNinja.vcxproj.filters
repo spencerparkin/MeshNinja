@@ -64,6 +64,9 @@
     <ClInclude Include="Sources\TriangleStrips.h">
       <Filter>Sources</Filter>
     </ClInclude>
+    <ClInclude Include="Sources\RenderMesh.h">
+      <Filter>Sources</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sources\MeshBinaryOperation.cpp">
@@ -118,6 +121,9 @@
       <Filter>Sources</Filter>
     </ClCompile>
     <ClCompile Include="Sources\TriangleStrips.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\RenderMesh.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
   </ItemGroup>

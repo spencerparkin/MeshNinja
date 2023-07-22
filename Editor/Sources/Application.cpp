@@ -9,8 +9,9 @@ Application::Application()
 	this->frame = nullptr;
 	this->meshScene = new MeshCollectionScene();
 	this->lightingMode = LightingMode::UNLIT;
-	this->renderEdges = false;
+	this->renderEdges = true;
 	this->renderFaceNormals = false;
+	this->renderVertexNormals = false;
 }
 
 /*virtual*/ Application::~Application()
