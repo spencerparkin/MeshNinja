@@ -8,7 +8,7 @@
 #	define MESH_NINJA_API
 #endif
 
-#define MESH_NINJA_EPS				1e-3 //1e-4
+#define MESH_NINJA_EPS				1e-4	// Tighter?
 #define MESH_NINJA_PHI				1.618033988749
 #define MESH_NINJA_PI				3.1415926536
 #define MESH_NINJA_TWO_PI			(2.0 * MESH_NINJA_PI)
