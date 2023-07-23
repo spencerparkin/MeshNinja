@@ -82,7 +82,7 @@ bool TriangleStrips::Generate(const ConvexPolygonMesh* mesh)
 			{
 				Entry newEntry{ nullptr, entry.curNode };
 
-				Graph::VertexPair traveledEdge{ -1, -1 };
+				Graph::VertexPair<false> traveledEdge{ -1, -1 };
 				if (entry.prevNode)
 				{
 					for (int i = 0; i < (signed)entry.curNode->edgeArray.size(); i++)

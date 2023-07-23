@@ -18,7 +18,7 @@ namespace MeshNinja
 
 		void Clear();
 		bool Generate(const ConvexPolygonMesh& givenMesh);
-		bool GenerateDual(ConvexPolygonMesh& mesh) const;
+		bool GenerateDual(ConvexPolygonMesh& dualMesh) const;
 
 		virtual Node* CreateNode();
 		virtual Edge* CreateEdge();
@@ -33,11 +33,21 @@ namespace MeshNinja
 			std::vector<Edge*> edgeArray;
 		};
 
+		template<bool ordered>
 		struct VertexPair
 		{
 			int i, j;
 
-			uint64_t CalcKey() const;
+			uint64_t CalcKey() const
+			{
+				if constexpr (!ordered)
+				{
+					if (this->i < this->j)
+						return uint64_t(this->i) | (uint64_t(this->j) << 32);
+				}
+
+				return uint64_t(this->j) | (uint64_t(this->i) << 32);
+			}
 		};
 
 		class Edge
@@ -48,7 +58,7 @@ namespace MeshNinja
 
 			Node* Fallow(Node* origin);
 
-			VertexPair pair;
+			VertexPair<false> pair;
 			Node* node[2];
 		};
 
@@ -58,5 +68,12 @@ namespace MeshNinja
 		const ConvexPolygonMesh* mesh;
 	};
 
-	bool MESH_NINJA_API operator<(const MeshGraph::VertexPair& pairA, const MeshGraph::VertexPair& pairB);
+	template<bool ordered>
+	bool operator<(const MeshGraph::VertexPair<ordered>& pairA, const MeshGraph::VertexPair<ordered>& pairB)
+	{
+		uint64_t keyA = pairA.CalcKey();
+		uint64_t keyB = pairB.CalcKey();
+
+		return keyA < keyB;
+	}
 }

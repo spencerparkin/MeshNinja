@@ -210,7 +210,7 @@ Mesh::Mesh()
 		else
 			glColor3f(0.3f, 0.3f, 0.3f);
 
-		std::set<MeshNinja::MeshGraph::VertexPair> vertexPairSet;
+		std::set<MeshNinja::MeshGraph::VertexPair<false>> vertexPairSet;
 
 		for (const MeshNinja::ConvexPolygonMesh::Facet& facet : *this->mesh.facetArray)
 		{
@@ -218,7 +218,7 @@ Mesh::Mesh()
 			{
 				int j = (i + 1) % facet.vertexArray->size();
 
-				MeshNinja::MeshGraph::VertexPair pair{ (*facet.vertexArray)[i], (*facet.vertexArray)[j] };
+				MeshNinja::MeshGraph::VertexPair<false> pair{ (*facet.vertexArray)[i], (*facet.vertexArray)[j] };
 				if (vertexPairSet.find(pair) == vertexPairSet.end())
 				{
 					vertexPairSet.insert(pair);

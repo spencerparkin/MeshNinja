@@ -45,7 +45,7 @@ bool MeshGraph::Generate(const ConvexPolygonMesh& givenMesh)
 		this->nodeArray->push_back(node);
 	}
 
-	std::map<VertexPair, Node*> nodeMap;
+	std::map<VertexPair<false>, Node*> nodeMap;
 
 	// We're assuming here that an edge is shared by at most two polygons.
 	for (Node* nodeA : *this->nodeArray)
@@ -54,14 +54,14 @@ bool MeshGraph::Generate(const ConvexPolygonMesh& givenMesh)
 		{
 			int j = (i + 1) % nodeA->facet->vertexArray->size();
 
-			VertexPair pair;
+			VertexPair<false> pair;
 
 			pair.i = (*nodeA->facet->vertexArray)[i];
 			pair.j = (*nodeA->facet->vertexArray)[j];
 
-			std::map<VertexPair, Node*>::iterator iter = nodeMap.find(pair);
+			std::map<VertexPair<false>, Node*>::iterator iter = nodeMap.find(pair);
 			if (iter == nodeMap.end())
-				nodeMap.insert(std::pair<VertexPair, Node*>(pair, nodeA));
+				nodeMap.insert(std::pair<VertexPair<false>, Node*>(pair, nodeA));
 			else
 			{
 				Node* nodeB = iter->second;
@@ -93,20 +93,91 @@ bool MeshGraph::Generate(const ConvexPolygonMesh& givenMesh)
 	return new Edge();
 }
 
-bool MeshGraph::GenerateDual(ConvexPolygonMesh& mesh) const
+// TODO: Sometimes this fails when it shouldn't.  Figure out why.
+bool MeshGraph::GenerateDual(ConvexPolygonMesh& dualMesh) const
 {
-	// TODO: Generate the dual mesh here.
-	return false;
-}
+	dualMesh.Clear();
 
-//----------------------------------- MeshGraph::VertexPair -----------------------------------
+	std::map<const ConvexPolygonMesh::Facet*, int> vertexMap;
 
-uint64_t MeshGraph::VertexPair::CalcKey() const
-{
-	if (this->i < this->j)
-		return uint64_t(this->i) | (uint64_t(this->j) << 32);
+	for (const Node* node : *this->nodeArray)
+	{
+		ConvexPolygon polygon;
+		node->facet->MakePolygon(polygon, this->mesh);
+		vertexMap.insert(std::pair<const ConvexPolygonMesh::Facet*, int>(node->facet, dualMesh.vertexArray->size()));
+		dualMesh.vertexArray->push_back(polygon.CalcCenter());
+	}
 
-	return uint64_t(this->j) | (uint64_t(this->i) << 32);
+	std::list<VertexPair<true>> directedEdgeQueue;
+
+	for (const Edge* edge : *this->edgeArray)
+	{
+		int i = vertexMap.find(edge->node[0]->facet)->second;
+		int j = vertexMap.find(edge->node[1]->facet)->second;
+		
+		directedEdgeQueue.push_back(VertexPair<true>{ i, j });
+		directedEdgeQueue.push_back(VertexPair<true>{ j, i });
+	}
+
+	while (directedEdgeQueue.size() > 0)
+	{
+		std::list<VertexPair<true>>::iterator iter = directedEdgeQueue.begin();
+		VertexPair<true> pairA = *iter;
+		directedEdgeQueue.erase(iter);
+
+		ConvexPolygonMesh::Facet facet;
+
+		while (true)
+		{
+			facet.vertexArray->push_back(pairA.i);
+			if (facet.HasVertex(pairA.j))
+				break;
+
+			double smallestTurnAngle = DBL_MAX;
+			std::list<VertexPair<true>>::iterator chosenIter = directedEdgeQueue.end();
+			for (iter = directedEdgeQueue.begin(); iter != directedEdgeQueue.end(); iter++)
+			{
+				VertexPair<true> pairB = *iter;
+				if (pairA.j == pairB.i && pairA.i != pairB.j)
+				{
+					const Vector& pointA = (*dualMesh.vertexArray)[pairA.i];
+					const Vector& pointB = (*dualMesh.vertexArray)[pairA.j];
+					const Vector& pointC = (*dualMesh.vertexArray)[pairB.j];
+
+					Vector vectorAB, vectorBC;
+
+					vectorAB = pointB - pointA;
+					vectorBC = pointC - pointB;
+
+					double turnAngle = vectorAB.AngleBetweenThisAnd(vectorBC);
+
+					if (vectorAB.Cross(vectorBC).Dot(pointB) < 0.0)
+						turnAngle = MESH_NINJA_PI + turnAngle;
+					else
+						turnAngle = MESH_NINJA_PI - turnAngle;
+
+					if (turnAngle < smallestTurnAngle)
+					{
+						smallestTurnAngle = turnAngle;
+						chosenIter = iter;
+					}
+				}
+			}
+
+			if (chosenIter == directedEdgeQueue.end())
+				return false;
+
+			pairA = *chosenIter;
+			directedEdgeQueue.erase(chosenIter);
+		}
+
+		dualMesh.facetArray->push_back(facet);
+	}
+
+	// TODO: The output might not actually be a valid convex-polygon mesh, even if the
+	//       input was a valid convex-polygon mesh.  Vet the output here.
+
+	return true;
 }
 
 //----------------------------------- MeshGraph::Node -----------------------------------
@@ -124,7 +195,7 @@ MeshGraph::Node::Node()
 
 MeshGraph::Edge::Edge()
 {
-	this->pair = VertexPair{ -1, -1 };
+	this->pair = VertexPair<false>{ -1, -1 };
 	this->node[0] = nullptr;
 	this->node[1] = nullptr;
 }
@@ -136,15 +207,4 @@ MeshGraph::Edge::Edge()
 MeshGraph::Node* MeshGraph::Edge::Fallow(Node* origin)
 {
 	return (origin == this->node[0]) ? this->node[1] : this->node[0];
-}
-
-namespace MeshNinja
-{
-	bool operator<(const MeshGraph::VertexPair& pairA, const MeshGraph::VertexPair& pairB)
-	{
-		uint64_t keyA = pairA.CalcKey();
-		uint64_t keyB = pairB.CalcKey();
-
-		return keyA < keyB;
-	}
 }

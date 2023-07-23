@@ -54,9 +54,11 @@ void MeshListControl::OnMakeDual(wxCommandEvent& event)
 	Mesh* mesh = this->GetSelectedMesh();
 	if (mesh)
 	{
+		MeshNinja::ConvexPolygonMesh transformedMesh(mesh->mesh);
+		transformedMesh.ApplyTransform(mesh->transform);
+
 		MeshNinja::MeshGraph meshGraph;
-		
-		if (!meshGraph.Generate(mesh->mesh))
+		if (!meshGraph.Generate(transformedMesh))
 		{
 			wxMessageBox("Failed to generate mesh graph!", "Error", wxICON_ERROR | wxOK, this);
 			return;

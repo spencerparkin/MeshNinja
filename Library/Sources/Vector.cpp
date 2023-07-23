@@ -242,7 +242,9 @@ double Vector::AngleBetweenThisAnd(const Vector& vector) const
 	if (!unitNormalA.Normalize() || !unitNormalB.Normalize())
 		return 0.0;
 
-	return ::acos(unitNormalA.Dot(unitNormalB));
+	double dot = unitNormalA.Dot(unitNormalB);
+	dot = MESH_NINJA_CLAMP(dot, -1.0, 1.0);
+	return ::acos(dot);
 }
 
 namespace MeshNinja
