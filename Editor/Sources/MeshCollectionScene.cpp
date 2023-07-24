@@ -2,6 +2,7 @@
 #include "Mesh.h"
 #include "Application.h"
 #include "Frame.h"
+#include "Camera.h"
 
 MeshCollectionScene::MeshCollectionScene()
 {
@@ -112,8 +113,8 @@ void MeshCollectionScene::Clear()
 		if (wxGetApp().lightingMode != Application::LightingMode::UNLIT)
 		{
 			GLfloat lightColor[] = { 1.f, 1.f, 1.f, 1.f };
-			GLfloat lightPos[] = { 1000.f, 1000.f, 500.f };
-			GLfloat lightSpec[] = { 0.3f, 0.3f, 0.3f, 0.3f };
+			GLfloat lightPos[] = { (GLfloat)camera->position.x, (GLfloat)camera->position.y, (GLfloat)camera->position.z, 1.0f };
+			GLfloat lightSpec[] = { 0.1f, 0.1f, 0.1f, 0.1f };
 			glEnable(GL_LIGHTING);
 			glEnable(GL_LIGHT0);
 			glLightfv(GL_LIGHT0, GL_DIFFUSE, lightColor);
