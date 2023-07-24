@@ -10,6 +10,7 @@ Canvas::Canvas(wxWindow* parent) : wxGLCanvas(parent, wxID_ANY, attributeList, w
 	this->scene = nullptr;
 	this->camera = new Camera();
 	this->dragging = false;
+	this->scaleMode = ScaleMode::UNIFORM;
 
 	this->Bind(wxEVT_PAINT, &Canvas::OnPaint, this);
 	this->Bind(wxEVT_SIZE, &Canvas::OnSize, this);
@@ -85,6 +86,30 @@ void Canvas::OnKeyDown(wxKeyEvent& event)
 		case 'D':
 		{
 			this->camera->MoveForwardBackward(0.5);
+			break;
+		}
+		case 'x':
+		case 'X':
+		{
+			this->scaleMode = ScaleMode::X_AXIS;
+			break;
+		}
+		case 'y':
+		case 'Y':
+		{
+			this->scaleMode = ScaleMode::Y_AXIS;
+			break;
+		}
+		case 'z':
+		case 'Z':
+		{
+			this->scaleMode = ScaleMode::Z_AXIS;
+			break;
+		}
+		case 'u':
+		case 'U':
+		{
+			this->scaleMode = ScaleMode::UNIFORM;
 			break;
 		}
 		default:
@@ -175,9 +200,31 @@ void Canvas::OnMouseWheel(wxMouseEvent& event)
 		{
 			double scale = 1.0 + double(mouseWheelTicks) * 0.1;
 
-			transform.matrix.SetCol(0, MeshNinja::Vector(scale, 0.0, 0.0));
-			transform.matrix.SetCol(1, MeshNinja::Vector(0.0, scale, 0.0));
-			transform.matrix.SetCol(2, MeshNinja::Vector(0.0, 0.0, scale));
+			switch (this->scaleMode)
+			{
+				case ScaleMode::UNIFORM:
+				{
+					transform.matrix.SetCol(0, MeshNinja::Vector(scale, 0.0, 0.0));
+					transform.matrix.SetCol(1, MeshNinja::Vector(0.0, scale, 0.0));
+					transform.matrix.SetCol(2, MeshNinja::Vector(0.0, 0.0, scale));
+					break;
+				}
+				case ScaleMode::X_AXIS:
+				{
+					transform.matrix.SetCol(0, MeshNinja::Vector(scale, 0.0, 0.0));
+					break;
+				}
+				case ScaleMode::Y_AXIS:
+				{
+					transform.matrix.SetCol(1, MeshNinja::Vector(0.0, scale, 0.0));
+					break;
+				}
+				case ScaleMode::Z_AXIS:
+				{
+					transform.matrix.SetCol(2, MeshNinja::Vector(0.0, 0.0, scale));
+					break;
+				}
+			}
 		}
 		else
 		{

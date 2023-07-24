@@ -26,6 +26,14 @@ public:
 
 private:
 
+	enum ScaleMode
+	{
+		UNIFORM,
+		X_AXIS,
+		Y_AXIS,
+		Z_AXIS
+	};
+
 	void BindContext();
 	const Scene::Object* RenderScene(GLint renderMode, const wxPoint* pickingPoint = nullptr);
 
@@ -35,4 +43,5 @@ private:
 	Camera* camera;
 	bool dragging;
 	wxPoint lastMousePos;
+	ScaleMode scaleMode;
 };
