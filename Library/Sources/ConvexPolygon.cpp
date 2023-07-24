@@ -26,7 +26,7 @@ void ConvexPolygon::Clear()
 	this->vertexArray->clear();
 }
 
-bool ConvexPolygon::IsConvex(double eps /*= MESH_NINJA_EPS*/) const
+bool ConvexPolygon::VerticesAreCoplanar(double eps /*= MESH_NINJA_EPS*/) const
 {
 	Plane plane;
 	if (!this->CalcPlane(plane, eps))
@@ -35,6 +35,15 @@ bool ConvexPolygon::IsConvex(double eps /*= MESH_NINJA_EPS*/) const
 	for (const Vector& vertex : *this->vertexArray)
 		if (plane.WhichSide(vertex, eps) != Plane::Side::NEITHER)
 			return false;
+
+	return true;
+}
+
+bool ConvexPolygon::IsConvex(double eps /*= MESH_NINJA_EPS*/) const
+{
+	Plane plane;
+	if (!this->CalcPlane(plane, eps))
+		return false;
 
 	for (int i = 0; i < (signed)this->vertexArray->size(); i++)
 	{

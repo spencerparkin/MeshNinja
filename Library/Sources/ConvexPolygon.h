@@ -19,6 +19,7 @@ namespace MeshNinja
 
 		void Clear();
 		void Compress(double eps = MESH_NINJA_EPS);
+		bool VerticesAreCoplanar(double eps = MESH_NINJA_EPS) const;
 		bool IsConvex(double eps = MESH_NINJA_EPS) const;
 		bool IsConcave(double eps = MESH_NINJA_EPS) const;
 		bool CalcPlane(Plane& plane, double eps = MESH_NINJA_EPS) const;

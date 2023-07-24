@@ -93,7 +93,6 @@ bool MeshGraph::Generate(const ConvexPolygonMesh& givenMesh)
 	return new Edge();
 }
 
-// TODO: Sometimes this fails when it shouldn't.  Figure out why.
 bool MeshGraph::GenerateDual(ConvexPolygonMesh& dualMesh) const
 {
 	dualMesh.Clear();
@@ -174,8 +173,8 @@ bool MeshGraph::GenerateDual(ConvexPolygonMesh& dualMesh) const
 		dualMesh.facetArray->push_back(facet);
 	}
 
-	// TODO: The output might not actually be a valid convex-polygon mesh, even if the
-	//       input was a valid convex-polygon mesh.  Vet the output here.
+	if (!dualMesh.AllFacetsValid())
+		return false;
 
 	return true;
 }

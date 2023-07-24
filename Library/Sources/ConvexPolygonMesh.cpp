@@ -43,6 +43,23 @@ void ConvexPolygonMesh::Copy(const ConvexPolygonMesh& mesh)
 		this->facetArray->push_back(facet);
 }
 
+bool ConvexPolygonMesh::AllFacetsValid(double eps /*= MESH_NINJA_EPS*/) const
+{
+	for (const Facet& facet : *this->facetArray)
+	{
+		ConvexPolygon polygon;
+		facet.MakePolygon(polygon, this);
+
+		if (!polygon.VerticesAreCoplanar(eps))
+			return false;
+
+		if (!polygon.IsConvex(eps))
+			return false;
+	}
+
+	return true;
+}
+
 bool ConvexPolygonMesh::IsConvex(double eps /*= MESH_NINJA_EPS*/) const
 {
 	for (const Facet& facet : *this->facetArray)
