@@ -1,90 +1,136 @@
 #include "RenderMesh.h"
 #include "Plane.h"
+#include "ConvexPolygonMesh.h"
 
 using namespace MeshNinja;
 
 RenderMesh::RenderMesh()
 {
-	this->extraFaceDataArray = new std::vector<ExtraFaceData>();
-	this->extraVertexDataArray = new std::vector<ExtraVertexData>();
+	this->facetArray = new std::vector<Facet>();
+	this->vertexArray = new std::vector<Vertex>();
 }
 
 /*virtual*/ RenderMesh::~RenderMesh()
 {
-	delete this->extraFaceDataArray;
-	delete this->extraVertexDataArray;
+	delete this->facetArray;
+	delete this->vertexArray;
 }
 
-/*virtual*/ void RenderMesh::ApplyTransform(const Transform& transform)
+void RenderMesh::Clear()
 {
-	ConvexPolygonMesh::ApplyTransform(transform);
+	this->facetArray->clear();
+	this->vertexArray->clear();
+}
 
-	for (ExtraFaceData& faceData : *this->extraFaceDataArray)
+void RenderMesh::ApplyTransform(const Transform& transform)
+{
+	for (Facet& facet : *this->facetArray)
 	{
-		faceData.normal = transform.TransformVector(faceData.normal);
-		faceData.center = transform.TransformPosition(faceData.center);
+		facet.normal = transform.TransformVector(facet.normal);
+		facet.center = transform.TransformPosition(facet.center);
 	}
 
-	for (ExtraVertexData& vertexData : *this->extraVertexDataArray)
+	for (Vertex& vertex : *this->vertexArray)
 	{
-		vertexData.normal = transform.TransformVector(vertexData.normal);
+		vertex.position = transform.TransformPosition(vertex.position);
+		vertex.normal = transform.TransformVector(vertex.normal);
 	}
 }
 
-void RenderMesh::RegenerateNormals()
+void RenderMesh::FromConvexPolygonMesh(const ConvexPolygonMesh& mesh)
 {
-	this->FixArraySizes();
+	this->Clear();
 
-	for (int i = 0; i < (signed)this->extraFaceDataArray->size(); i++)
+	for (const Vector& vertex : *mesh.vertexArray)
 	{
-		const Facet& facet = (*this->facetArray)[i];
-		ExtraFaceData& faceData = (*this->extraFaceDataArray)[i];
+		Vertex renderVertex;
+		
+		renderVertex.position = vertex;
+		renderVertex.normal = Vector(0.0, 0.0, 0.0);
+		renderVertex.color = Vector(1.0, 1.0, 1.0);
+		renderVertex.texCoords = Vector(0.0, 0.0, 0.0);
+
+		this->vertexArray->push_back(renderVertex);
+	}
+
+	for (const ConvexPolygonMesh::Facet& facet : *mesh.facetArray)
+	{
+		Facet renderFacet;
+		renderFacet.center = Vector(0.0, 0.0, 0.0);
+
+		for (int i = 0; i < (signed)facet.vertexArray->size(); i++)
+		{
+			renderFacet.vertexArray->push_back(facet[i]);
+			renderFacet.center += (*mesh.vertexArray)[facet[i]];
+		}
+
+		if (facet.vertexArray->size() > 0)
+			renderFacet.center /= double(facet.vertexArray->size());
 
 		ConvexPolygon polygon;
-		facet.MakePolygon(polygon, this);
+		facet.MakePolygon(polygon, &mesh);
 
 		Plane plane;
 		polygon.CalcPlane(plane);
 
-		faceData.normal = plane.normal;
-		faceData.center = Vector(0.0, 0.0, 0.0);
+		renderFacet.normal = plane.normal;
+		renderFacet.color = Vector(1.0, 1.0, 1.0);
+
+		this->facetArray->push_back(renderFacet);
 	}
 
-	for (ExtraVertexData& vertexData : *this->extraVertexDataArray)
-		vertexData.normal = Vector(0.0, 0.0, 0.0);
-
-	for (int i = 0; i < (signed)this->extraFaceDataArray->size(); i++)
+	for (Facet& facet : *this->facetArray)
 	{
-		const Facet& facet = (*this->facetArray)[i];
-		ExtraFaceData& faceData = (*this->extraFaceDataArray)[i];
-
-		for (int j = 0; j < (signed)facet.vertexArray->size(); j++)
+		for (int i = 0; i < (signed)facet.vertexArray->size(); i++)
 		{
-			ExtraVertexData& vertexData = (*this->extraVertexDataArray)[facet[j]];
-			vertexData.normal += faceData.normal;
-
-			faceData.center += (*this->vertexArray)[facet[j]];
+			Vertex& vertex = (*this->vertexArray)[facet[i]];
+			vertex.normal += facet.normal;
 		}
-
-		if (facet.vertexArray->size() != 0)
-			faceData.center /= float(facet.vertexArray->size());
 	}
 
-	for (ExtraVertexData& vertexData : *this->extraVertexDataArray)
-		vertexData.normal.Normalize();
+	for (Vertex& vertex : *this->vertexArray)
+		vertex.normal.Normalize();
 }
 
-void RenderMesh::FixArraySizes()
+void RenderMesh::ToConvexPolygonMesh(ConvexPolygonMesh& mesh) const
 {
-	while (this->extraFaceDataArray->size() < this->facetArray->size())
-		this->extraFaceDataArray->push_back(ExtraFaceData{});
+	// TODO: Write this.
+}
 
-	while (this->extraFaceDataArray->size() > this->facetArray->size())
-		this->extraFaceDataArray->pop_back();
+RenderMesh::Facet::Facet()
+{
+	this->vertexArray = new std::vector<int>();
+}
 
-	while (this->extraVertexDataArray->size() < this->vertexArray->size())
-		this->extraVertexDataArray->push_back(ExtraVertexData{});
+RenderMesh::Facet::Facet(const Facet& facet)
+{
+	this->vertexArray = new std::vector<int>();
 
-	while (this->extraVertexDataArray->size() > this->vertexArray->size())
-		this->extraVertexDataArray->pop_back();
+	for (int i : *facet.vertexArray)
+		this->vertexArray->push_back(i);
+
+	this->color = facet.color;
+	this->normal = facet.normal;
+	this->center = facet.center;
+}
+
+/*virtual*/ RenderMesh::Facet::~Facet()
+{
+	delete this->vertexArray;
+}
+
+RenderMesh::Vertex::Vertex()
+{
+}
+
+RenderMesh::Vertex::Vertex(const Vertex& vertex)
+{
+	this->position = vertex.position;
+	this->normal = vertex.normal;
+	this->color = vertex.color;
+	this->texCoords = vertex.texCoords;
+}
+
+/*virtual*/ RenderMesh::Vertex::~Vertex()
+{
 }

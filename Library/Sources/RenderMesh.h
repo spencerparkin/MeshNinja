@@ -1,41 +1,58 @@
 #pragma once
 
-#include "ConvexPolygonMesh.h"
+#include "Common.h"
+#include "Vector.h"
+#include "Transform.h"
 
 namespace MeshNinja
 {
-	// When doing operations on meshes, we don't want to carry around any of
-	// the extra baggage normally associated with a renderable mesh.  But here
-	// provide a means of carrying and calculating that extra baggage.
-	class MESH_NINJA_API RenderMesh : public ConvexPolygonMesh
+	class ConvexPolygonMesh;
+
+	// When doing most operations on meshes, we don't want to carry around any of
+	// the extra baggage normally associated with a renderable mesh.  Operations that
+	// involve the calculation of UVs or normal, etc., can be done here, usually once
+	// the final shape of the mesh is decided upon.
+	class MESH_NINJA_API RenderMesh
 	{
 	public:
 		RenderMesh();
 		virtual ~RenderMesh();
 
-		virtual void ApplyTransform(const Transform& transform) override;
+		void Clear();
+		void FromConvexPolygonMesh(const ConvexPolygonMesh& mesh);
+		void ToConvexPolygonMesh(ConvexPolygonMesh& mesh) const;
+		void ApplyTransform(const Transform& transform);
 
-		void RegenerateNormals();
-
-		// TODO: Add methods for calculating colors and tex-coords using polar-coordinates.
-
-		void FixArraySizes();
-
-		struct ExtraFaceData
+		struct Facet
 		{
+			Facet();
+			Facet(const Facet& facet);
+			virtual ~Facet();
+
+			int operator[](int i) const
+			{
+				return (*this->vertexArray)[i];
+			}
+
+			std::vector<int>* vertexArray;
 			Vector color;
 			Vector normal;
 			Vector center;
 		};
 
-		struct ExtraVertexData
+		struct Vertex
 		{
+			Vertex();
+			Vertex(const Vertex& vertex);
+			virtual ~Vertex();
+
+			Vector position;
 			Vector color;
 			Vector normal;
 			Vector texCoords;
 		};
 
-		std::vector<ExtraFaceData>* extraFaceDataArray;
-		std::vector<ExtraVertexData>* extraVertexDataArray;
+		std::vector<Facet>* facetArray;
+		std::vector<Vertex>* vertexArray;
 	};
 }

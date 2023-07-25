@@ -7,6 +7,7 @@ namespace MeshNinja
 {
 	class ConvexPolygonMesh;
 
+	// TODO: This has yet to be tested.
 	class MESH_NINJA_API TriangleStrips
 	{
 	public:

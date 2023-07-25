@@ -4,6 +4,7 @@
 #include <wx/glcanvas.h>
 #include <wx/datetime.h>
 #include "RenderMesh.h"
+#include "ConvexPolygonMesh.h"
 #include "MeshFileFormat.h"
 #include "Scene.h"
 #include "Transform.h"

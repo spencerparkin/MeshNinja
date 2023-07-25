@@ -84,7 +84,7 @@ bool ConvexPolygonMesh::IsConcave(double eps /*= MESH_NINJA_EPS*/) const
 	return !this->IsConvex(eps);
 }
 
-/*virtual*/ void ConvexPolygonMesh::ApplyTransform(const Transform& transform)
+void ConvexPolygonMesh::ApplyTransform(const Transform& transform)
 {
 	for (Vector& vertex : *this->vertexArray)
 		vertex = transform.TransformPosition(vertex);
