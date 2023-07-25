@@ -21,6 +21,8 @@ Frame::Frame(wxWindow* parent, const wxPoint& pos, const wxSize& size) : wxFrame
 	this->auiManager.SetFlags(wxAUI_MGR_LIVE_RESIZE | wxAUI_MGR_DEFAULT);
 
 	wxMenu* fileMenu = new wxMenu();
+	fileMenu->Append(new wxMenuItem(fileMenu, ID_ClearScene, "Clear Scene", "Delete all meshes from the scene."));
+	fileMenu->AppendSeparator();
 	fileMenu->Append(new wxMenuItem(fileMenu, ID_ImportMesh, "Import Mesh", "Load a mesh file and add it to the scene."));
 	fileMenu->Append(new wxMenuItem(fileMenu, ID_ExportMesh, "Export Mesh", "Save a mesh from the scene to disk."));
 	fileMenu->AppendSeparator();
@@ -105,12 +107,14 @@ Frame::Frame(wxWindow* parent, const wxPoint& pos, const wxSize& size) : wxFrame
 	this->Bind(wxEVT_MENU, &Frame::OnToggle, this, ID_ToggleEdgeRender);
 	this->Bind(wxEVT_MENU, &Frame::OnToggle, this, ID_ToggleFaceNormalRender);
 	this->Bind(wxEVT_MENU, &Frame::OnToggle, this, ID_ToggleVertexNormalRender);
+	this->Bind(wxEVT_MENU, &Frame::OnClearScene, this, ID_ClearScene);
 	this->Bind(wxEVT_UPDATE_UI, &Frame::OnUpdateUI, this, ID_RenderUnlit);
 	this->Bind(wxEVT_UPDATE_UI, &Frame::OnUpdateUI, this, ID_RenderFaceLit);
 	this->Bind(wxEVT_UPDATE_UI, &Frame::OnUpdateUI, this, ID_RenderVertexLit);
 	this->Bind(wxEVT_UPDATE_UI, &Frame::OnUpdateUI, this, ID_ToggleEdgeRender);
 	this->Bind(wxEVT_UPDATE_UI, &Frame::OnUpdateUI, this, ID_ToggleFaceNormalRender);
 	this->Bind(wxEVT_UPDATE_UI, &Frame::OnUpdateUI, this, ID_ToggleVertexNormalRender);
+	this->Bind(wxEVT_UPDATE_UI, &Frame::OnUpdateUI, this, ID_ClearScene);
 
 	this->MakePanels();
 	this->UpdatePanels();
@@ -128,6 +132,13 @@ Frame::Frame(wxWindow* parent, const wxPoint& pos, const wxSize& size) : wxFrame
 void Frame::OnSceneChanged(wxCommandEvent& event)
 {
 	this->UpdatePanels();
+}
+
+void Frame::OnClearScene(wxCommandEvent& event)
+{
+	MeshCollectionScene* meshScene = wxGetApp().GetMeshScene();
+	meshScene->Clear();
+	wxPostEvent(this, wxCommandEvent(EVT_SCENE_CHANGED));
 }
 
 void Frame::OnToggle(wxCommandEvent& event)
@@ -174,6 +185,11 @@ void Frame::OnUpdateUI(wxUpdateUIEvent& event)
 {
 	switch (event.GetId())
 	{
+		case ID_ClearScene:
+		{
+			event.Enable(wxGetApp().GetMeshScene()->GetSceneObjectCount() > 0);
+			break;
+		}
 		case ID_RenderUnlit:
 		{
 			event.Check(wxGetApp().lightingMode == Application::LightingMode::UNLIT);

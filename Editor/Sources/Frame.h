@@ -25,6 +25,7 @@ public:
 	void OnAddMesh(wxCommandEvent& event);
 	void OnToggle(wxCommandEvent& event);
 	void OnUpdateUI(wxUpdateUIEvent& event);
+	void OnClearScene(wxCommandEvent& event);
 
 	enum
 	{
@@ -41,7 +42,8 @@ public:
 		ID_RenderVertexLit,
 		ID_ToggleEdgeRender,
 		ID_ToggleFaceNormalRender,
-		ID_ToggleVertexNormalRender
+		ID_ToggleVertexNormalRender,
+		ID_ClearScene
 	};
 
 private:

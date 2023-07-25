@@ -36,6 +36,7 @@
     <ClInclude Include="Sources\Plane.h" />
     <ClInclude Include="Sources\PointCloud.h" />
     <ClInclude Include="Sources\RenderMesh.h" />
+    <ClInclude Include="Sources\SpaceCurve.h" />
     <ClInclude Include="Sources\Transform.h" />
     <ClInclude Include="Sources\TriangleStrips.h" />
     <ClInclude Include="Sources\Vector.h" />
@@ -57,6 +58,7 @@
     <ClCompile Include="Sources\Plane.cpp" />
     <ClCompile Include="Sources\PointCloud.cpp" />
     <ClCompile Include="Sources\RenderMesh.cpp" />
+    <ClCompile Include="Sources\SpaceCurve.cpp" />
     <ClCompile Include="Sources\Transform.cpp" />
     <ClCompile Include="Sources\TriangleStrips.cpp" />
     <ClCompile Include="Sources\Vector.cpp" />

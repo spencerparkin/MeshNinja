@@ -26,9 +26,9 @@
 									} while(0)
 
 #if defined MESH_NINJA_DEBUG
-#	define MESH_NINJA_ASSERT(cond)		do { \
-											assert(cond); \
-										} while(0)
+#	define MESH_NINJA_ASSERT(cond)	do { \
+										assert(cond); \
+									} while(0)
 #else
 #	define MESH_NINJA_ASSERT(cond)
 #endif

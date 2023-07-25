@@ -67,6 +67,9 @@
     <ClInclude Include="Sources\RenderMesh.h">
       <Filter>Sources</Filter>
     </ClInclude>
+    <ClInclude Include="Sources\SpaceCurve.h">
+      <Filter>Sources</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sources\MeshBinaryOperation.cpp">
@@ -124,6 +127,9 @@
       <Filter>Sources</Filter>
     </ClCompile>
     <ClCompile Include="Sources\RenderMesh.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\SpaceCurve.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
   </ItemGroup>

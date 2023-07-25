@@ -1,6 +1,7 @@
 #include "ConvexPolygonMesh.h"
 #include "LineSegment.h"
 #include "Plane.h"
+#include "SpaceCurve.h"
 
 using namespace MeshNinja;
 
@@ -787,8 +788,27 @@ bool ConvexPolygonMesh::GenerateMobiusStrip(double width, double radius, int seg
 
 bool ConvexPolygonMesh::GenerateKleinBottle(int segments)
 {
-	// TODO: Skin a spline to accomplish this?
-	return false;
+	CompositeBezierCurve curve;
+
+	curve.controlPointArray->push_back(CompositeBezierCurve::ControlPoint{ Vector(0.0, 16.0, 0.0), Vector(0.0, -2.0, 0.0) });
+	curve.controlPointArray->push_back(CompositeBezierCurve::ControlPoint{ Vector(-1.0, 0.0, 0.0), Vector(0.0, -2.0, 0.0) });
+	curve.controlPointArray->push_back(CompositeBezierCurve::ControlPoint{ Vector(3.0, -4.0, 0.0), Vector(2.0, 0.0, 0.0) });
+	curve.controlPointArray->push_back(CompositeBezierCurve::ControlPoint{ Vector(7.0, 0.0, 0.0), Vector(0.0, 3.0, 0.0) });
+	curve.controlPointArray->push_back(CompositeBezierCurve::ControlPoint{ Vector(0.0, 16.0, 0.0), Vector(0.0, 8.0, 0.0) });
+
+	double length = curve.CalculateLength();
+
+	curve.GenerateTubeMesh(*this, length, 1.0, 8, [](double t) -> double
+		{
+			if (t < 0.2)
+			{
+				return 1.0 + 4.0 * ::sin((t / 0.2) * MESH_NINJA_PI);
+			}
+
+			return 1.0;
+		});
+
+	return true;
 }
 
 Vector ConvexPolygonMesh::CalcCenter() const
