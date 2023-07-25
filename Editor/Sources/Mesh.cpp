@@ -135,7 +135,8 @@ Mesh::Mesh()
 		{
 			if (wxGetApp().lightingMode == Application::LightingMode::FACE_LIT)
 			{
-				const MeshNinja::Vector faceNormal = this->transform.TransformVector(facet.normal);
+				MeshNinja::Vector faceNormal = this->transform.TransformVector(facet.normal);
+				faceNormal.Normalize();
 				glNormal3d(faceNormal.x, faceNormal.y, faceNormal.z);
 			}
 
@@ -146,7 +147,8 @@ Mesh::Mesh()
 
 				if (wxGetApp().lightingMode == Application::LightingMode::VERTEX_LIT)
 				{
-					const MeshNinja::Vector vertexNormal = this->transform.TransformVector(vertex.normal);
+					MeshNinja::Vector vertexNormal = this->transform.TransformVector(vertex.normal);
+					vertexNormal.Normalize();
 					glNormal3d(vertexNormal.x, vertexNormal.y, vertexNormal.z);
 				}
 
