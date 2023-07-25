@@ -12,6 +12,7 @@ Application::Application()
 	this->renderEdges = false;
 	this->renderFaceNormals = false;
 	this->renderVertexNormals = false;
+	this->renderAxes = true;
 }
 
 /*virtual*/ Application::~Application()

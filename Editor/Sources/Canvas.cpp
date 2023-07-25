@@ -1,5 +1,6 @@
 #include "Canvas.h"
 #include "Scene.h"
+#include "Application.h"
 #include <wx/kbdstate.h>
 
 int Canvas::attributeList[] = { WX_GL_RGBA, WX_GL_DOUBLEBUFFER, 0 };
@@ -266,7 +267,7 @@ const Scene::Object* Canvas::RenderScene(GLint renderMode, const wxPoint* pickin
 
 	this->camera->PreRender(renderMode, pickingPoint);
 
-	if (renderMode == GL_RENDER)
+	if (renderMode == GL_RENDER && wxGetApp().renderAxes)
 	{
 		glBegin(GL_LINES);
 

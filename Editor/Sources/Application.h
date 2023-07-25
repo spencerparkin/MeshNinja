@@ -29,6 +29,7 @@ public:
 	bool renderEdges;
 	bool renderFaceNormals;
 	bool renderVertexNormals;
+	bool renderAxes;
 
 private:
 

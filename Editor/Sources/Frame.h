@@ -40,6 +40,7 @@ public:
 		ID_RenderUnlit,
 		ID_RenderFaceLit,
 		ID_RenderVertexLit,
+		ID_RenderAxes,
 		ID_ToggleEdgeRender,
 		ID_ToggleFaceNormalRender,
 		ID_ToggleVertexNormalRender,

@@ -41,6 +41,7 @@ Frame::Frame(wxWindow* parent, const wxPoint& pos, const wxSize& size) : wxFrame
 	wxBitmap unionBitmap, intersectionBitmap, subtractionBitmap;
 	wxBitmap addMeshBitmap, unlitBitmap, faceLitBitmap, vertexLitBitmap;
 	wxBitmap faceNormalsBitmap, vertexNormalsBitmap, edgesBitmap;
+	wxBitmap axesBitmap;
 
 	intersectionBitmap.LoadFile(wxGetCwd() + "/Textures/IntersectionIcon.png", wxBITMAP_TYPE_PNG);
 	unionBitmap.LoadFile(wxGetCwd() + "/Textures/UnionIcon.png", wxBITMAP_TYPE_PNG);
@@ -52,6 +53,7 @@ Frame::Frame(wxWindow* parent, const wxPoint& pos, const wxSize& size) : wxFrame
 	faceNormalsBitmap.LoadFile(wxGetCwd() + "/Textures/FaceNormalsIcon.png", wxBITMAP_TYPE_PNG);
 	vertexNormalsBitmap.LoadFile(wxGetCwd() + "/Textures/VertexNormalsIcon.png", wxBITMAP_TYPE_PNG);
 	edgesBitmap.LoadFile(wxGetCwd() + "/Textures/EdgesIcon.png", wxBITMAP_TYPE_PNG);
+	axesBitmap.LoadFile(wxGetCwd() + "/Textures/AxesIcon.png", wxBITMAP_TYPE_PNG);
 
 	wxToolBar* toolBar = this->CreateToolBar();
 	toolBar->AddTool(ID_IntersectMeshes, "Intersect Meshes", intersectionBitmap, "Take the intersection of two meshes.");
@@ -61,6 +63,8 @@ Frame::Frame(wxWindow* parent, const wxPoint& pos, const wxSize& size) : wxFrame
 	toolBar->AddTool(ID_RenderUnlit, "Render Unlit", unlitBitmap, "Render unlit.", wxITEM_CHECK);
 	toolBar->AddTool(ID_RenderFaceLit, "Render Face Lit", faceLitBitmap, "Render lit with face normals.", wxITEM_CHECK);
 	toolBar->AddTool(ID_RenderVertexLit, "Render Vertex Lit", vertexLitBitmap, "Render lit with vertex normals.", wxITEM_CHECK);
+	toolBar->AddSeparator();
+	toolBar->AddTool(ID_RenderAxes, "Render XYZ Axes", axesBitmap, "Render the X, Y and Z-axis near the origin.", wxITEM_CHECK);
 	toolBar->AddSeparator();
 	toolBar->AddTool(ID_ToggleEdgeRender, "Toggle Edges", edgesBitmap, "Turn edge rendering on/off", wxITEM_CHECK);
 	toolBar->AddTool(ID_ToggleFaceNormalRender, "Toggle Face Normals", faceNormalsBitmap, "Turn face normal rendering on/off", wxITEM_CHECK);
@@ -104,6 +108,7 @@ Frame::Frame(wxWindow* parent, const wxPoint& pos, const wxSize& size) : wxFrame
 	this->Bind(wxEVT_MENU, &Frame::OnToggle, this, ID_RenderUnlit);
 	this->Bind(wxEVT_MENU, &Frame::OnToggle, this, ID_RenderFaceLit);
 	this->Bind(wxEVT_MENU, &Frame::OnToggle, this, ID_RenderVertexLit);
+	this->Bind(wxEVT_MENU, &Frame::OnToggle, this, ID_RenderAxes);
 	this->Bind(wxEVT_MENU, &Frame::OnToggle, this, ID_ToggleEdgeRender);
 	this->Bind(wxEVT_MENU, &Frame::OnToggle, this, ID_ToggleFaceNormalRender);
 	this->Bind(wxEVT_MENU, &Frame::OnToggle, this, ID_ToggleVertexNormalRender);
@@ -111,6 +116,7 @@ Frame::Frame(wxWindow* parent, const wxPoint& pos, const wxSize& size) : wxFrame
 	this->Bind(wxEVT_UPDATE_UI, &Frame::OnUpdateUI, this, ID_RenderUnlit);
 	this->Bind(wxEVT_UPDATE_UI, &Frame::OnUpdateUI, this, ID_RenderFaceLit);
 	this->Bind(wxEVT_UPDATE_UI, &Frame::OnUpdateUI, this, ID_RenderVertexLit);
+	this->Bind(wxEVT_UPDATE_UI, &Frame::OnUpdateUI, this, ID_RenderAxes);
 	this->Bind(wxEVT_UPDATE_UI, &Frame::OnUpdateUI, this, ID_ToggleEdgeRender);
 	this->Bind(wxEVT_UPDATE_UI, &Frame::OnUpdateUI, this, ID_ToggleFaceNormalRender);
 	this->Bind(wxEVT_UPDATE_UI, &Frame::OnUpdateUI, this, ID_ToggleVertexNormalRender);
@@ -160,6 +166,11 @@ void Frame::OnToggle(wxCommandEvent& event)
 			wxGetApp().lightingMode = Application::LightingMode::VERTEX_LIT;
 			break;
 		}
+		case ID_RenderAxes:
+		{
+			wxGetApp().renderAxes = !wxGetApp().renderAxes;
+			break;
+		}
 		case ID_ToggleEdgeRender:
 		{
 			wxGetApp().renderEdges = !wxGetApp().renderEdges;
@@ -203,6 +214,11 @@ void Frame::OnUpdateUI(wxUpdateUIEvent& event)
 		case ID_RenderVertexLit:
 		{
 			event.Check(wxGetApp().lightingMode == Application::LightingMode::VERTEX_LIT);
+			break;
+		}
+		case ID_RenderAxes:
+		{
+			event.Check(wxGetApp().renderAxes);
 			break;
 		}
 		case ID_ToggleEdgeRender:
