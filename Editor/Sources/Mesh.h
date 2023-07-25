@@ -6,6 +6,7 @@
 #include "RenderMesh.h"
 #include "ConvexPolygonMesh.h"
 #include "MeshFileFormat.h"
+#include "MeshGraph.h"
 #include "Scene.h"
 #include "Transform.h"
 
@@ -43,6 +44,7 @@ public:
 private:
 
 	mutable MeshNinja::RenderMesh renderMesh;
+	mutable MeshNinja::MeshGraph meshGraph;
 	mutable bool isSelected;
 	mutable bool isVisible;
 	mutable bool renderMeshDirty;

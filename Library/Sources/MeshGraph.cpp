@@ -1,4 +1,5 @@
 #include "MeshGraph.h"
+#include "Plane.h"
 
 using namespace MeshNinja;
 
@@ -91,6 +92,45 @@ bool MeshGraph::Generate(const ConvexPolygonMesh& givenMesh)
 /*virtual*/ MeshGraph::Edge* MeshGraph::CreateEdge()
 {
 	return new Edge();
+}
+
+// TODO: This isn't quite right.  I wonder if it's accurate in an orthographic project, but not a perspective one?
+void MeshGraph::CollectSillouetteEdges(const Vector& viewPoint, std::set<VertexPair<false>>& edgeSet, const Transform& transform) const
+{
+	edgeSet.clear();
+
+	for (const Edge* edge : *this->edgeArray)
+	{
+		Node* nodeA = edge->node[0];
+		Node* nodeB = edge->node[1];
+
+		ConvexPolygon polygonA, polygonB;
+
+		nodeA->facet->MakePolygon(polygonA, this->mesh);
+		nodeB->facet->MakePolygon(polygonB, this->mesh);
+
+		Plane planeA, planeB;
+
+		polygonA.CalcPlane(planeA);
+		polygonB.CalcPlane(planeB);
+
+		Vector normalA = transform.TransformVector(planeA.normal);
+		Vector normalB = transform.TransformVector(planeB.normal);
+
+		Vector vertexA = transform.TransformPosition((*this->mesh->vertexArray)[edge->pair.i]);
+		Vector vertexB = transform.TransformPosition((*this->mesh->vertexArray)[edge->pair.j]);
+
+		Vector viewVector = viewPoint - (vertexA + vertexB) / 2.0;
+
+		double angleA = normalA.AngleBetweenThisAnd(viewVector);
+		double angleB = normalB.AngleBetweenThisAnd(viewVector);
+
+		bool facingAwayA = (angleA >= MESH_NINJA_PI / 2.0);
+		bool facingAwayB = (angleB >= MESH_NINJA_PI / 2.0);
+
+		if (facingAwayA != facingAwayB)
+			edgeSet.insert(edge->pair);
+	}
 }
 
 bool MeshGraph::GenerateDual(ConvexPolygonMesh& dualMesh) const

@@ -85,6 +85,8 @@ Mesh::Mesh()
 		tessellatedMesh.TessellateFaces();
 
 		this->renderMesh.FromConvexPolygonMesh(tessellatedMesh);
+
+		this->meshGraph.Generate(this->mesh);
 	}
 
 	if (renderMode == GL_SELECT)
@@ -98,22 +100,13 @@ Mesh::Mesh()
 
 	glBegin(GL_TRIANGLES);
 
-	MeshNinja::Vector renderedColor(color);
-	if (this->isSelected)
-	{
-		renderedColor += MeshNinja::Vector(0.2, 0.2, 0.2);
-		renderedColor.x = MESH_NINJA_CLAMP(renderedColor.x, 0.0, 1.0);
-		renderedColor.y = MESH_NINJA_CLAMP(renderedColor.y, 0.0, 1.0);
-		renderedColor.z = MESH_NINJA_CLAMP(renderedColor.z, 0.0, 1.0);
-	}
-	
 	if (wxGetApp().lightingMode == Application::LightingMode::UNLIT)
-		glColor3d(renderedColor.x, renderedColor.y, renderedColor.z);
+		glColor3d(this->color.x, this->color.y, this->color.z);
 	else
 	{
-		GLfloat diffuseColor[] = { (GLfloat)renderedColor.x, (GLfloat)renderedColor.y, (GLfloat)renderedColor.z, 1.0f };
+		GLfloat diffuseColor[] = { (GLfloat)this->color.x, (GLfloat)this->color.y, (GLfloat)this->color.z, 1.0f };
 		GLfloat specularColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-		GLfloat ambientColor[] = { (GLfloat)renderedColor.x, (GLfloat)renderedColor.y, (GLfloat)renderedColor.z, 1.0f };
+		GLfloat ambientColor[] = { (GLfloat)this->color.x, (GLfloat)this->color.y, (GLfloat)this->color.z, 1.0f };
 		GLfloat shininess[] = { 30.0f };
 
 		glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuseColor);
@@ -168,6 +161,8 @@ Mesh::Mesh()
 	if (renderMode == GL_SELECT)
 		glPopName();
 
+	glLineWidth(1.0f);
+
 	if (renderMode == GL_RENDER && wxGetApp().renderFaceNormals)
 	{
 		glBegin(GL_LINES);
@@ -207,11 +202,7 @@ Mesh::Mesh()
 	if (renderMode == GL_RENDER && wxGetApp().renderEdges)
 	{
 		glBegin(GL_LINES);
-
-		if (this->isSelected)
-			glColor3f(1.0f, 1.0f, 1.0f);
-		else
-			glColor3f(0.3f, 0.3f, 0.3f);
+		glColor3f(0.7f, 0.7f, 0.7f);
 
 		std::set<MeshNinja::MeshGraph::VertexPair<false>> vertexPairSet;
 
@@ -233,7 +224,7 @@ Mesh::Mesh()
 					vertexB = this->transform.TransformPosition(vertexB);
 
 					MeshNinja::Vector lineOfSightDirection = (vertexA + vertexB) / 2.0 - camera->position;
-					MeshNinja::Vector offset = lineOfSightDirection.Normalized() * -0.05;
+					MeshNinja::Vector offset = lineOfSightDirection.Normalized() * -0.01;
 
 					// This is to prevent Z-fighting.
 					vertexA += offset;
@@ -246,6 +237,28 @@ Mesh::Mesh()
 		}
 
 		glEnd();
+	}
+
+	if (renderMode == GL_RENDER && this->isSelected)
+	{
+		std::set<MeshNinja::MeshGraph::VertexPair<false>> edgeSet;
+		this->meshGraph.CollectSillouetteEdges(camera->position, edgeSet, this->transform);
+
+		glLineWidth(4.0f);
+		glBegin(GL_LINES);
+		glColor3d(1.0, 1.0, 1.0);
+
+		for (MeshNinja::MeshGraph::VertexPair<false> pair : edgeSet)
+		{
+			MeshNinja::Vector vertexA = this->transform.TransformPosition((*this->mesh.vertexArray)[pair.i]);
+			MeshNinja::Vector vertexB = this->transform.TransformPosition((*this->mesh.vertexArray)[pair.j]);
+
+			glVertex3dv(&vertexA.x);
+			glVertex3dv(&vertexB.x);
+		}
+
+		glEnd();
+		glLineWidth(1.0f);
 	}
 }
 

@@ -5,6 +5,8 @@
 
 namespace MeshNinja
 {
+	class Transform;
+
 	// Mesh graphs make it easier to traverse a given convex polygon mesh using a
 	// breadth-first search or depth-first search or whatever.
 	class MESH_NINJA_API MeshGraph
@@ -61,6 +63,8 @@ namespace MeshNinja
 			VertexPair<false> pair;
 			Node* node[2];
 		};
+
+		void CollectSillouetteEdges(const Vector& viewPoint, std::set<VertexPair<false>>& edgeSet, const Transform& transform) const;
 
 		std::vector<Node*>* nodeArray;
 		std::vector<Edge*>* edgeArray;

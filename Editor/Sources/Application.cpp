@@ -8,8 +8,8 @@ Application::Application()
 {
 	this->frame = nullptr;
 	this->meshScene = new MeshCollectionScene();
-	this->lightingMode = LightingMode::UNLIT;
-	this->renderEdges = true;
+	this->lightingMode = LightingMode::FACE_LIT;
+	this->renderEdges = false;
 	this->renderFaceNormals = false;
 	this->renderVertexNormals = false;
 }
