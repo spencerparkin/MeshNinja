@@ -242,7 +242,7 @@ Mesh::Mesh()
 	if (renderMode == GL_RENDER && this->isSelected)
 	{
 		std::set<MeshNinja::MeshGraph::VertexPair<false>> edgeSet;
-		this->meshGraph.CollectSillouetteEdges(camera->position, edgeSet, this->transform);
+		this->meshGraph.CollectSilhouetteEdges(camera->position, edgeSet, this->transform);
 
 		glLineWidth(4.0f);
 		glBegin(GL_LINES);

@@ -95,7 +95,7 @@ bool MeshGraph::Generate(const ConvexPolygonMesh& givenMesh)
 }
 
 // TODO: This isn't quite right.  I wonder if it's accurate in an orthographic project, but not a perspective one?
-void MeshGraph::CollectSillouetteEdges(const Vector& viewPoint, std::set<VertexPair<false>>& edgeSet, const Transform& transform) const
+void MeshGraph::CollectSilhouetteEdges(const Vector& viewPoint, std::set<VertexPair<false>>& edgeSet, const Transform& transform) const
 {
 	edgeSet.clear();
 

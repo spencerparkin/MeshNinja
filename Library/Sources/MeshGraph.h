@@ -64,7 +64,7 @@ namespace MeshNinja
 			Node* node[2];
 		};
 
-		void CollectSillouetteEdges(const Vector& viewPoint, std::set<VertexPair<false>>& edgeSet, const Transform& transform) const;
+		void CollectSilhouetteEdges(const Vector& viewPoint, std::set<VertexPair<false>>& edgeSet, const Transform& transform) const;
 
 		std::vector<Node*>* nodeArray;
 		std::vector<Edge*>* edgeArray;
