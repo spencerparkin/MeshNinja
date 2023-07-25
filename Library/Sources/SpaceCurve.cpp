@@ -16,20 +16,11 @@ SpaceCurve::SpaceCurve()
 /*virtual*/ double SpaceCurve::AdvanceByCurveLength(double t, double length, double eps /*= MESH_NINJA_EPS*/) const
 {
 	Vector startingPoint = this->Evaluate(t);
-
 	double dt = length / 2.0;
-
 	while (true)
 	{
 		t += dt;
-		if (t > 2.0)
-		{
-			t = 1.0;
-			break;
-		}
-
 		Vector endingPoint = this->Evaluate(t);
-
 		double currentLength = (endingPoint - startingPoint).Length();
 		if (::fabs(currentLength - length) < eps)
 			break;
@@ -38,6 +29,11 @@ SpaceCurve::SpaceCurve()
 		{
 			t -= dt;
 			dt *= 0.5;
+		}
+		else if (t > 1.0)
+		{
+			t = 1.0;
+			break;
 		}
 	}
 
@@ -58,6 +54,7 @@ SpaceCurve::SpaceCurve()
 
 double SpaceCurve::CalculateLength() const
 {
+	// A more accurate algorithm here would have an adaptive step size.
 	double length = 0.0;
 	double dt = 0.001;
 	Vector pointA = this->Evaluate(0.0);
@@ -78,21 +75,19 @@ void SpaceCurve::CalculateFrame(double t, Vector& tangent, Vector& normal, Vecto
 
 	double angle = tangent.AngleBetweenThisAnd(normal);
 	if (::fabs(angle - MESH_NINJA_PI / 2.0) >= MESH_NINJA_EPS)
-		normal.MakeOrthogonalTo(tangent);
+		normal.MakeOrthogonalTo(tangent);	// This is a hack.  I'm not sure exactly why it happens.
 
 	binormal = tangent.Cross(normal);
 }
 
-void SpaceCurve::GenerateTubeMesh(ConvexPolygonMesh& mesh, double length, double stepLength, int sides, std::function<double(double)> radiusFunction) const
+void SpaceCurve::GenerateTubeMesh(ConvexPolygonMesh& mesh, double stepLength, int sides, std::function<double(double)> radiusFunction) const
 {
 	std::vector<std::vector<Vector>> vertexData;
 
 	double t = 0.0;
-	double lengthCovered = 0.0;
-
-	while (lengthCovered < length)
+	while (t <= 1.0)
 	{
-		double radius = radiusFunction(t);
+		double radius = radiusFunction(t);	// Should probably have passed in 'lengthCovered', not 't'.
 
 		Vector curvePoint = this->Evaluate(t);
 		Vector xAxis, yAxis, zAxis;
@@ -110,8 +105,10 @@ void SpaceCurve::GenerateTubeMesh(ConvexPolygonMesh& mesh, double length, double
 			vertexArray.push_back(vertex);
 		}
 
+		if (t == 1.0)
+			break;
+
 		t = this->AdvanceByCurveLength(t, stepLength);
-		lengthCovered += stepLength;
 	}
 
 	std::vector<ConvexPolygon> polygonArray;

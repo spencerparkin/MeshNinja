@@ -6,6 +6,7 @@ namespace MeshNinja
 {
 	class ConvexPolygonMesh;
 
+	// These are always parameterized from 0 to 1.
 	class MESH_NINJA_API SpaceCurve
 	{
 	public:
@@ -19,7 +20,7 @@ namespace MeshNinja
 
 		double CalculateLength() const;
 		void CalculateFrame(double t, Vector& tangent, Vector& normal, Vector& binormal) const;
-		void GenerateTubeMesh(ConvexPolygonMesh& mesh, double length, double stepLength, int sides, std::function<double(double)> radiusFunction) const;
+		void GenerateTubeMesh(ConvexPolygonMesh& mesh, double stepLength, int sides, std::function<double(double)> radiusFunction) const;
 	};
 
 	class MESH_NINJA_API ControlPointCurve : public SpaceCurve

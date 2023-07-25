@@ -796,13 +796,16 @@ bool ConvexPolygonMesh::GenerateKleinBottle(int segments)
 	curve.controlPointArray->push_back(CompositeBezierCurve::ControlPoint{ Vector(7.0, 0.0, 0.0), Vector(0.0, 3.0, 0.0) });
 	curve.controlPointArray->push_back(CompositeBezierCurve::ControlPoint{ Vector(0.0, 16.0, 0.0), Vector(0.0, 8.0, 0.0) });
 
-	double length = curve.CalculateLength();
-
-	curve.GenerateTubeMesh(*this, length, 1.0, 8, [](double t) -> double
+	curve.GenerateTubeMesh(*this, 1.0, 16, [](double t) -> double
 		{
 			if (t < 0.2)
 			{
-				return 1.0 + 4.0 * ::sin((t / 0.2) * MESH_NINJA_PI);
+				return 3.0 - 2.0 * MESH_NINJA_SQUARED(t / 0.2) + 4.0 * ::sin((t / 0.2) * MESH_NINJA_PI);
+			}
+
+			if (t > 0.8)
+			{
+				return 1.0 + MESH_NINJA_SQUARED((t - 0.8) / 0.2) * 2.0;
 			}
 
 			return 1.0;
