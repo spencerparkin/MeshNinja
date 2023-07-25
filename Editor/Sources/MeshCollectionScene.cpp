@@ -115,8 +115,6 @@ void MeshCollectionScene::Clear()
 			GLfloat lightColor[] = { 1.f, 1.f, 1.f, 1.f };
 			GLfloat lightPos[] = { (GLfloat)camera->position.x, (GLfloat)camera->position.y, (GLfloat)camera->position.z, 1.0f };
 			GLfloat lightSpec[] = { 0.1f, 0.1f, 0.1f, 0.1f };
-			glEnable(GL_LIGHTING);
-			glEnable(GL_LIGHT0);
 			glLightfv(GL_LIGHT0, GL_DIFFUSE, lightColor);
 			glLightfv(GL_LIGHT0, GL_POSITION, lightPos);
 			glLightfv(GL_LIGHT0, GL_SPECULAR, lightSpec);
