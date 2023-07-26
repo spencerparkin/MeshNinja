@@ -287,6 +287,19 @@ void Frame::OnAddMesh(wxCommandEvent& event)
 			mesh->mesh.GenerateMobiusStrip(1.0, 5.0, 16);
 		else if (meshName == "Klein Bottle")
 			mesh->mesh.GenerateKleinBottle(16);
+		else if (meshName == "Plane")
+		{
+			MeshNinja::ConvexPolygon polygon;
+			polygon.vertexArray->push_back(MeshNinja::Vector(-10.0, -10.0, 0.0));
+			polygon.vertexArray->push_back(MeshNinja::Vector(10.0, -10.0, 0.0));
+			polygon.vertexArray->push_back(MeshNinja::Vector(10.0, 10.0, 0.0));
+			polygon.vertexArray->push_back(MeshNinja::Vector(-10.0, 10.0, 0.0));
+
+			std::vector<MeshNinja::ConvexPolygon> polygonArray;
+			polygonArray.push_back(polygon);
+
+			mesh->mesh.FromConvexPolygonArray(polygonArray);
+		}
 	}
 
 	if (mesh->mesh.vertexArray->size() == 0)

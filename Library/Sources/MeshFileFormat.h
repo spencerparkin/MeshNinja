@@ -30,4 +30,6 @@ namespace MeshNinja
 		void TokenizeLine(const std::string& line, char delimeter, std::vector<std::string>& tokenArray, bool stripEmptyTokens);
 		void ProcessLine(const std::vector<std::string>& tokenArray, ConvexPolygonMesh& mesh);
 	};
+
+	// TODO: Add gITF support.  See "https://github.com/KhronosGroup/glTF-Tutorials/blob/master/gltfTutorial/gltfTutorial_002_BasicGltfStructure.md".
 }
