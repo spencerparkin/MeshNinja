@@ -5,6 +5,9 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
+    <Filter Include="Sources\JSON">
+      <UniqueIdentifier>{b7bbdb59-b870-47fa-843f-62056f92d96d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Sources\ConvexPolygonMesh.h">
@@ -70,6 +73,9 @@
     <ClInclude Include="Sources\SpaceCurve.h">
       <Filter>Sources</Filter>
     </ClInclude>
+    <ClInclude Include="Sources\JSON\JsonValue.h">
+      <Filter>Sources\JSON</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sources\MeshBinaryOperation.cpp">
@@ -131,6 +137,9 @@
     </ClCompile>
     <ClCompile Include="Sources\SpaceCurve.cpp">
       <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\JSON\JsonValue.cpp">
+      <Filter>Sources\JSON</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
