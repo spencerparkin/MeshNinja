@@ -182,9 +182,9 @@ bool glTF_FileFormat::WriteVertexBuffer(const RenderMesh& mesh, std::ofstream& b
 	int colorBufferViewNumber = jsonBufferViewsArray->GetSize();
 	jsonBufferViewsArray->PushValue(jsonColorBufferView);
 	jsonColorBufferView->SetValue("buffer", new JsonInt(0));
-	jsonColorBufferView->SetValue("bufferLength", new JsonInt(sizeof(float) * 3 * mesh.vertexArray->size()));
-	jsonColorBufferView->SetValue("bufferOffset", new JsonInt(sizeof(float) * 6));
-	jsonColorBufferView->SetValue("bufferStride", new JsonInt(sizeof(float) * 9));
+	jsonColorBufferView->SetValue("byteLength", new JsonInt(sizeof(float) * 3 * mesh.vertexArray->size()));
+	jsonColorBufferView->SetValue("byteOffset", new JsonInt(sizeof(float) * 6));
+	jsonColorBufferView->SetValue("byteStride", new JsonInt(sizeof(float) * 9));
 	jsonColorBufferView->SetValue("target", new JsonInt(MESH_NINJA_GLTF_ELEMENT_ARRAY_BUFFER));
 
 	JsonObject* jsonPositionAccessor = new JsonObject();
@@ -200,7 +200,7 @@ bool glTF_FileFormat::WriteVertexBuffer(const RenderMesh& mesh, std::ofstream& b
 	int normalAccessorNumber = jsonAccessorsArray->GetSize();
 	jsonAccessorsArray->PushValue(jsonNormalAccessor);
 	jsonNormalAccessor->SetValue("bufferView", new JsonInt(normalBufferViewNumber));
-	jsonNormalAccessor->SetValue("bufferOffset", new JsonInt(0));
+	jsonNormalAccessor->SetValue("byteOffset", new JsonInt(0));
 	jsonNormalAccessor->SetValue("componentType", new JsonInt(MESH_NINJA_GLTF_ACCESSOR_DT_FLOAT));
 	jsonNormalAccessor->SetValue("count", new JsonInt(mesh.vertexArray->size() * 3));
 	jsonNormalAccessor->SetValue("type", new JsonString("VEC3"));
@@ -209,7 +209,7 @@ bool glTF_FileFormat::WriteVertexBuffer(const RenderMesh& mesh, std::ofstream& b
 	int colorAccessorNumber = jsonAccessorsArray->GetSize();
 	jsonAccessorsArray->PushValue(jsonColorAccessor);
 	jsonColorAccessor->SetValue("bufferView", new JsonInt(colorBufferViewNumber));
-	jsonColorAccessor->SetValue("bufferOffset", new JsonInt(0));
+	jsonColorAccessor->SetValue("byteOffset", new JsonInt(0));
 	jsonColorAccessor->SetValue("componentType", new JsonInt(MESH_NINJA_GLTF_ACCESSOR_DT_FLOAT));
 	jsonColorAccessor->SetValue("count", new JsonInt(mesh.vertexArray->size() * 3));
 	jsonColorAccessor->SetValue("type", new JsonString("VEC3"));
