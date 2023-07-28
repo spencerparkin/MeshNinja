@@ -22,11 +22,14 @@ private:
 	void OnListItemRightClick(wxListEvent& event);
 	void OnToggleVisibility(wxCommandEvent& event);
 	void OnMakeDual(wxCommandEvent& event);
+	void OnClearFileSource(wxCommandEvent& event);
+	void OnUpdateUI(wxUpdateUIEvent& event);
 
 	enum
 	{
 		ID_ToggleVisibility = wxID_HIGHEST + 500,
-		ID_MakeDual
+		ID_MakeDual,
+		ID_ClearFileSource
 	};
 
 	Mesh* GetSelectedMesh();

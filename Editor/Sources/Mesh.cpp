@@ -1,5 +1,6 @@
 #include "Mesh.h"
 #include "FileFormats/ObjFileFormat.h"
+#include "FileFormats/glTF_FileFormat.h"
 #include "ConvexPolygonMesh.h"
 #include "Plane.h"
 #include "Camera.h"
@@ -262,28 +263,53 @@ Mesh::Mesh()
 	}
 }
 
-bool Mesh::Load()
+bool Mesh::Load(bool loadRenderMesh /*= false*/)
 {
-	MeshNinja::MeshFileFormat* fileFormat = this->MakeFileFormatObject();
-	if (!fileFormat)
-		return false;
+	bool success = false;
 
-	bool success = fileFormat->LoadMesh((const char*)this->fileSource.c_str(), this->mesh);
-	delete fileFormat;
+	MeshNinja::MeshFileFormat* fileFormat = this->GetFileFormatObject();
+	if (fileFormat)
+	{
+		if (loadRenderMesh)
+		{
+			success = fileFormat->LoadRenderMesh((const char*)this->fileSource.c_str(), this->renderMesh);
+			if (success)
+			{
+				this->renderMeshDirty = false;
+				this->renderMesh.ToConvexPolygonMesh(this->mesh);
+			}
+		}
+		else
+		{
+			success = fileFormat->LoadMesh((const char*)this->fileSource.c_str(), this->mesh);
+			this->renderMeshDirty = true;
+		}
+	}
+
 	return success;
 }
 
-bool Mesh::Save()
+bool Mesh::Save(bool saveRenderMesh /*= false*/)
 {
-	MeshNinja::MeshFileFormat* fileFormat = this->MakeFileFormatObject();
-	if (!fileFormat)
-		return false;
+	bool success = false;
 
-	MeshNinja::ConvexPolygonMesh transformedMesh(this->mesh);
-	transformedMesh.ApplyTransform(this->transform);
+	MeshNinja::MeshFileFormat* fileFormat = this->GetFileFormatObject();
+	if (fileFormat)
+	{
+		if (saveRenderMesh)
+		{
+			MeshNinja::RenderMesh transformedMesh(this->renderMesh);
+			transformedMesh.ApplyTransform(this->transform);
+			success = fileFormat->SaveRenderMesh((const char*)this->fileSource.c_str(), transformedMesh);
+		}
+		else
+		{
+			MeshNinja::ConvexPolygonMesh transformedMesh(this->mesh);
+			transformedMesh.ApplyTransform(this->transform);
+			success = fileFormat->SaveMesh((const char*)this->fileSource.c_str(), transformedMesh);
+		}
+	}
 
-	bool success = fileFormat->SaveMesh((const char*)this->fileSource.c_str(), transformedMesh);
-	delete fileFormat;
 	return success;
 }
 
@@ -294,10 +320,23 @@ void Mesh::BakeTransform()
 	this->renderMeshDirty = true;
 }
 
-MeshNinja::MeshFileFormat* Mesh::MakeFileFormatObject()
+MeshNinja::MeshFileFormat* Mesh::GetFileFormatObject()
 {
-	// TODO: Look at extension to know what to return here.
-	return new MeshNinja::ObjFileFormat();
+	std::string ext = std::filesystem::path(std::string(this->fileSource.c_str())).extension().string();
+
+	static MeshNinja::ObjFileFormat objFileFormat;
+	static MeshNinja::glTF_FileFormat gltfFileFormat;
+
+	std::vector<MeshNinja::MeshFileFormat*> fileFormatArray;
+
+	fileFormatArray.push_back(&objFileFormat);
+	fileFormatArray.push_back(&gltfFileFormat);
+
+	for (MeshNinja::MeshFileFormat* fileFormat : fileFormatArray)
+		if (fileFormat->GetExtension() == ext)
+			return fileFormat;
+
+	return nullptr;
 }
 
 void Mesh::SetSelected(bool selected) const

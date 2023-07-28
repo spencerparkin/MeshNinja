@@ -28,13 +28,28 @@ void MeshListControl::OnListItemRightClick(wxListEvent& event)
 	wxMenu contextMenu;
 
 	contextMenu.Append(new wxMenuItem(&contextMenu, ID_ToggleVisibility, "Toggle Visibility", "Turn the visibility of the mesh on/off."));
-	contextMenu.AppendSeparator();
 	contextMenu.Append(new wxMenuItem(&contextMenu, ID_MakeDual, "Make Dual", "Add the dual of this mesh to the scene."));
+	contextMenu.Append(new wxMenuItem(&contextMenu, ID_ClearFileSource, "Clear File Source", "Unbind this mesh from any known file on the file system."));
 
 	contextMenu.Bind(wxEVT_MENU, &MeshListControl::OnToggleVisibility, this, ID_ToggleVisibility);
 	contextMenu.Bind(wxEVT_MENU, &MeshListControl::OnMakeDual, this, ID_MakeDual);
+	contextMenu.Bind(wxEVT_MENU, &MeshListControl::OnClearFileSource, this, ID_ClearFileSource);
+	contextMenu.Bind(wxEVT_UPDATE_UI, &MeshListControl::OnUpdateUI, this, ID_ClearFileSource);
 
 	this->PopupMenu(&contextMenu);
+}
+
+void MeshListControl::OnUpdateUI(wxUpdateUIEvent& event)
+{
+	switch (event.GetId())
+	{
+		case ID_ClearFileSource:
+		{
+			Mesh* mesh = this->GetSelectedMesh();
+			event.Enable(mesh && mesh->fileSource.Len() > 0);
+			break;
+		}
+	}
 }
 
 void MeshListControl::OnToggleVisibility(wxCommandEvent& event)
@@ -77,6 +92,17 @@ void MeshListControl::OnMakeDual(wxCommandEvent& event)
 
 		wxCommandEvent sceneChangedEvent(EVT_SCENE_CHANGED);
 		wxPostEvent(wxGetApp().GetFrame(), sceneChangedEvent);
+	}
+}
+
+void MeshListControl::OnClearFileSource(wxCommandEvent& event)
+{
+	Mesh* mesh = this->GetSelectedMesh();
+	if (mesh)
+	{
+		mesh->fileSource = "";
+
+		wxPostEvent(wxGetApp().GetFrame(), wxCommandEvent(EVT_SCENE_CHANGED));
 	}
 }
 

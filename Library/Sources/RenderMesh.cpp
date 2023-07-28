@@ -10,10 +10,29 @@ RenderMesh::RenderMesh()
 	this->vertexArray = new std::vector<Vertex>();
 }
 
+RenderMesh::RenderMesh(const RenderMesh& renderMesh)
+{
+	this->facetArray = new std::vector<Facet>();
+	this->vertexArray = new std::vector<Vertex>();
+
+	this->Copy(renderMesh);
+}
+
 /*virtual*/ RenderMesh::~RenderMesh()
 {
 	delete this->facetArray;
 	delete this->vertexArray;
+}
+
+void RenderMesh::Copy(const RenderMesh& renderMesh)
+{
+	this->Clear();
+
+	for (const Vertex& vertex : *renderMesh.vertexArray)
+		this->vertexArray->push_back(vertex);
+
+	for (const Facet& facet : *renderMesh.facetArray)
+		this->facetArray->push_back(facet);
 }
 
 void RenderMesh::Clear()

@@ -121,6 +121,7 @@ Frame::Frame(wxWindow* parent, const wxPoint& pos, const wxSize& size) : wxFrame
 	this->Bind(wxEVT_UPDATE_UI, &Frame::OnUpdateUI, this, ID_ToggleFaceNormalRender);
 	this->Bind(wxEVT_UPDATE_UI, &Frame::OnUpdateUI, this, ID_ToggleVertexNormalRender);
 	this->Bind(wxEVT_UPDATE_UI, &Frame::OnUpdateUI, this, ID_ClearScene);
+	this->Bind(wxEVT_UPDATE_UI, &Frame::OnUpdateUI, this, ID_ExportMesh);
 
 	this->MakePanels();
 	this->UpdatePanels();
@@ -234,6 +235,11 @@ void Frame::OnUpdateUI(wxUpdateUIEvent& event)
 		case ID_ToggleVertexNormalRender:
 		{
 			event.Check(wxGetApp().renderVertexNormals);
+			break;
+		}
+		case ID_ExportMesh:
+		{
+			event.Enable(wxGetApp().GetMeshScene()->FindFirstSelectedMesh() != nullptr);
 			break;
 		}
 	}
@@ -478,9 +484,16 @@ void Frame::OnExportMesh(wxCommandEvent& event)
 			mesh->fileSource = fileDialog.GetPath();
 	}
 
+	bool saveRenderMesh = false;
+	int answer = wxMessageBox("Save render mesh?", "Inquery", wxICON_QUESTION | wxYES_NO | wxCANCEL, this);
+	if (wxYES == answer)
+		saveRenderMesh = true;
+	else if (wxCANCEL == answer)
+		return;
+
 	wxBusyCursor busyCursor;
 
-	if (!mesh->Save())
+	if (!mesh->Save(saveRenderMesh))
 		wxMessageBox("Failed to write file: " + mesh->fileSource, "Error", wxICON_ERROR | wxOK, this);
 	else
 		wxMessageBox("Mesh file (" + mesh->fileSource + ") saved!", "Success", wxICON_INFORMATION | wxOK, this);

@@ -18,8 +18,8 @@ public:
 	Mesh();
 	virtual ~Mesh();
 
-	bool Load();
-	bool Save();
+	bool Load(bool loadRenderMesh = false);
+	bool Save(bool saveRenderMesh = false);
 
 	virtual void Render(GLint renderMode, const Camera* camera) const override;
 	virtual MeshNinja::Vector GetPosition() const override;
@@ -34,7 +34,7 @@ public:
 
 	const wxDateTime& GetSelectionTime() const { return this->selectionTime; }
 
-	MeshNinja::MeshFileFormat* MakeFileFormatObject();
+	MeshNinja::MeshFileFormat* GetFileFormatObject();
 
 	MeshNinja::Vector color;
 	MeshNinja::ConvexPolygonMesh mesh;
