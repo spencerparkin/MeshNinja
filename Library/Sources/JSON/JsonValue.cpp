@@ -56,7 +56,7 @@ JsonValue::JsonValue()
 		if (!token->Eat(jsonString.c_str(), i))
 		{
 			delete token;
-			return false;
+			break;
 		}
 
 		tokenArray.push_back(token);
@@ -65,70 +65,72 @@ JsonValue::JsonValue()
 	return true;
 }
 
-bool JsonValue::Token::Eat(const char* buffer, int& i)
+bool JsonValue::Token::Eat(const char* givenBuffer, int& i)
 {
-	while (::isspace(buffer[i]))
+	while (::isspace(givenBuffer[i]))
 		i++;
 
-	const char* tokenText = &buffer[i];
+	const char* tokenText = &givenBuffer[i];
 	if (tokenText[0] == '"')
 	{
-		int j = 0;
+		int j = 1;
 		while (tokenText[j] != '\0' && tokenText[j] != '"')
 		{
-			this->buffer[j] = tokenText[j];
+			this->buffer[j - 1] = tokenText[j];
 			j++;
 		}
 
 		if (tokenText[j] == '\0')
 			return false;
 
+		i += j + 1;
 		this->type = Token::STRING;
 		return true;
 	}
-	else if (tokenText[0] == '-' || ::isdigit(tokenText[0]))
+	else if (*tokenText == '-' || ::isdigit(*tokenText))
 	{
 		int j = 0;
-		while (tokenText[j] != '\0' && (tokenText[0] == '-' || tokenText[0] == '.' || ::isdigit(tokenText[0])))
+		while (tokenText[j] != '\0' && (tokenText[j] == '-' || tokenText[j] == '.' || ::isdigit(tokenText[j])))
 		{
 			this->buffer[j] = tokenText[j];
 			j++;
 		}
 
+		i += j;
 		this->type = Token::NUMBER;
 		return true;
 	}
-	else if (tokenText[0] == '{')
+	else if (*tokenText == '{')
 	{
 		this->type = Token::OPEN_CURLY_BRACKET;
 		i++;
 		return true;
 	}
-	else if (tokenText[0] == '}')
+	else if (*tokenText == '}')
 	{
 		this->type = Token::CLOSE_CURLY_BRACKET;
 		i++;
 		return true;
 	}
-	else if (tokenText[0] == '[')
+	else if (*tokenText == '[')
 	{
 		this->type = Token::OPEN_SQUARE_BRACKET;
 		i++;
 		return true;
 	}
-	else if (tokenText[0] == ']')
+	else if (*tokenText == ']')
 	{
 		this->type = Token::CLOSE_SQUARE_BRACKET;
 		i++;
 		return true;
 	}
-	else if (tokenText[0] == ':')
+	else if (*tokenText == ':')
 	{
 		this->type = Token::COLON;
 		i++;
 		return true;
 	}
-	else if (tokenText[0] == ',')
+	else if (*tokenText == ',')
 	{
 		this->type = Token::COMMA;
 		i++;
@@ -221,6 +223,81 @@ void JsonNumber::SetValue(double value)
 	this->value = value;
 }
 
+//-------------------------------- JsonStructure --------------------------------
+
+JsonStructure::JsonStructure()
+{
+}
+
+/*virtual*/ JsonStructure::~JsonStructure()
+{
+}
+
+bool JsonStructure::ParseTokensWithCallback(const std::vector<Token*>& tokenArray, std::function<bool(const std::vector<Token*>&)> callback)
+{
+	std::vector<Token*> subTokenArray;
+
+	unsigned int level = 0;
+	for (unsigned int i = 0; i < tokenArray.size(); i++)
+	{
+		const Token* token = tokenArray[i];
+		switch (token->type)
+		{
+			case Token::OPEN_CURLY_BRACKET:
+			case Token::OPEN_SQUARE_BRACKET:
+			{
+				if (++level > 1)
+					subTokenArray.push_back(const_cast<Token*>(token));
+
+				break;
+			}
+			case Token::CLOSE_CURLY_BRACKET:
+			case Token::CLOSE_SQUARE_BRACKET:
+			{
+				if (level == 0)
+					return false;
+
+				if (level > 1)
+					subTokenArray.push_back(const_cast<Token*>(token));
+
+				if (--level == 0)
+				{
+					if (!callback(subTokenArray))
+						return false;
+
+					subTokenArray.clear();
+				}
+
+				break;
+			}
+			case Token::COMMA:
+			{
+				if (level > 1)
+					subTokenArray.push_back(const_cast<Token*>(token));
+				else if (level == 1)
+				{
+					if (!callback(subTokenArray))
+						return false;
+
+					subTokenArray.clear();
+				}
+
+				break;
+			}
+			default:
+			{
+				subTokenArray.push_back(const_cast<Token*>(token));
+				break;
+			}
+		}
+	}
+
+	if (level != 0)
+		return false;
+
+	return true;
+}
+
 //-------------------------------- JsonObject --------------------------------
 
 JsonObject::JsonObject()
@@ -246,7 +323,7 @@ JsonObject::JsonObject()
 		if (i++ > 0)
 			jsonString += ",\n";
 
-		jsonString += MakeTabs(tabLevel + 1) + pair.first + ":";
+		jsonString += MakeTabs(tabLevel + 1) + "\"" + pair.first + "\":";
 		
 		std::string jsonSubString;
 		if (!pair.second->PrintJson(jsonSubString, tabLevel + 1))
@@ -261,7 +338,7 @@ JsonObject::JsonObject()
 		jsonString += jsonSubString;
 	}
 
-	jsonString += MakeTabs(tabLevel) + "}";
+	jsonString += "\n" + MakeTabs(tabLevel) + "}";
 
 	return true;
 }
@@ -274,68 +351,33 @@ JsonObject::JsonObject()
 	if (tokenArray[0]->type != Token::OPEN_CURLY_BRACKET)
 		return false;
 
-	std::vector<Token*> subTokenArray;
-	unsigned int level = 0;
-	for (unsigned int i = 0; i < tokenArray.size(); i++)
-	{
-		const Token* token = tokenArray[i];
-		switch (token->type)
+	return this->ParseTokensWithCallback(tokenArray, [this](const std::vector<Token*>& subTokenArray) -> bool
 		{
-			case Token::OPEN_CURLY_BRACKET:
-			case Token::OPEN_SQUARE_BRACKET:
-			{
-				level++;
-				break;
-			}
-			case Token::CLOSE_CURLY_BRACKET:
-			case Token::CLOSE_SQUARE_BRACKET:
-			{
-				if (level == 0)
-					return false;
+			if (subTokenArray.size() < 3)
+				return false;
 
-				level--;
-				break;
-			}
-			case Token::COMMA:
-			{
-				if (level == 1)
-				{
-					if (subTokenArray.size() < 3)
-						return false;
+			if (subTokenArray[0]->type != Token::STRING || subTokenArray[1]->type != Token::COLON)
+				return false;
 
-					if (subTokenArray[0]->type != Token::STRING || subTokenArray[1]->type != Token::COLON)
-						return false;
+			std::string key = subTokenArray[0]->buffer;
+			if (this->GetValue(key))
+				return false;
 
-					std::string key = subTokenArray[0]->buffer;
-					if (this->GetValue(key))
-						return false;
+			// Unfortunately, I think this does a copy.  If we just passed a C-array down, we could avoid the copy.
+			std::vector<Token*> slicedSubTokenArray(subTokenArray.begin() + 2, subTokenArray.end());
 
-					// Hmmm...this is expensive for an array.
-					subTokenArray.erase(subTokenArray.begin());
-					subTokenArray.erase(subTokenArray.begin());
+			JsonValue* jsonValue = ValueFactory(*slicedSubTokenArray[0]);
+			if (!jsonValue)
+				return false;
 
-					JsonValue* jsonValue = ValueFactory(*subTokenArray[0]);
-					if (!jsonValue)
-						return false;
+			if (!this->SetValue(key, jsonValue))
+				return false;
 
-					if (!this->SetValue(key, jsonValue))
-						return false;
-				}
+			if (!jsonValue->ParseTokens(slicedSubTokenArray))
+				return false;
 
-				break;
-			}
-			default:
-			{
-				subTokenArray.push_back(const_cast<Token*>(token));
-				break;
-			}
-		}
-	}
-
-	if (level != 0)
-		return false;
-
-	return true;
+			return true;
+		});
 }
 
 void JsonObject::Clear()
@@ -407,14 +449,18 @@ JsonArray::JsonArray()
 			jsonString += ",\n";
 
 		std::string jsonSubString;
-		if (!(*this->valueArray)[i]->PrintJson(jsonSubString, tabLevel + 1))
+		const JsonValue* jsonValue = (*this->valueArray)[i];
+		if (!jsonValue->PrintJson(jsonSubString, tabLevel + 1))
 			return false;
 
 		// Again, this isn't terribly efficient.
-		jsonString += jsonSubString;
+		if (dynamic_cast<const JsonArray*>(jsonValue) || dynamic_cast<const JsonObject*>(jsonValue))
+			jsonString += jsonSubString;
+		else
+			jsonString += MakeTabs(tabLevel + 1) + jsonSubString;
 	}
 
-	jsonString += MakeTabs(tabLevel) + "]";
+	jsonString += "\n" + MakeTabs(tabLevel) + "]";
 
 	return true;
 }
@@ -427,61 +473,22 @@ JsonArray::JsonArray()
 	if (tokenArray[0]->type != Token::OPEN_SQUARE_BRACKET)
 		return false;
 
-	std::vector<Token*> subTokenArray;
-	unsigned int level = 0;
-	for (unsigned int i = 0; i < tokenArray.size(); i++)
-	{
-		const Token* token = tokenArray[i];
-		switch (token->type)
+	return this->ParseTokensWithCallback(tokenArray, [this](const std::vector<Token*>& subTokenArray) -> bool
 		{
-			case Token::OPEN_CURLY_BRACKET:
-			case Token::OPEN_SQUARE_BRACKET:
-			{
-				level++;
-				break;
-			}
-			case Token::CLOSE_CURLY_BRACKET:
-			case Token::CLOSE_SQUARE_BRACKET:
-			{
-				if (level == 0)
-					return false;
+			if (subTokenArray.size() == 0)
+				return false;
 
-				level--;
-				break;
-			}
-			case Token::COMMA:
-			{
-				if (level == 1)
-				{
-					if (subTokenArray.size() == 0)
-						return false;
+			JsonValue* jsonValue = ValueFactory(*subTokenArray[0]);
+			if (!jsonValue)
+				return false;
 
-					JsonValue* jsonValue = ValueFactory(*subTokenArray[0]);
-					if (!jsonValue)
-						return false;
+			this->PushValue(jsonValue);
 
-					this->PushValue(jsonValue);
+			if (!jsonValue->ParseTokens(subTokenArray))
+				return false;
 
-					if (!jsonValue->ParseTokens(subTokenArray))
-						return false;
-
-					subTokenArray.clear();
-				}
-
-				break;
-			}
-			default:
-			{
-				subTokenArray.push_back(const_cast<Token*>(token));
-				break;
-			}
-		}
-	}
-
-	if (level != 0)
-		return false;
-
-	return true;
+			return true;
+		});
 }
 
 void JsonArray::Clear()
@@ -593,6 +600,7 @@ JsonNull::JsonNull()
 
 /*virtual*/ bool JsonNull::PrintJson(std::string& jsonString, int tabLevel /*= 0*/) const
 {
+	jsonString = "null";
 	return true;
 }
 

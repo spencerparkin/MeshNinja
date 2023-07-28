@@ -6,6 +6,7 @@
 #include "AlgebraicSurface.h"
 #include "Ray.h"
 #include "AxisAlignedBoundingBox.h"
+#include "JSON/JsonValue.h"
 
 int main(int argc, char** argv)
 {
@@ -88,6 +89,7 @@ int main(int argc, char** argv)
 	fileFormat.SaveMesh("Meshes/Rhombicosidodecahedron.obj", mesh);
 #endif
 
+#if 0
 	QuadraticSurface surface;
 	surface.MakeEllipsoid(20.0, 25.0, 30.0);
 
@@ -98,6 +100,31 @@ int main(int argc, char** argv)
 	surface.GenerateMesh(mesh, contactRay, aabb, 5.0);
 
 	fileFormat.SaveMesh("Meshes/Ellipsoid.obj", mesh);
+#endif
+
+	std::ifstream inputFileStream;
+	inputFileStream.open("Meshes/BoxTextured.gltf");
+	if (inputFileStream.is_open())
+	{
+		std::stringstream stringStream;
+		stringStream << inputFileStream.rdbuf();
+		MeshNinja::JsonValue* jsonValue = MeshNinja::JsonValue::ParseJson(stringStream.str());
+		inputFileStream.close();
+
+		if (jsonValue)
+		{
+			std::string jsonString;
+			if (jsonValue->PrintJson(jsonString))
+			{
+				std::ofstream outputFileStream;
+				outputFileStream.open("Meshes/Test.json");
+				outputFileStream << jsonString;
+				outputFileStream.close();
+			}
+
+			delete jsonValue;
+		}
+	}
 
 	return 0;
 }

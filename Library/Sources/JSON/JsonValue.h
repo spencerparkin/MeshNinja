@@ -35,7 +35,7 @@ namespace MeshNinja
 				COLON
 			};
 
-			bool Eat(const char* buffer, int& i);
+			bool Eat(const char* givenBuffer, int& i);
 
 			char buffer[128];
 			Type type;
@@ -74,7 +74,17 @@ namespace MeshNinja
 		double value;
 	};
 
-	class MESH_NINJA_API JsonObject : public JsonValue
+	class MESH_NINJA_API JsonStructure : public JsonValue
+	{
+	public:
+		JsonStructure();
+		virtual ~JsonStructure();
+
+	protected:
+		bool ParseTokensWithCallback(const std::vector<Token*>& tokenArray, std::function<bool(const std::vector<Token*>&)> callback);
+	};
+
+	class MESH_NINJA_API JsonObject : public JsonStructure
 	{
 	public:
 		JsonObject();
@@ -97,7 +107,7 @@ namespace MeshNinja
 		JsonValueMap* valueMap;
 	};
 
-	class MESH_NINJA_API JsonArray : public JsonValue
+	class MESH_NINJA_API JsonArray : public JsonStructure
 	{
 	public:
 		JsonArray();
