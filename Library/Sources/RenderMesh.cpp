@@ -22,6 +22,15 @@ void RenderMesh::Clear()
 	this->vertexArray->clear();
 }
 
+bool RenderMesh::IsTriangleMesh() const
+{
+	for (const Facet& facet : *this->facetArray)
+		if (facet.vertexArray->size() != 3)
+			return false;
+
+	return true;
+}
+
 void RenderMesh::ApplyTransform(const Transform& transform)
 {
 	for (Facet& facet : *this->facetArray)

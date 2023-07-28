@@ -30,7 +30,8 @@ namespace MeshNinja
 				CLOSE_SQUARE_BRACKET,
 				COMMA,
 				STRING,
-				NUMBER,
+				FLOAT,
+				INT,
 				BOOLEAN,
 				COLON
 			};
@@ -46,6 +47,7 @@ namespace MeshNinja
 	{
 	public:
 		JsonString();
+		JsonString(const std::string& value);
 		virtual ~JsonString();
 
 		virtual bool PrintJson(std::string& jsonString, int tabLevel = 0) const override;
@@ -58,11 +60,12 @@ namespace MeshNinja
 		std::string* value;
 	};
 
-	class MESH_NINJA_API JsonNumber : public JsonValue
+	class MESH_NINJA_API JsonFloat : public JsonValue
 	{
 	public:
-		JsonNumber();
-		virtual ~JsonNumber();
+		JsonFloat();
+		JsonFloat(double value);
+		virtual ~JsonFloat();
 
 		virtual bool PrintJson(std::string& jsonString, int tabLevel = 0) const override;
 		virtual bool ParseTokens(const std::vector<Token*>& tokenArray) override;
@@ -72,6 +75,23 @@ namespace MeshNinja
 
 	private:
 		double value;
+	};
+
+	class MESH_NINJA_API JsonInt : public JsonValue
+	{
+	public:
+		JsonInt();
+		JsonInt(long value);
+		virtual ~JsonInt();
+
+		virtual bool PrintJson(std::string& jsonString, int tabLevel = 0) const override;
+		virtual bool ParseTokens(const std::vector<Token*>& tokenArray) override;
+
+		long GetValue() const;
+		void SetValue(long value);
+
+	private:
+		long value;
 	};
 
 	class MESH_NINJA_API JsonStructure : public JsonValue
@@ -135,6 +155,7 @@ namespace MeshNinja
 	{
 	public:
 		JsonBool();
+		JsonBool(bool value);
 		virtual ~JsonBool();
 
 		virtual bool PrintJson(std::string& jsonString, int tabLevel = 0) const override;

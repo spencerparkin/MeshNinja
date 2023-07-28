@@ -39,8 +39,10 @@ JsonValue::JsonValue()
 		return new JsonObject();
 	else if (token.type == Token::STRING)
 		return new JsonString();
-	else if (token.type == Token::NUMBER)
-		return new JsonNumber();
+	else if (token.type == Token::FLOAT)
+		return new JsonFloat();
+	else if (token.type == Token::INT)
+		return new JsonInt();
 	else if (token.type == Token::BOOLEAN)
 		return new JsonBool();
 
@@ -89,15 +91,18 @@ bool JsonValue::Token::Eat(const char* givenBuffer, int& i)
 	}
 	else if (*tokenText == '-' || ::isdigit(*tokenText))
 	{
+		this->type = Token::INT;
 		int j = 0;
 		while (tokenText[j] != '\0' && (tokenText[j] == '-' || tokenText[j] == '.' || ::isdigit(tokenText[j])))
 		{
+			if (tokenText[j] == '.')
+				this->type = Token::FLOAT;
+
 			this->buffer[j] = tokenText[j];
 			j++;
 		}
 
 		i += j;
-		this->type = Token::NUMBER;
 		return true;
 	}
 	else if (*tokenText == '{')
@@ -155,6 +160,11 @@ JsonString::JsonString()
 	this->value = new std::string();
 }
 
+JsonString::JsonString(const std::string& value)
+{
+	this->value = new std::string(value);
+}
+
 /*virtual*/ JsonString::~JsonString()
 {
 	delete this->value;
@@ -185,18 +195,23 @@ void JsonString::SetValue(const std::string& value)
 	*this->value = value;
 }
 
-//-------------------------------- JsonNumber --------------------------------
+//-------------------------------- JsonFloat --------------------------------
 
-JsonNumber::JsonNumber()
+JsonFloat::JsonFloat()
 {
 	this->value = 0.0;
 }
 
-/*virtual*/ JsonNumber::~JsonNumber()
+JsonFloat::JsonFloat(double value)
+{
+	this->value = value;
+}
+
+/*virtual*/ JsonFloat::~JsonFloat()
 {
 }
 
-/*virtual*/ bool JsonNumber::PrintJson(std::string& jsonString, int tabLevel /*= 0*/) const
+/*virtual*/ bool JsonFloat::PrintJson(std::string& jsonString, int tabLevel /*= 0*/) const
 {
 	char buffer[128];
 	sprintf_s(buffer, sizeof(buffer), "%f", this->value);
@@ -204,21 +219,64 @@ JsonNumber::JsonNumber()
 	return true;
 }
 
-/*virtual*/ bool JsonNumber::ParseTokens(const std::vector<Token*>& tokenArray)
+/*virtual*/ bool JsonFloat::ParseTokens(const std::vector<Token*>& tokenArray)
 {
-	if (tokenArray.size() != 1 || tokenArray[0]->type != Token::NUMBER)
+	if (tokenArray.size() != 1 || tokenArray[0]->type != Token::FLOAT)
 		return false;
 
 	this->SetValue(::atof(tokenArray[0]->buffer));
 	return true;
 }
 
-double JsonNumber::GetValue() const
+double JsonFloat::GetValue() const
 {
 	return value;
 }
 
-void JsonNumber::SetValue(double value)
+void JsonFloat::SetValue(double value)
+{
+	this->value = value;
+}
+
+//-------------------------------- JsonInt --------------------------------
+
+JsonInt::JsonInt()
+{
+	this->value = 0L;
+}
+
+JsonInt::JsonInt(long value)
+{
+	this->value = value;
+}
+
+/*virtual*/ JsonInt::~JsonInt()
+{
+}
+
+/*virtual*/ bool JsonInt::PrintJson(std::string& jsonString, int tabLevel /*= 0*/) const
+{
+	char buffer[128];
+	sprintf_s(buffer, sizeof(buffer), "%d", this->value);
+	jsonString = buffer;
+	return true;
+}
+
+/*virtual*/ bool JsonInt::ParseTokens(const std::vector<Token*>& tokenArray)
+{
+	if (tokenArray.size() != 1 || tokenArray[0]->type != Token::INT)
+		return false;
+
+	this->SetValue(::atoi(tokenArray[0]->buffer));
+	return true;
+}
+
+long JsonInt::GetValue() const
+{
+	return this->value;
+}
+
+void JsonInt::SetValue(long value)
 {
 	this->value = value;
 }
@@ -552,6 +610,11 @@ JsonValue* JsonArray::PopValue()
 JsonBool::JsonBool()
 {
 	this->value = false;
+}
+
+JsonBool::JsonBool(bool value)
+{
+	this->value = value;
 }
 
 /*virtual*/ JsonBool::~JsonBool()

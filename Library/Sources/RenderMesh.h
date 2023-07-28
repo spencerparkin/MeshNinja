@@ -22,6 +22,7 @@ namespace MeshNinja
 		void FromConvexPolygonMesh(const ConvexPolygonMesh& mesh);
 		void ToConvexPolygonMesh(ConvexPolygonMesh& mesh) const;
 		void ApplyTransform(const Transform& transform);
+		bool IsTriangleMesh() const;
 
 		struct Facet
 		{
