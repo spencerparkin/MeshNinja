@@ -1,5 +1,5 @@
 #include "Mesh.h"
-#include "MeshFileFormat.h"
+#include "FileFormats/ObjFileFormat.h"
 #include "ConvexPolygonMesh.h"
 #include "Plane.h"
 #include "Camera.h"

@@ -7,6 +7,7 @@
 #include "Ray.h"
 #include "AxisAlignedBoundingBox.h"
 #include "JSON/JsonValue.h"
+#include "FileFormats/ObjFileFormat.h"
 
 int main(int argc, char** argv)
 {

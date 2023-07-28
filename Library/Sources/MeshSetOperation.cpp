@@ -4,7 +4,7 @@
 #include "Plane.h"
 #include "Ray.h"
 #if defined MESH_NINJA_DEBUG
-#	include "MeshFileFormat.h"
+#	include "FileFormats/ObjFileFormat.h"
 #endif
 
 using namespace MeshNinja;

@@ -8,6 +8,9 @@
     <Filter Include="Sources\JSON">
       <UniqueIdentifier>{b7bbdb59-b870-47fa-843f-62056f92d96d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Sources\FileFormats">
+      <UniqueIdentifier>{587be7c7-74c9-4c55-8754-d29b15f9fcf1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Sources\ConvexPolygonMesh.h">
@@ -76,6 +79,12 @@
     <ClInclude Include="Sources\JSON\JsonValue.h">
       <Filter>Sources\JSON</Filter>
     </ClInclude>
+    <ClInclude Include="Sources\FileFormats\ObjFileFormat.h">
+      <Filter>Sources\FileFormats</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\FileFormats\glTF_FileFormat.h">
+      <Filter>Sources\FileFormats</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sources\MeshBinaryOperation.cpp">
@@ -140,6 +149,12 @@
     </ClCompile>
     <ClCompile Include="Sources\JSON\JsonValue.cpp">
       <Filter>Sources\JSON</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\FileFormats\ObjFileFormat.cpp">
+      <Filter>Sources\FileFormats</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\FileFormats\glTF_FileFormat.cpp">
+      <Filter>Sources\FileFormats</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
