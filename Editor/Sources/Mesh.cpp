@@ -300,6 +300,7 @@ bool Mesh::Save(bool saveRenderMesh /*= false*/)
 		{
 			MeshNinja::RenderMesh transformedMesh(this->renderMesh);
 			transformedMesh.ApplyTransform(this->transform);
+			transformedMesh.SetColor(this->color);
 			success = fileFormat->SaveRenderMesh((const char*)this->fileSource.c_str(), transformedMesh);
 		}
 		else

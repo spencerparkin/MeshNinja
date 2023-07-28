@@ -25,6 +25,7 @@ namespace MeshNinja
 		void ToConvexPolygonMesh(ConvexPolygonMesh& mesh) const;
 		void ApplyTransform(const Transform& transform);
 		bool IsTriangleMesh() const;
+		void SetColor(const Vector& color);
 
 		struct Facet
 		{

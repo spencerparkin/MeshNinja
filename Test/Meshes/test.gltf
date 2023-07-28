@@ -11,21 +11,21 @@
 			"bufferView": 1,
 			"byteOffset": 0,
 			"componentType": 5126,
-			"count": 90,
+			"count": 36,
 			"type": "VEC3"
 		},
 		{
-			"bufferOffset": 0,
 			"bufferView": 2,
+			"byteOffset": 0,
 			"componentType": 5126,
-			"count": 90,
+			"count": 36,
 			"type": "VEC3"
 		},
 		{
-			"bufferOffset": 0,
 			"bufferView": 3,
+			"byteOffset": 0,
 			"componentType": 5126,
-			"count": 90,
+			"count": 36,
 			"type": "VEC3"
 		}
 	],
@@ -39,36 +39,36 @@
 	[
 		{
 			"buffer": 0,
-			"byteLength": 280,
+			"byteLength": 70,
 			"byteOffset": 0,
 			"target": 34962
 		},
 		{
 			"buffer": 0,
-			"byteLength": 360,
+			"byteLength": 144,
 			"byteOffset": 0,
 			"byteStride": 36,
 			"target": 34963
 		},
 		{
 			"buffer": 0,
-			"byteLength": 360,
+			"byteLength": 144,
 			"byteOffset": 12,
 			"byteStride": 36,
 			"target": 34963
 		},
 		{
 			"buffer": 0,
-			"bufferLength": 360,
-			"bufferOffset": 24,
-			"bufferStride": 36,
+			"byteLength": 144,
+			"byteOffset": 24,
+			"byteStride": 36,
 			"target": 34963
 		}
 	],
 	"buffers":
 	[
 		{
-			"byteLength": 1608,
+			"byteLength": 541,
 			"uri": "test.bin"
 		}
 	],

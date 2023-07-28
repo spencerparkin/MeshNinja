@@ -50,6 +50,15 @@ bool RenderMesh::IsTriangleMesh() const
 	return true;
 }
 
+void RenderMesh::SetColor(const Vector& color)
+{
+	for (Facet& facet : *this->facetArray)
+		facet.color = color;
+
+	for (Vertex& vertex : *this->vertexArray)
+		vertex.color = color;
+}
+
 void RenderMesh::ApplyTransform(const Transform& transform)
 {
 	for (Facet& facet : *this->facetArray)
