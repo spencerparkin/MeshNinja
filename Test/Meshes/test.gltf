@@ -1,0 +1,93 @@
+{
+	"accessor":
+	[
+		{
+			"bufferView": 0,
+			"byteOffset": 0,
+			"componentType": 5125,
+			"type": "SCALAR"
+		},
+		{
+			"bufferView": 1,
+			"byteOffset": 0,
+			"componentType": 5126,
+			"count": 90,
+			"type": "VEC3"
+		},
+		{
+			"bufferOffset": 0,
+			"bufferView": 2,
+			"componentType": 5126,
+			"count": 90,
+			"type": "VEC3"
+		},
+		{
+			"bufferOffset": 0,
+			"bufferView": 3,
+			"componentType": 5126,
+			"count": 90,
+			"type": "VEC3"
+		}
+	],
+	"asset":
+	{
+		"copyright": "2023 (c) Spencer T. Parkin",
+		"generator": "Mesh Ninja",
+		"version": "2.0"
+	},
+	"bufferViews":
+	[
+		{
+			"buffer": 0,
+			"byteLength": 280,
+			"byteOffset": 0,
+			"target": 34962
+		},
+		{
+			"buffer": 0,
+			"byteLength": 360,
+			"byteOffset": 0,
+			"byteStride": 36,
+			"target": 34963
+		},
+		{
+			"buffer": 0,
+			"byteLength": 360,
+			"byteOffset": 12,
+			"byteStride": 36,
+			"target": 34963
+		},
+		{
+			"buffer": 0,
+			"bufferLength": 360,
+			"bufferOffset": 24,
+			"bufferStride": 36,
+			"target": 34963
+		}
+	],
+	"buffers":
+	[
+		{
+			"byteLength": 1608,
+			"uri": "test.bin"
+		}
+	],
+	"meshes":
+	[
+		{
+			"primitives":
+			[
+				{
+					"attributes":
+					{
+						"COLOR": 3,
+						"NORMAL": 2,
+						"POSITION": 1
+					},
+					"indices": 0,
+					"mode": 4
+				}
+			]
+		}
+	]
+}
