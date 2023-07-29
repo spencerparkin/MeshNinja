@@ -40,6 +40,8 @@ namespace MeshNinja
 		bool MakeOrthogonalTo(const Vector& vector);
 		bool IsEqualTo(const Vector& vector, double eps = MESH_NINJA_EPS) const;
 		double AngleBetweenThisAnd(const Vector& vector) const;
+		void Max(const Vector& vectorA, const Vector& vectorB);
+		void Min(const Vector& vectorA, const Vector& vectorB);
 
 		double x, y, z;
 	};

@@ -247,6 +247,20 @@ double Vector::AngleBetweenThisAnd(const Vector& vector) const
 	return ::acos(dot);
 }
 
+void Vector::Max(const Vector& vectorA, const Vector& vectorB)
+{
+	this->x = MESH_NINJA_MAX(vectorA.x, vectorB.x);
+	this->y = MESH_NINJA_MAX(vectorA.y, vectorB.y);
+	this->z = MESH_NINJA_MAX(vectorA.z, vectorB.z);
+}
+
+void Vector::Min(const Vector& vectorA, const Vector& vectorB)
+{
+	this->x = MESH_NINJA_MIN(vectorA.x, vectorB.x);
+	this->y = MESH_NINJA_MIN(vectorA.y, vectorB.y);
+	this->z = MESH_NINJA_MIN(vectorA.z, vectorB.z);
+}
+
 namespace MeshNinja
 {
 	Vector operator+(const Vector& vectorA, const Vector& vectorB)

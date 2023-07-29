@@ -65,7 +65,7 @@ glTF_FileFormat::glTF_FileFormat()
 		jsonRootObject->SetValue("bufferViews", jsonBufferViewsArray);
 
 		JsonArray* jsonAccessorsArray = new JsonArray();
-		jsonRootObject->SetValue("accessor", jsonAccessorsArray);
+		jsonRootObject->SetValue("accessors", jsonAccessorsArray);
 
 		JsonArray* jsonMeshesArray = new JsonArray();
 		jsonRootObject->SetValue("meshes", jsonMeshesArray);
@@ -116,22 +116,24 @@ glTF_FileFormat::glTF_FileFormat()
 
 bool glTF_FileFormat::WriteIndexBuffer(const RenderMesh& mesh, std::ofstream& binFileStream, JsonArray* jsonBufferViewsArray, JsonArray* jsonAccessorsArray, JsonObject* jsonPrim)
 {
-	long offsetA = (long)binFileStream.tellp();
+	long offset = (long)binFileStream.tellp();
 
 	for (const RenderMesh::Facet& facet : *mesh.facetArray)
+	{
 		for (int i = 0; i < (signed)facet.vertexArray->size(); i++)
-			binFileStream << uint32_t(facet[i]);
-
-	long offsetB = (long)binFileStream.tellp();
-	long byteLength = offsetB - offsetA;
+		{
+			uint32_t j = facet[i];
+			binFileStream.write((const char*)&j, sizeof(uint32_t));
+		}
+	}
 
 	JsonObject* jsonBufferView = new JsonObject();
 	int bufferViewNumber = jsonBufferViewsArray->GetSize();
 	jsonBufferViewsArray->PushValue(jsonBufferView);
 	jsonBufferView->SetValue("buffer", new JsonInt(0));
-	jsonBufferView->SetValue("byteLength", new JsonInt(byteLength));
-	jsonBufferView->SetValue("byteOffset", new JsonInt(offsetA));
-	jsonBufferView->SetValue("target", new JsonInt(MESH_NINJA_GLTF_ARRAY_BUFFER));
+	jsonBufferView->SetValue("byteLength", new JsonInt(sizeof(uint32_t) * 3 * mesh.facetArray->size()));
+	jsonBufferView->SetValue("byteOffset", new JsonInt(offset));
+	jsonBufferView->SetValue("target", new JsonInt(MESH_NINJA_GLTF_ELEMENT_ARRAY_BUFFER));
 
 	JsonObject* jsonAccessor = new JsonObject();
 	int accessorNumber = jsonAccessorsArray->GetSize();
@@ -140,6 +142,7 @@ bool glTF_FileFormat::WriteIndexBuffer(const RenderMesh& mesh, std::ofstream& bi
 	jsonAccessor->SetValue("byteOffset", new JsonInt(0));
 	jsonAccessor->SetValue("componentType", new JsonInt(MESH_NINJA_GLTF_ACCESSOR_DT_UNSIGNED_INT));
 	jsonAccessor->SetValue("type", new JsonString("SCALAR"));
+	jsonAccessor->SetValue("count", new JsonInt(mesh.facetArray->size() * 3));
 
 	jsonPrim->SetValue("indices", new JsonInt(accessorNumber));
 
@@ -148,44 +151,42 @@ bool glTF_FileFormat::WriteIndexBuffer(const RenderMesh& mesh, std::ofstream& bi
 
 bool glTF_FileFormat::WriteVertexBuffer(const RenderMesh& mesh, std::ofstream& binFileStream, JsonArray* jsonBufferViewsArray, JsonArray* jsonAccessorsArray, JsonObject* jsonPrim)
 {
-	long offsetA = (long)binFileStream.tellp();
+	// Note that I tried to interleave the vertex data (for better cache coherency), but
+	// the glTF validator kept complaining about strides not to be used unless a buffer
+	// view is into "raw vertex data".  Isn't all vertex data "raw"?
+
+	long offset = (long)binFileStream.tellp();
+
+	MeshNinja::Vector minPosition(DBL_MAX, DBL_MAX, DBL_MAX);
+	MeshNinja::Vector maxPosition(DBL_MIN, DBL_MIN, DBL_MIN);
 
 	for (const RenderMesh::Vertex& vertex : *mesh.vertexArray)
 	{
-		binFileStream << float(vertex.position.x) << float(vertex.position.y) << float(vertex.position.z);
-		binFileStream << float(vertex.normal.x) << float(vertex.normal.y) << float(vertex.normal.z);
-		binFileStream << float(vertex.color.x) << float(vertex.color.y) << float(vertex.color.z);
+		binFileStream.write((const char*)&vertex.position.x, sizeof(float));
+		binFileStream.write((const char*)&vertex.position.y, sizeof(float));
+		binFileStream.write((const char*)&vertex.position.z, sizeof(float));
+
+		minPosition.Min(minPosition, vertex.position);
+		maxPosition.Max(maxPosition, vertex.position);
 	}
 
-	long offsetB = (long)binFileStream.tellp();
-	long byteLength = offsetB - offsetA;
+	JsonArray* jsonMinArray = new JsonArray();
+	jsonMinArray->PushValue(new JsonFloat(minPosition.x));
+	jsonMinArray->PushValue(new JsonFloat(minPosition.y));
+	jsonMinArray->PushValue(new JsonFloat(minPosition.z));
+
+	JsonArray* jsonMaxArray = new JsonArray();
+	jsonMaxArray->PushValue(new JsonFloat(maxPosition.x));
+	jsonMaxArray->PushValue(new JsonFloat(maxPosition.y));
+	jsonMaxArray->PushValue(new JsonFloat(maxPosition.z));
 
 	JsonObject* jsonPositionBufferView = new JsonObject();
 	int positionBufferViewNumber = jsonBufferViewsArray->GetSize();
 	jsonBufferViewsArray->PushValue(jsonPositionBufferView);
 	jsonPositionBufferView->SetValue("buffer", new JsonInt(0));
 	jsonPositionBufferView->SetValue("byteLength", new JsonInt(sizeof(float) * 3 * mesh.vertexArray->size()));
-	jsonPositionBufferView->SetValue("byteOffset", new JsonInt(0));
-	jsonPositionBufferView->SetValue("byteStride", new JsonInt(sizeof(float) * 9));
-	jsonPositionBufferView->SetValue("target", new JsonInt(MESH_NINJA_GLTF_ELEMENT_ARRAY_BUFFER));
-
-	JsonObject* jsonNormalBufferView = new JsonObject();
-	int normalBufferViewNumber = jsonBufferViewsArray->GetSize();
-	jsonBufferViewsArray->PushValue(jsonNormalBufferView);
-	jsonNormalBufferView->SetValue("buffer", new JsonInt(0));
-	jsonNormalBufferView->SetValue("byteLength", new JsonInt(sizeof(float) * 3 * mesh.vertexArray->size()));
-	jsonNormalBufferView->SetValue("byteOffset", new JsonInt(sizeof(float) * 3));
-	jsonNormalBufferView->SetValue("byteStride", new JsonInt(sizeof(float) * 9));
-	jsonNormalBufferView->SetValue("target", new JsonInt(MESH_NINJA_GLTF_ELEMENT_ARRAY_BUFFER));
-
-	JsonObject* jsonColorBufferView = new JsonObject();
-	int colorBufferViewNumber = jsonBufferViewsArray->GetSize();
-	jsonBufferViewsArray->PushValue(jsonColorBufferView);
-	jsonColorBufferView->SetValue("buffer", new JsonInt(0));
-	jsonColorBufferView->SetValue("byteLength", new JsonInt(sizeof(float) * 3 * mesh.vertexArray->size()));
-	jsonColorBufferView->SetValue("byteOffset", new JsonInt(sizeof(float) * 6));
-	jsonColorBufferView->SetValue("byteStride", new JsonInt(sizeof(float) * 9));
-	jsonColorBufferView->SetValue("target", new JsonInt(MESH_NINJA_GLTF_ELEMENT_ARRAY_BUFFER));
+	jsonPositionBufferView->SetValue("byteOffset", new JsonInt(offset));
+	jsonPositionBufferView->SetValue("target", new JsonInt(MESH_NINJA_GLTF_ARRAY_BUFFER));
 
 	JsonObject* jsonPositionAccessor = new JsonObject();
 	int positionAccessorNumber = jsonAccessorsArray->GetSize();
@@ -193,8 +194,27 @@ bool glTF_FileFormat::WriteVertexBuffer(const RenderMesh& mesh, std::ofstream& b
 	jsonPositionAccessor->SetValue("bufferView", new JsonInt(positionBufferViewNumber));
 	jsonPositionAccessor->SetValue("byteOffset", new JsonInt(0));
 	jsonPositionAccessor->SetValue("componentType", new JsonInt(MESH_NINJA_GLTF_ACCESSOR_DT_FLOAT));
-	jsonPositionAccessor->SetValue("count", new JsonInt(mesh.vertexArray->size() * 3));
+	jsonPositionAccessor->SetValue("count", new JsonInt(mesh.vertexArray->size()));
 	jsonPositionAccessor->SetValue("type", new JsonString("VEC3"));
+	jsonPositionAccessor->SetValue("min", jsonMinArray);
+	jsonPositionAccessor->SetValue("max", jsonMaxArray);
+
+	offset = (long)binFileStream.tellp();
+
+	for (const RenderMesh::Vertex& vertex : *mesh.vertexArray)
+	{
+		binFileStream.write((const char*)&vertex.normal.x, sizeof(float));
+		binFileStream.write((const char*)&vertex.normal.y, sizeof(float));
+		binFileStream.write((const char*)&vertex.normal.z, sizeof(float));
+	}
+
+	JsonObject* jsonNormalBufferView = new JsonObject();
+	int normalBufferViewNumber = jsonBufferViewsArray->GetSize();
+	jsonBufferViewsArray->PushValue(jsonNormalBufferView);
+	jsonNormalBufferView->SetValue("buffer", new JsonInt(0));
+	jsonNormalBufferView->SetValue("byteLength", new JsonInt(sizeof(float) * 3 * mesh.vertexArray->size()));
+	jsonNormalBufferView->SetValue("byteOffset", new JsonInt(offset));
+	jsonNormalBufferView->SetValue("target", new JsonInt(MESH_NINJA_GLTF_ARRAY_BUFFER));
 
 	JsonObject* jsonNormalAccessor = new JsonObject();
 	int normalAccessorNumber = jsonAccessorsArray->GetSize();
@@ -202,8 +222,25 @@ bool glTF_FileFormat::WriteVertexBuffer(const RenderMesh& mesh, std::ofstream& b
 	jsonNormalAccessor->SetValue("bufferView", new JsonInt(normalBufferViewNumber));
 	jsonNormalAccessor->SetValue("byteOffset", new JsonInt(0));
 	jsonNormalAccessor->SetValue("componentType", new JsonInt(MESH_NINJA_GLTF_ACCESSOR_DT_FLOAT));
-	jsonNormalAccessor->SetValue("count", new JsonInt(mesh.vertexArray->size() * 3));
+	jsonNormalAccessor->SetValue("count", new JsonInt(mesh.vertexArray->size()));
 	jsonNormalAccessor->SetValue("type", new JsonString("VEC3"));
+
+	offset = (long)binFileStream.tellp();
+
+	for (const RenderMesh::Vertex& vertex : *mesh.vertexArray)
+	{
+		binFileStream.write((const char*)&vertex.color.x, sizeof(float));
+		binFileStream.write((const char*)&vertex.color.y, sizeof(float));
+		binFileStream.write((const char*)&vertex.color.z, sizeof(float));
+	}
+
+	JsonObject* jsonColorBufferView = new JsonObject();
+	int colorBufferViewNumber = jsonBufferViewsArray->GetSize();
+	jsonBufferViewsArray->PushValue(jsonColorBufferView);
+	jsonColorBufferView->SetValue("buffer", new JsonInt(0));
+	jsonColorBufferView->SetValue("byteLength", new JsonInt(sizeof(float) * 3 * mesh.vertexArray->size()));
+	jsonColorBufferView->SetValue("byteOffset", new JsonInt(offset));
+	jsonColorBufferView->SetValue("target", new JsonInt(MESH_NINJA_GLTF_ARRAY_BUFFER));
 
 	JsonObject* jsonColorAccessor = new JsonObject();
 	int colorAccessorNumber = jsonAccessorsArray->GetSize();
@@ -211,14 +248,14 @@ bool glTF_FileFormat::WriteVertexBuffer(const RenderMesh& mesh, std::ofstream& b
 	jsonColorAccessor->SetValue("bufferView", new JsonInt(colorBufferViewNumber));
 	jsonColorAccessor->SetValue("byteOffset", new JsonInt(0));
 	jsonColorAccessor->SetValue("componentType", new JsonInt(MESH_NINJA_GLTF_ACCESSOR_DT_FLOAT));
-	jsonColorAccessor->SetValue("count", new JsonInt(mesh.vertexArray->size() * 3));
+	jsonColorAccessor->SetValue("count", new JsonInt(mesh.vertexArray->size()));
 	jsonColorAccessor->SetValue("type", new JsonString("VEC3"));
 
 	JsonObject* jsonAttributes = new JsonObject();
 	jsonPrim->SetValue("attributes", jsonAttributes);
 	jsonAttributes->SetValue("POSITION", new JsonInt(positionAccessorNumber));
 	jsonAttributes->SetValue("NORMAL", new JsonInt(normalAccessorNumber));
-	jsonAttributes->SetValue("COLOR", new JsonInt(colorAccessorNumber));
+	jsonAttributes->SetValue("COLOR_0", new JsonInt(colorAccessorNumber));
 
 	return true;
 }
