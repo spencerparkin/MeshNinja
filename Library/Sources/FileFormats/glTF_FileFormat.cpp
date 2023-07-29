@@ -94,6 +94,23 @@ glTF_FileFormat::glTF_FileFormat()
 		jsonBufferObject->SetValue("uri", new JsonString(std::filesystem::path(binFilePath).filename().string()));
 		jsonBuffersArray->PushValue(jsonBufferObject);
 
+		JsonArray* jsonScenesArray = new JsonArray();
+		jsonRootObject->SetValue("scenes", jsonScenesArray);
+
+		JsonObject* jsonSceneObject = new JsonObject();
+		jsonScenesArray->PushValue(jsonSceneObject);
+
+		JsonArray* jsonSceneNodesArray = new JsonArray();
+		jsonSceneObject->SetValue("nodes", jsonSceneNodesArray);
+		jsonSceneNodesArray->PushValue(new JsonInt(0));
+
+		JsonArray* jsonNodesArray = new JsonArray();
+		jsonRootObject->SetValue("nodes", jsonNodesArray);
+
+		JsonObject* jsonNode = new JsonObject();
+		jsonNodesArray->PushValue(jsonNode);
+		jsonNode->SetValue("mesh", new JsonInt(0));
+
 		std::string jsonString;
 		if (!jsonRootObject->PrintJson(jsonString))
 			break;
