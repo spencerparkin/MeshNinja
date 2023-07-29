@@ -49,7 +49,7 @@ glTF_FileFormat::glTF_FileFormat()
 			break;
 
 		std::string binFilePath = std::filesystem::path(filePath).replace_extension(".bin").string();
-		binFileStream.open(binFilePath, std::ios::binary | std::ios::out);
+		binFileStream.open(binFilePath, std::ios::binary);
 		if (!binFileStream.is_open())
 			break;
 
@@ -123,7 +123,7 @@ bool glTF_FileFormat::WriteIndexBuffer(const RenderMesh& mesh, std::ofstream& bi
 		for (int i = 0; i < (signed)facet.vertexArray->size(); i++)
 		{
 			uint32_t j = facet[i];
-			binFileStream.write((const char*)&j, sizeof(uint32_t));
+			this->WriteUnsignedInt(binFileStream, j);
 		}
 	}
 
@@ -162,9 +162,9 @@ bool glTF_FileFormat::WriteVertexBuffer(const RenderMesh& mesh, std::ofstream& b
 
 	for (const RenderMesh::Vertex& vertex : *mesh.vertexArray)
 	{
-		binFileStream.write((const char*)&vertex.position.x, sizeof(float));
-		binFileStream.write((const char*)&vertex.position.y, sizeof(float));
-		binFileStream.write((const char*)&vertex.position.z, sizeof(float));
+		this->WriteFloat(binFileStream, (float)vertex.position.x);
+		this->WriteFloat(binFileStream, (float)vertex.position.y);
+		this->WriteFloat(binFileStream, (float)vertex.position.z);
 
 		minPosition.Min(minPosition, vertex.position);
 		maxPosition.Max(maxPosition, vertex.position);
@@ -203,9 +203,9 @@ bool glTF_FileFormat::WriteVertexBuffer(const RenderMesh& mesh, std::ofstream& b
 
 	for (const RenderMesh::Vertex& vertex : *mesh.vertexArray)
 	{
-		binFileStream.write((const char*)&vertex.normal.x, sizeof(float));
-		binFileStream.write((const char*)&vertex.normal.y, sizeof(float));
-		binFileStream.write((const char*)&vertex.normal.z, sizeof(float));
+		this->WriteFloat(binFileStream, (float)vertex.normal.x);
+		this->WriteFloat(binFileStream, (float)vertex.normal.y);
+		this->WriteFloat(binFileStream, (float)vertex.normal.z);
 	}
 
 	JsonObject* jsonNormalBufferView = new JsonObject();
@@ -229,9 +229,9 @@ bool glTF_FileFormat::WriteVertexBuffer(const RenderMesh& mesh, std::ofstream& b
 
 	for (const RenderMesh::Vertex& vertex : *mesh.vertexArray)
 	{
-		binFileStream.write((const char*)&vertex.color.x, sizeof(float));
-		binFileStream.write((const char*)&vertex.color.y, sizeof(float));
-		binFileStream.write((const char*)&vertex.color.z, sizeof(float));
+		this->WriteFloat(binFileStream, (float)vertex.color.x);
+		this->WriteFloat(binFileStream, (float)vertex.color.y);
+		this->WriteFloat(binFileStream, (float)vertex.color.z);
 	}
 
 	JsonObject* jsonColorBufferView = new JsonObject();
@@ -256,6 +256,27 @@ bool glTF_FileFormat::WriteVertexBuffer(const RenderMesh& mesh, std::ofstream& b
 	jsonAttributes->SetValue("POSITION", new JsonInt(positionAccessorNumber));
 	jsonAttributes->SetValue("NORMAL", new JsonInt(normalAccessorNumber));
 	jsonAttributes->SetValue("COLOR_0", new JsonInt(colorAccessorNumber));
+
+	return true;
+}
+
+bool glTF_FileFormat::WriteFloat(std::ofstream& binFileStream, float value)
+{
+	return this->WriteWord(binFileStream, (const char*)&value);
+}
+
+bool glTF_FileFormat::WriteUnsignedInt(std::ofstream& binFileStream, unsigned int value)
+{
+	return this->WriteWord(binFileStream, (const char*)&value);
+}
+
+bool glTF_FileFormat::WriteWord(std::ofstream& binFileStream, const char* word)
+{
+	// Write the word in Little Endian style as per the glTF specification.
+	binFileStream.write(&word[0], 1);
+	binFileStream.write(&word[1], 1);
+	binFileStream.write(&word[2], 1);
+	binFileStream.write(&word[3], 1);
 
 	return true;
 }
