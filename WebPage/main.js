@@ -6,13 +6,9 @@ const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 
 const renderer = new THREE.WebGLRenderer();
+renderer.setClearColor(0xFFFFFF);
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
-
-//const geometry = new THREE.BoxGeometry(1, 1, 1);
-//const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-//const cube = new THREE.Mesh(geometry, material);
-//scene.add(cube);
 
 const loader = new GLTFLoader();
 
@@ -26,15 +22,13 @@ loader.load('public/test.gltf', function(gltf) {
 camera.position.set(0, 0, 10);
 camera.lookAt(0, 0, 0);
 
+const light = new THREE.AmbientLight(0x404040);
+scene.add(light);
+
 function animate() {
 	requestAnimationFrame(animate);
 	
-	//cube.rotation.x += 0.01;
-	//cube.rotation.y += 0.01;
-	
-	// TODO: Maybe this doesn't work, because there are no lights in the scene?
-	//       Note that my GLTF file does load here: https://gltf-viewer.donmccurdy.com/
-	//       So that is promising.
+	// TODO: My GLTF file renders!  But...it's all black.  Why?
 	renderer.render(scene, camera);
 }
 
