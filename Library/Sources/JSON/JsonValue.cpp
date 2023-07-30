@@ -490,6 +490,22 @@ JsonArray::JsonArray()
 	this->valueArray = new JsonValueArray();
 }
 
+JsonArray::JsonArray(const std::vector<double>& floatArray)
+{
+	this->valueArray = new JsonValueArray();
+
+	for (float value : floatArray)
+		this->valueArray->push_back(new JsonFloat(value));
+}
+
+JsonArray::JsonArray(const std::vector<int>& intArray)
+{
+	this->valueArray = new JsonValueArray();
+
+	for (int value : intArray)
+		this->valueArray->push_back(new JsonInt(value));
+}
+
 /*virtual*/ JsonArray::~JsonArray()
 {
 	this->Clear();

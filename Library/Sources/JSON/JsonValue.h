@@ -131,6 +131,8 @@ namespace MeshNinja
 	{
 	public:
 		JsonArray();
+		JsonArray(const std::vector<double>& floatArray);
+		JsonArray(const std::vector<int>& intArray);
 		virtual ~JsonArray();
 
 		virtual bool PrintJson(std::string& jsonString, int tabLevel = 0) const override;

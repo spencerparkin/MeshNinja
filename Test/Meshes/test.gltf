@@ -82,6 +82,23 @@
 			"uri": "test.bin"
 		}
 	],
+	"materials":
+	[
+		{
+			"pbrMetallicRoughness":
+			{
+				"baseColorFactor":
+				[
+					1.000000,
+					0.766000,
+					0.336000,
+					1.000000
+				],
+				"metallicFactor": 1.000000,
+				"roughnessFactor": 0.000000
+			}
+		}
+	],
 	"meshes":
 	[
 		{
@@ -95,6 +112,7 @@
 						"POSITION": 1
 					},
 					"indices": 0,
+					"material": 0,
 					"mode": 4
 				}
 			]

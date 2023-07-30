@@ -79,6 +79,7 @@ glTF_FileFormat::glTF_FileFormat()
 		JsonObject* jsonPrim = new JsonObject();
 		jsonPrimArray->PushValue(jsonPrim);
 		jsonPrim->SetValue("mode", new JsonInt(MESH_NINJA_GLTF_TOPO_MODE_TRIANGLES));
+		jsonPrim->SetValue("material", new JsonInt(0));
 
 		if (!this->WriteIndexBuffer(mesh, binFileStream, jsonBufferViewsArray, jsonAccessorsArray, jsonPrim))
 			break;
@@ -110,6 +111,18 @@ glTF_FileFormat::glTF_FileFormat()
 		JsonObject* jsonNode = new JsonObject();
 		jsonNodesArray->PushValue(jsonNode);
 		jsonNode->SetValue("mesh", new JsonInt(0));
+
+		JsonArray* jsonMaterialsArray = new JsonArray();
+		jsonRootObject->SetValue("materials", jsonMaterialsArray);
+
+		JsonObject* jsonMaterial = new JsonObject();
+		jsonMaterialsArray->PushValue(jsonMaterial);
+		
+		JsonObject* jsonPBRMetallicRoughness = new JsonObject();
+		jsonMaterial->SetValue("pbrMetallicRoughness", jsonPBRMetallicRoughness);
+		jsonPBRMetallicRoughness->SetValue("baseColorFactor", new JsonArray(std::vector<double>{ 1.0, 0.766, 0.336, 1.0 }));
+		jsonPBRMetallicRoughness->SetValue("metallicFactor", new JsonFloat(1.0));
+		jsonPBRMetallicRoughness->SetValue("roughnessFactor", new JsonFloat(0.0));
 
 		std::string jsonString;
 		if (!jsonRootObject->PrintJson(jsonString))
