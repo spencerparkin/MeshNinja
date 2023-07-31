@@ -26,6 +26,7 @@ public:
 	void OnToggle(wxCommandEvent& event);
 	void OnUpdateUI(wxUpdateUIEvent& event);
 	void OnClearScene(wxCommandEvent& event);
+	void OnGenerateMaze(wxCommandEvent& event);
 
 	enum
 	{
@@ -44,7 +45,8 @@ public:
 		ID_ToggleEdgeRender,
 		ID_ToggleFaceNormalRender,
 		ID_ToggleVertexNormalRender,
-		ID_ClearScene
+		ID_ClearScene,
+		ID_GenerateMaze
 	};
 
 private:

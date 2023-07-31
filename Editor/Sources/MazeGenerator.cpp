@@ -1,5 +1,6 @@
 #include "MazeGenerator.h"
 #include "MeshGraph.h"
+#include "MeshSetOperation.h"
 
 //------------------------------- MazeGenerator -------------------------------
 
@@ -32,7 +33,7 @@ bool MazeGenerator::GenerateGridMaze(int width, int height, int depth, double sc
 			for (int k = 0; k < depth; k++)
 			{
 				Node* node = new Node();
-				node->location = MeshNinja::Vector(double(i) - double(width) / 2.0, double(j) - double(height) / 2.0, double(k) - double(depth) / 2.0) * scale;
+				node->location = MeshNinja::Vector(double(i) - double(width - 1) / 2.0, double(j) - double(height - 1) / 2.0, double(k) - double(depth - 1) / 2.0) * scale;
 				matrix[i][j][k] = node;
 				this->nodeArray.push_back(node);
 			}
@@ -189,7 +190,34 @@ bool MazeGenerator::GenerateMazeMeshes(std::list<MeshNinja::ConvexPolygonMesh*>&
 	
 	if (unionize)
 	{
-		// TODO: Reduce the mesh list down to a single mesh using the mesh-union operation.
+		std::vector<MeshNinja::ConvexPolygon> nodePolygonArray;
+		std::vector<MeshNinja::ConvexPolygon> tunnelPolygonArray;
+		int i = 0;
+		for (MeshNinja::ConvexPolygonMesh* mesh : meshList)
+		{
+			if (i++ < (signed)this->nodeArray.size())
+				mesh->ToConvexPolygonArray(nodePolygonArray, true);
+			else
+				mesh->ToConvexPolygonArray(tunnelPolygonArray, true);
+			delete mesh;
+		}
+
+		meshList.clear();
+
+		MeshNinja::ConvexPolygonMesh nodesMesh(nodePolygonArray);
+		MeshNinja::ConvexPolygonMesh tunnelsMesh(tunnelPolygonArray);
+
+		MeshNinja::MeshUnion meshUnion;
+
+		MeshNinja::ConvexPolygonMesh* mazeMesh = new MeshNinja::ConvexPolygonMesh();
+		
+		if (!meshUnion.Perform(nodesMesh, tunnelsMesh, *mazeMesh))
+		{
+			delete mazeMesh;
+			return false;
+		}
+
+		meshList.push_back(mazeMesh);
 	}
 
 	return true;
@@ -208,7 +236,7 @@ bool MazeGenerator::GenerateTunnelMesh(MeshNinja::ConvexPolygonMesh* mesh, const
 
 	for (int i = 0; i < sides; i++)
 	{
-		double angle = 2.0 * MESH_NINJA_PI * (double(i) / double(sides));
+		double angle = -2.0 * MESH_NINJA_PI * (double(i) / double(sides));
 		MeshNinja::Vector vector = (xAxis * ::cos(angle) + yAxis * ::sin(angle)) * radius;
 		vertexArray[0].push_back(pointA + vector);
 		vertexArray[1].push_back(pointB + vector);
@@ -224,6 +252,18 @@ bool MazeGenerator::GenerateTunnelMesh(MeshNinja::ConvexPolygonMesh* mesh, const
 		polygon.vertexArray->push_back(vertexArray[1][j]);
 		polygon.vertexArray->push_back(vertexArray[0][j]);
 		polygonArray.push_back(polygon);
+	}
+
+	for (int i = 0; i < 2; i++)
+	{
+		MeshNinja::ConvexPolygon cap;
+		for (int j = 0; j < sides; j++)
+		{
+			int k = (i == 0) ? j : (sides - 1 - j);
+			cap.vertexArray->push_back(vertexArray[i][k]);
+		}
+
+		polygonArray.push_back(cap);
 	}
 
 	mesh->FromConvexPolygonArray(polygonArray);

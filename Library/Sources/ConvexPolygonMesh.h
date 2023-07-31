@@ -14,6 +14,7 @@ namespace MeshNinja
 	public:
 		ConvexPolygonMesh();
 		ConvexPolygonMesh(const ConvexPolygonMesh& mesh);
+		ConvexPolygonMesh(const std::vector<ConvexPolygon>& polygonArray);
 		virtual ~ConvexPolygonMesh();
 
 		enum class Polyhedron
@@ -36,7 +37,7 @@ namespace MeshNinja
 		void NormalizeEdges(double eps = MESH_NINJA_EPS);
 		void UntessellateFaces(double eps = MESH_NINJA_EPS);
 		void TessellateFaces(double eps = MESH_NINJA_EPS);
-		void ToConvexPolygonArray(std::vector<ConvexPolygon>& convexPolygonArray) const;
+		void ToConvexPolygonArray(std::vector<ConvexPolygon>& convexPolygonArray, bool concatinate = true) const;
 		void FromConvexPolygonArray(const std::vector<ConvexPolygon>& convexPolygonArray);
 		bool GenerateConvexHull(const std::vector<Vector>& pointArray, double eps = MESH_NINJA_EPS);
 		bool GeneratePolyhedron(Polyhedron polyhedron, double eps = MESH_NINJA_EPS);

@@ -21,6 +21,14 @@ ConvexPolygonMesh::ConvexPolygonMesh(const ConvexPolygonMesh& mesh)
 	this->Copy(mesh);
 }
 
+ConvexPolygonMesh::ConvexPolygonMesh(const std::vector<ConvexPolygon>& polygonArray)
+{
+	this->facetArray = new std::vector<Facet>();
+	this->vertexArray = new std::vector<Vector>();
+
+	this->FromConvexPolygonArray(polygonArray);
+}
+
 /*virtual*/ ConvexPolygonMesh::~ConvexPolygonMesh()
 {
 	delete this->facetArray;
@@ -188,8 +196,11 @@ void ConvexPolygonMesh::NormalizeEdges(double eps /*= MESH_NINJA_EPS*/)
 	}
 }
 
-void ConvexPolygonMesh::ToConvexPolygonArray(std::vector<ConvexPolygon>& convexPolygonArray) const
+void ConvexPolygonMesh::ToConvexPolygonArray(std::vector<ConvexPolygon>& convexPolygonArray, bool concatinate /*= true*/) const
 {
+	if (!concatinate)
+		convexPolygonArray.clear();
+
 	for (const Facet& facet : *this->facetArray)
 	{
 		ConvexPolygon polygon;

@@ -5,10 +5,12 @@
 #include "Mesh.h"
 #include "MeshSetOperation.h"
 #include "ConvexPolygonMesh.h"
+#include "MazeGenerator.h"
 #include <wx/aboutdlg.h>
 #include <wx/menu.h>
 #include <wx/filedlg.h>
 #include <wx/msgdlg.h>
+#include <wx/numdlg.h>
 #include <wx/toolbar.h>
 
 wxDEFINE_EVENT(EVT_SCENE_CHANGED, wxCommandEvent);
@@ -41,7 +43,7 @@ Frame::Frame(wxWindow* parent, const wxPoint& pos, const wxSize& size) : wxFrame
 	wxBitmap unionBitmap, intersectionBitmap, subtractionBitmap;
 	wxBitmap addMeshBitmap, unlitBitmap, faceLitBitmap, vertexLitBitmap;
 	wxBitmap faceNormalsBitmap, vertexNormalsBitmap, edgesBitmap;
-	wxBitmap axesBitmap;
+	wxBitmap axesBitmap, mazeBitmap;
 
 	intersectionBitmap.LoadFile(wxGetCwd() + "/Textures/IntersectionIcon.png", wxBITMAP_TYPE_PNG);
 	unionBitmap.LoadFile(wxGetCwd() + "/Textures/UnionIcon.png", wxBITMAP_TYPE_PNG);
@@ -54,6 +56,7 @@ Frame::Frame(wxWindow* parent, const wxPoint& pos, const wxSize& size) : wxFrame
 	vertexNormalsBitmap.LoadFile(wxGetCwd() + "/Textures/VertexNormalsIcon.png", wxBITMAP_TYPE_PNG);
 	edgesBitmap.LoadFile(wxGetCwd() + "/Textures/EdgesIcon.png", wxBITMAP_TYPE_PNG);
 	axesBitmap.LoadFile(wxGetCwd() + "/Textures/AxesIcon.png", wxBITMAP_TYPE_PNG);
+	mazeBitmap.LoadFile(wxGetCwd() + "/Textures/MazeIcon.png", wxBITMAP_TYPE_PNG);
 
 	wxToolBar* toolBar = this->CreateToolBar();
 	toolBar->AddTool(ID_IntersectMeshes, "Intersect Meshes", intersectionBitmap, "Take the intersection of two meshes.");
@@ -92,7 +95,8 @@ Frame::Frame(wxWindow* parent, const wxPoint& pos, const wxSize& size) : wxFrame
 	toolBar->AddSeparator();
 	toolBar->AddControl(this->meshComboBox, "Mesh:");
 	toolBar->AddTool(ID_AddMesh, "Add Mesh", addMeshBitmap, "Add the mesh specified in the drop-down to the scene.");
-
+	toolBar->AddSeparator();
+	toolBar->AddTool(ID_GenerateMaze, "Generate Maze", mazeBitmap, "Generate a maze mesh.");
 	toolBar->Realize();
 
 	this->Bind(wxEVT_MENU, &Frame::OnExit, this, ID_Exit);
@@ -113,6 +117,7 @@ Frame::Frame(wxWindow* parent, const wxPoint& pos, const wxSize& size) : wxFrame
 	this->Bind(wxEVT_MENU, &Frame::OnToggle, this, ID_ToggleFaceNormalRender);
 	this->Bind(wxEVT_MENU, &Frame::OnToggle, this, ID_ToggleVertexNormalRender);
 	this->Bind(wxEVT_MENU, &Frame::OnClearScene, this, ID_ClearScene);
+	this->Bind(wxEVT_MENU, &Frame::OnGenerateMaze, this, ID_GenerateMaze);
 	this->Bind(wxEVT_UPDATE_UI, &Frame::OnUpdateUI, this, ID_RenderUnlit);
 	this->Bind(wxEVT_UPDATE_UI, &Frame::OnUpdateUI, this, ID_RenderFaceLit);
 	this->Bind(wxEVT_UPDATE_UI, &Frame::OnUpdateUI, this, ID_RenderVertexLit);
@@ -146,6 +151,51 @@ void Frame::OnClearScene(wxCommandEvent& event)
 	MeshCollectionScene* meshScene = wxGetApp().GetMeshScene();
 	meshScene->Clear();
 	wxPostEvent(this, wxCommandEvent(EVT_SCENE_CHANGED));
+}
+
+void Frame::OnGenerateMaze(wxCommandEvent& event)
+{
+	MazeGenerator mazeGenerator;
+
+	wxNumberEntryDialog widthDialog(this, "Maze width?", "Width:", "Enter Width", 1, 1, 100);
+	if (widthDialog.ShowModal() == wxID_CANCEL)
+		return;
+
+	wxNumberEntryDialog heightDialog(this, "Maze height?", "Height:", "Enter Height", 1, 1, 100);
+	if (heightDialog.ShowModal() == wxID_CANCEL)
+		return;
+
+	wxNumberEntryDialog depthDialog(this, "Maze depth?", "Depth:", "Enter Depth", 1, 1, 100);
+	if (depthDialog.ShowModal() == wxID_CANCEL)
+		return;
+
+	int width = widthDialog.GetValue();
+	int height = heightDialog.GetValue();
+	int depth = depthDialog.GetValue();
+
+	if (!mazeGenerator.GenerateGridMaze(width, height, depth, 10.0))
+	{
+		wxMessageBox("Failed to generate maze!", "Error", wxICON_ERROR | wxOK, this);
+		return;
+	}
+
+	std::list<MeshNinja::ConvexPolygonMesh*> meshList;
+	if (!mazeGenerator.GenerateMazeMeshes(meshList, 5.0, false))
+	{
+		wxMessageBox("Failed to generate maze meshe(s)!", "Error", wxICON_ERROR | wxOK, this);
+		return;
+	}
+
+	for (MeshNinja::ConvexPolygonMesh* polygonMesh : meshList)
+	{
+		Mesh* mesh = new Mesh();
+		mesh->mesh.Copy(*polygonMesh);
+		wxGetApp().GetMeshScene()->GetMeshList().push_back(mesh);
+		delete polygonMesh;
+	}
+
+	wxCommandEvent sceneChangedEvent(EVT_SCENE_CHANGED);
+	wxPostEvent(this, sceneChangedEvent);
 }
 
 void Frame::OnToggle(wxCommandEvent& event)
