@@ -23,6 +23,7 @@
     <ClCompile Include="Sources\Camera.cpp" />
     <ClCompile Include="Sources\Canvas.cpp" />
     <ClCompile Include="Sources\Frame.cpp" />
+    <ClCompile Include="Sources\MazeGenerator.cpp" />
     <ClCompile Include="Sources\Mesh.cpp" />
     <ClCompile Include="Sources\MeshCollectionScene.cpp" />
     <ClCompile Include="Sources\MeshListControl.cpp" />
@@ -36,6 +37,7 @@
     <ClInclude Include="Sources\Camera.h" />
     <ClInclude Include="Sources\Canvas.h" />
     <ClInclude Include="Sources\Frame.h" />
+    <ClInclude Include="Sources\MazeGenerator.h" />
     <ClInclude Include="Sources\Mesh.h" />
     <ClInclude Include="Sources\MeshCollectionScene.h" />
     <ClInclude Include="Sources\MeshListControl.h" />

@@ -522,6 +522,12 @@ int ConvexPolygonMesh::FindClosestPointTo(const Vector& point, double* smallestD
 	return j;
 }
 
+void ConvexPolygonMesh::ReverseAllPolygons()
+{
+	for (Facet& facet : *this->facetArray)
+		facet.Reverse();
+}
+
 bool ConvexPolygonMesh::GenerateSphere(double radius, int segments, int slices)
 {
 	if (segments < 3 || slices < 3)
@@ -1084,4 +1090,37 @@ bool ConvexPolygonMesh::Facet::HasVertex(int i) const
 			return true;
 
 	return false;
+}
+
+void ConvexPolygonMesh::Facet::Reverse()
+{
+	std::vector<int> reverseVertexArray;
+	for (int i = (signed)this->vertexArray->size(); i >= 0; i--)
+		reverseVertexArray.push_back((*this)[i]);
+
+	this->vertexArray->clear();
+	for (int i : reverseVertexArray)
+		this->vertexArray->push_back(i);
+}
+
+void ConvexPolygonMesh::CenterAndScale(double radius)
+{
+	Vector center = this->CalcCenter();
+	for (Vector& vertex : *this->vertexArray)
+		vertex -= center;
+
+	double maxLength = DBL_MIN;
+	for (Vector& vertex : *this->vertexArray)
+	{
+		double length = vertex.Length();
+		if (length > maxLength)
+			maxLength = length;
+	}
+
+	if (maxLength > 0.0)
+	{
+		double scale = radius / maxLength;
+		for (Vector& vertex : *this->vertexArray)
+			vertex *= scale;
+	}
 }

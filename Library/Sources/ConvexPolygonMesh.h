@@ -49,6 +49,8 @@ namespace MeshNinja
 		void Copy(const ConvexPolygonMesh& mesh);
 		Vector CalcCenter() const;
 		void ApplyTransform(const Transform& transform);
+		void ReverseAllPolygons();
+		void CenterAndScale(double radius);
 
 		struct MESH_NINJA_API Triangle
 		{
@@ -77,6 +79,7 @@ namespace MeshNinja
 			bool Split(Facet& facetA, Facet& facetB, const ConvexPolygonMesh* mesh) const;
 			bool CalcInteriorAngleStats(AngleStats& angleStats, const ConvexPolygonMesh* mesh) const;
 			bool HasVertex(int i) const;
+			void Reverse();
 
 			int operator[](int i) const		// TODO: Edit code to use this to make the code easier to read.
 			{

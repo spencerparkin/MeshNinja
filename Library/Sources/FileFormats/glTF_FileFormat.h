@@ -43,9 +43,10 @@ namespace MeshNinja
 
 		bool WriteIndexBuffer(const RenderMesh& mesh, std::ofstream& binFileStream, JsonArray* jsonBufferViewsArray, JsonArray* jsonAccessorsArray, JsonObject* jsonPrim);
 		bool WriteVertexBuffer(const RenderMesh& mesh, std::ofstream& binFileStream, JsonArray* jsonBufferViewsArray, JsonArray* jsonAccessorsArray, JsonObject* jsonPrim);
-		
 		bool WriteFloat(std::ofstream& binFileStream, float value);
 		bool WriteUnsignedInt(std::ofstream& binFileStream, unsigned int value);
 		bool WriteWord(std::ofstream& binFileStream, const char* word);
+
+		// TODO: Add some export options (e.g., compute normals for vertex lighting or face lighting.)
 	};
 }
