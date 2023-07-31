@@ -185,7 +185,10 @@ void ConvexPolygonMesh::NormalizeEdges(double eps /*= MESH_NINJA_EPS*/)
 				if (edge.IsInteriorPoint(vertex, eps))
 				{
 					foundInteriorPoint = true;
-					facet.vertexArray->insert(facet.vertexArray->begin() + j, k);
+					if (j == 0)
+						facet.vertexArray->push_back(k);
+					else
+						facet.vertexArray->insert(facet.vertexArray->begin() + j, k);
 					break;
 				}
 			}
