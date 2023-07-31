@@ -225,14 +225,22 @@ bool MeshGraph::GenerateDual(ConvexPolygonMesh& dualMesh) const
 	{
 		ConvexPolygon polygon;
 		node->facet->MakePolygon(polygon, this->mesh);
-		debugDraw.AddObject(new DebugDraw::Point(polygon.CalcCenter(), node->GetDebugColor()));
+
+		DebugDraw::Point* point = debugDraw.New<DebugDraw::Point>();
+		point->vertex = polygon.CalcCenter();
+		point->color = node->GetDebugColor();
+		debugDraw.AddObject(point);
 
 		for (const Edge* edge : node->edgeArray)
 		{
 			const Vector& pointA = (*this->mesh->vertexArray)[edge->pair.i];
 			const Vector& pointB = (*this->mesh->vertexArray)[edge->pair.j];
 
-			debugDraw.AddObject(new DebugDraw::Line(polygon.CalcCenter(), (pointA + pointB) / 2.0, edge->GetDebugColor()));
+			DebugDraw::Line* line = debugDraw.New<DebugDraw::Line>();
+			line->vertex[0] = point->vertex;
+			line->vertex[1] = (pointA + pointB) / 2.0;
+			line->color = edge->GetDebugColor();
+			debugDraw.AddObject(line);
 		}
 	}
 }

@@ -29,7 +29,7 @@ public:
 		virtual ~Object();
 
 		virtual void Render(GLint renderMode, const Camera* camera) const = 0;
-		virtual MeshNinja::Vector GetPosition() const = 0;
+		virtual MeshNinja::Vector GetPosition() const;
 
 		GLuint id;
 		static GLuint nextId;

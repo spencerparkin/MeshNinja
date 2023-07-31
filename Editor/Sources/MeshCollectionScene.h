@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Scene.h"
+#include "DebugDrawGL.h"
 #include <vector>
 
 class Mesh;
@@ -31,6 +32,8 @@ public:
 	bool GetSelectedMeshes(std::list<Mesh*>& selectedMeshList, bool sortedByTimeStamp);
 
 	void ForAllMeshes(std::function<void(Mesh*)> callback, bool mustBeSelected = false);
+
+	DebugDrawGL debugDraw;
 
 private:
 	MeshList meshList;

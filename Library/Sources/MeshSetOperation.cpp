@@ -139,12 +139,14 @@ bool MeshSetOperation::CalculatePolygonLists(const ConvexPolygonMesh& meshA, con
 	}
 	
 #if defined MESH_NINJA_DEBUG
-	DebugDraw graphDebugDraw;
+	DebugDraw graphDebugDrawA;
+	DebugDraw graphDebugDrawB;
 
-	graphA.GenerateDebugDrawObjects(graphDebugDraw);
-	graphB.GenerateDebugDrawObjects(graphDebugDraw);
+	graphA.GenerateDebugDrawObjects(graphDebugDrawA);
+	graphB.GenerateDebugDrawObjects(graphDebugDrawB);
 
-	graphDebugDraw.Save("Meshes/GraphDebugDraw.json");
+	graphDebugDrawA.Save("Meshes/GraphDebugDrawA.json");
+	graphDebugDrawB.Save("Meshes/GraphDebugDrawB.json");
 #endif //MESH_NINJA_DEBUG
 
 	if (!graphA.ColorNodes(&graphB))

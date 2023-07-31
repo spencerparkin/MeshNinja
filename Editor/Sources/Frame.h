@@ -27,6 +27,7 @@ public:
 	void OnUpdateUI(wxUpdateUIEvent& event);
 	void OnClearScene(wxCommandEvent& event);
 	void OnGenerateMaze(wxCommandEvent& event);
+	void OnLoadDebugDrawData(wxCommandEvent& event);
 
 	enum
 	{
@@ -46,7 +47,8 @@ public:
 		ID_ToggleFaceNormalRender,
 		ID_ToggleVertexNormalRender,
 		ID_ClearScene,
-		ID_GenerateMaze
+		ID_GenerateMaze,
+		ID_LoadDebugDrawData
 	};
 
 private:

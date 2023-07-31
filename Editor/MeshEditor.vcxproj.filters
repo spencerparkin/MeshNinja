@@ -46,6 +46,9 @@
     <ClCompile Include="Sources\MazeGenerator.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
+    <ClCompile Include="Sources\DebugDrawGL.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Sources\Application.h">
@@ -82,6 +85,9 @@
       <Filter>Sources\Panels</Filter>
     </ClInclude>
     <ClInclude Include="Sources\MazeGenerator.h">
+      <Filter>Sources</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\DebugDrawGL.h">
       <Filter>Sources</Filter>
     </ClInclude>
   </ItemGroup>

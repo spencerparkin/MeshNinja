@@ -43,7 +43,7 @@ Frame::Frame(wxWindow* parent, const wxPoint& pos, const wxSize& size) : wxFrame
 	wxBitmap unionBitmap, intersectionBitmap, subtractionBitmap;
 	wxBitmap addMeshBitmap, unlitBitmap, faceLitBitmap, vertexLitBitmap;
 	wxBitmap faceNormalsBitmap, vertexNormalsBitmap, edgesBitmap;
-	wxBitmap axesBitmap, mazeBitmap;
+	wxBitmap axesBitmap, mazeBitmap, debugBitmap;
 
 	intersectionBitmap.LoadFile(wxGetCwd() + "/Textures/IntersectionIcon.png", wxBITMAP_TYPE_PNG);
 	unionBitmap.LoadFile(wxGetCwd() + "/Textures/UnionIcon.png", wxBITMAP_TYPE_PNG);
@@ -57,6 +57,7 @@ Frame::Frame(wxWindow* parent, const wxPoint& pos, const wxSize& size) : wxFrame
 	edgesBitmap.LoadFile(wxGetCwd() + "/Textures/EdgesIcon.png", wxBITMAP_TYPE_PNG);
 	axesBitmap.LoadFile(wxGetCwd() + "/Textures/AxesIcon.png", wxBITMAP_TYPE_PNG);
 	mazeBitmap.LoadFile(wxGetCwd() + "/Textures/MazeIcon.png", wxBITMAP_TYPE_PNG);
+	debugBitmap.LoadFile(wxGetCwd() + "/Textures/DebugIcon.png", wxBITMAP_TYPE_PNG);
 
 	wxToolBar* toolBar = this->CreateToolBar();
 	toolBar->AddTool(ID_IntersectMeshes, "Intersect Meshes", intersectionBitmap, "Take the intersection of two meshes.");
@@ -97,6 +98,8 @@ Frame::Frame(wxWindow* parent, const wxPoint& pos, const wxSize& size) : wxFrame
 	toolBar->AddTool(ID_AddMesh, "Add Mesh", addMeshBitmap, "Add the mesh specified in the drop-down to the scene.");
 	toolBar->AddSeparator();
 	toolBar->AddTool(ID_GenerateMaze, "Generate Maze", mazeBitmap, "Generate a maze mesh.");
+	toolBar->AddSeparator();
+	toolBar->AddTool(ID_LoadDebugDrawData, "Load Debug Draw Data", debugBitmap, "Load a JSON file with a bunch of debug draw stuff in it that we can render in the scene.");
 	toolBar->Realize();
 
 	this->Bind(wxEVT_MENU, &Frame::OnExit, this, ID_Exit);
@@ -118,6 +121,7 @@ Frame::Frame(wxWindow* parent, const wxPoint& pos, const wxSize& size) : wxFrame
 	this->Bind(wxEVT_MENU, &Frame::OnToggle, this, ID_ToggleVertexNormalRender);
 	this->Bind(wxEVT_MENU, &Frame::OnClearScene, this, ID_ClearScene);
 	this->Bind(wxEVT_MENU, &Frame::OnGenerateMaze, this, ID_GenerateMaze);
+	this->Bind(wxEVT_MENU, &Frame::OnLoadDebugDrawData, this, ID_LoadDebugDrawData);
 	this->Bind(wxEVT_UPDATE_UI, &Frame::OnUpdateUI, this, ID_RenderUnlit);
 	this->Bind(wxEVT_UPDATE_UI, &Frame::OnUpdateUI, this, ID_RenderFaceLit);
 	this->Bind(wxEVT_UPDATE_UI, &Frame::OnUpdateUI, this, ID_RenderVertexLit);
@@ -151,6 +155,21 @@ void Frame::OnClearScene(wxCommandEvent& event)
 	MeshCollectionScene* meshScene = wxGetApp().GetMeshScene();
 	meshScene->Clear();
 	wxPostEvent(this, wxCommandEvent(EVT_SCENE_CHANGED));
+}
+
+void Frame::OnLoadDebugDrawData(wxCommandEvent& event)
+{
+	wxFileDialog fileDialog(this, "Choose JSON file to open.", wxEmptyString, wxEmptyString, "JSON file (*.json)|*.json", wxFD_OPEN | wxFD_FILE_MUST_EXIST);
+	if (wxID_OK == fileDialog.ShowModal())
+	{
+		wxBusyCursor busyCursor;
+		wxString filePath = fileDialog.GetPath();
+
+		if (wxGetApp().GetMeshScene()->debugDraw.Load((const char*)filePath.c_str()))
+			wxPostEvent(this, wxCommandEvent(EVT_SCENE_CHANGED));
+		else
+			wxMessageBox("Failed to load file: " + filePath, "Error", wxICON_ERROR | wxOK, this);
+	}
 }
 
 void Frame::OnGenerateMaze(wxCommandEvent& event)

@@ -30,10 +30,12 @@ void MeshListControl::OnListItemRightClick(wxListEvent& event)
 	contextMenu.Append(new wxMenuItem(&contextMenu, ID_ToggleVisibility, "Toggle Visibility", "Turn the visibility of the mesh on/off."));
 	contextMenu.Append(new wxMenuItem(&contextMenu, ID_MakeDual, "Make Dual", "Add the dual of this mesh to the scene."));
 	contextMenu.Append(new wxMenuItem(&contextMenu, ID_ClearFileSource, "Clear File Source", "Unbind this mesh from any known file on the file system."));
+	contextMenu.Append(new wxMenuItem(&contextMenu, ID_GenerateGraphDebugDraw, "Generate Graph Debug Draw", "Generate points and lines to visualize a graph made as a function of the mesn."));
 
 	contextMenu.Bind(wxEVT_MENU, &MeshListControl::OnToggleVisibility, this, ID_ToggleVisibility);
 	contextMenu.Bind(wxEVT_MENU, &MeshListControl::OnMakeDual, this, ID_MakeDual);
 	contextMenu.Bind(wxEVT_MENU, &MeshListControl::OnClearFileSource, this, ID_ClearFileSource);
+	contextMenu.Bind(wxEVT_MENU, &MeshListControl::OnGenerateGraphDebugDraw, this, ID_GenerateGraphDebugDraw);
 	contextMenu.Bind(wxEVT_UPDATE_UI, &MeshListControl::OnUpdateUI, this, ID_ClearFileSource);
 
 	this->PopupMenu(&contextMenu);
@@ -41,6 +43,7 @@ void MeshListControl::OnListItemRightClick(wxListEvent& event)
 
 void MeshListControl::OnUpdateUI(wxUpdateUIEvent& event)
 {
+	// TODO: Why is this never called?
 	switch (event.GetId())
 	{
 		case ID_ClearFileSource:
@@ -48,6 +51,20 @@ void MeshListControl::OnUpdateUI(wxUpdateUIEvent& event)
 			Mesh* mesh = this->GetSelectedMesh();
 			event.Enable(mesh && mesh->fileSource.Len() > 0);
 			break;
+		}
+	}
+}
+
+void MeshListControl::OnGenerateGraphDebugDraw(wxCommandEvent& event)
+{
+	Mesh* mesh = this->GetSelectedMesh();
+	if (mesh)
+	{
+		MeshNinja::MeshGraph graph;
+		if (graph.Generate(mesh->mesh))
+		{
+			graph.GenerateDebugDrawObjects(wxGetApp().GetMeshScene()->debugDraw);
+			wxPostEvent(wxGetApp().GetFrame(), wxCommandEvent(EVT_SCENE_CHANGED));
 		}
 	}
 }

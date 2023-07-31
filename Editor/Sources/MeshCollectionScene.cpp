@@ -19,19 +19,23 @@ void MeshCollectionScene::Clear()
 		delete mesh;
 
 	this->meshList.clear();
+	this->debugDraw.Clear();
 }
 
 /*virtual*/ int MeshCollectionScene::GetSceneObjectCount() const
 {
-	return this->meshList.size();
+	return this->meshList.size() + 1;
 }
 
 /*virtual*/ const Scene::Object* MeshCollectionScene::GetSceneObject(int i) const
 {
-	if (i < 0 || i >= (signed)this->meshList.size())
-		return nullptr;
+	if (0 <= i && i < (signed)this->meshList.size())
+		return this->meshList[i];
 
-	return this->meshList[i];
+	if (i == this->meshList.size())
+		return &this->debugDraw;
+
+	return nullptr;
 }
 
 /*virtual*/ void MeshCollectionScene::HandlePick(const Object* object, bool shiftDown)

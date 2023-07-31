@@ -23,13 +23,15 @@ private:
 	void OnToggleVisibility(wxCommandEvent& event);
 	void OnMakeDual(wxCommandEvent& event);
 	void OnClearFileSource(wxCommandEvent& event);
+	void OnGenerateGraphDebugDraw(wxCommandEvent& event);
 	void OnUpdateUI(wxUpdateUIEvent& event);
 
 	enum
 	{
 		ID_ToggleVisibility = wxID_HIGHEST + 500,
 		ID_MakeDual,
-		ID_ClearFileSource
+		ID_ClearFileSource,
+		ID_GenerateGraphDebugDraw
 	};
 
 	Mesh* GetSelectedMesh();

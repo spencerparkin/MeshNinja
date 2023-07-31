@@ -14,15 +14,36 @@ namespace MeshNinja
 
 		class Object;
 
-		virtual bool Draw();
+		virtual bool Draw() const;
 		virtual bool Load(const std::string& filePath);
 		virtual bool Save(const std::string& filePath) const;
-		virtual Object* Factory(const std::string& objectType);
+		virtual Object* Factory(const std::string& objectType) const;
+
+		template<typename T>
+		T* New()
+		{
+			Object* object = this->Factory(T::GetStaticType());
+			
+			T* t = dynamic_cast<T*>(object);
+			if (!t)
+				delete object;
+
+			return t;
+		}
+
+		template<typename T>
+		static T* Cast(Object* object)
+		{
+			if (T::GetStaticType() == object->GetType())
+				return (T*)object;
+
+			return nullptr;
+		}
 
 		void Clear();
 		void AddObject(Object* object);
 
-		class Object
+		class MESH_NINJA_API Object
 		{
 		public:
 			Object();
@@ -40,13 +61,14 @@ namespace MeshNinja
 			Vector color;
 		};
 
-		class Point : public Object
+		class MESH_NINJA_API Point : public Object
 		{
 		public:
 			Point();
 			Point(const Vector& vertex, const Vector& color);
 			virtual ~Point();
 
+			static std::string GetStaticType();
 			virtual std::string GetType() const override;
 			virtual bool Save(JsonObject* jsonObject) const override;
 			virtual bool Load(const JsonObject* jsonObject) override;
@@ -54,13 +76,14 @@ namespace MeshNinja
 			Vector vertex;
 		};
 
-		class Line : public Object
+		class MESH_NINJA_API Line : public Object
 		{
 		public:
 			Line();
 			Line(const Vector& pointA, const Vector& pointB, const Vector& color);
 			virtual ~Line();
 
+			static std::string GetStaticType();
 			virtual std::string GetType() const override;
 			virtual bool Save(JsonObject* jsonObject) const override;
 			virtual bool Load(const JsonObject* jsonObject) override;

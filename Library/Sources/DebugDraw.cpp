@@ -23,10 +23,13 @@ void DebugDraw::Clear()
 	this->objectArray->clear();
 }
 
-/*virtual*/ bool DebugDraw::Draw()
+/*virtual*/ bool DebugDraw::Draw() const
 {
-	// This needs to be overridden.
-	return false;
+	for (const Object* object : *this->objectArray)
+		if (!object->Draw())
+			return false;
+
+	return true;
 }
 
 /*virtual*/ bool DebugDraw::Load(const std::string& filePath)
@@ -42,8 +45,9 @@ void DebugDraw::Clear()
 		if (!fileStream.is_open())
 			break;
 
-		std::string jsonString;
-		fileStream >> jsonString;
+		std::stringstream stringStream;
+		stringStream << fileStream.rdbuf();
+		std::string jsonString = stringStream.str();
 
 		jsonValue = JsonValue::ParseJson(jsonString);
 		if (!jsonValue)
@@ -126,7 +130,7 @@ void DebugDraw::Clear()
 	return success;
 }
 
-/*virtual*/ DebugDraw::Object* DebugDraw::Factory(const std::string& objectType)
+/*virtual*/ DebugDraw::Object* DebugDraw::Factory(const std::string& objectType) const
 {
 	if (objectType == "point")
 		return new Point();
@@ -230,6 +234,11 @@ DebugDraw::Point::Point(const Vector& vertex, const Vector& color) : Object(colo
 {
 }
 
+/*static*/ std::string DebugDraw::Point::GetStaticType()
+{
+	return "point";
+}
+
 /*virtual*/ std::string DebugDraw::Point::GetType() const
 {
 	return "point";
@@ -273,6 +282,11 @@ DebugDraw::Line::Line(const Vector& pointA, const Vector& pointB, const Vector& 
 
 /*virtual*/ DebugDraw::Line::~Line()
 {
+}
+
+/*static*/ std::string DebugDraw::Line::GetStaticType()
+{
+	return "line";
 }
 
 /*virtual*/ std::string DebugDraw::Line::GetType() const
