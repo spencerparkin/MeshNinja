@@ -199,7 +199,7 @@ void Frame::OnGenerateMaze(wxCommandEvent& event)
 	}
 
 	std::list<MeshNinja::ConvexPolygonMesh*> meshList;
-	if (!mazeGenerator.GenerateMazeMeshes(meshList, 5.0, false))
+	if (!mazeGenerator.GenerateMazeMeshes(meshList, 5.0, true))
 	{
 		wxMessageBox("Failed to generate maze meshe(s)!", "Error", wxICON_ERROR | wxOK, this);
 		return;
