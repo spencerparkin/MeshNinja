@@ -32,6 +32,8 @@ public:
 	void SetVisible(bool visible) const;
 	bool GetVisible() const;
 
+	void DirtyRenderFlag() const;
+
 	const wxDateTime& GetSelectionTime() const { return this->selectionTime; }
 
 	MeshNinja::MeshFileFormat* GetFileFormatObject();

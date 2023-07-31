@@ -1146,7 +1146,7 @@ bool ConvexPolygonMesh::Facet::HasVertex(int i) const
 void ConvexPolygonMesh::Facet::Reverse()
 {
 	std::vector<int> reverseVertexArray;
-	for (int i = (signed)this->vertexArray->size(); i >= 0; i--)
+	for (int i = (signed)this->vertexArray->size() - 1; i >= 0; i--)
 		reverseVertexArray.push_back((*this)[i]);
 
 	this->vertexArray->clear();

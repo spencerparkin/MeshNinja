@@ -25,6 +25,7 @@ private:
 	void OnClearFileSource(wxCommandEvent& event);
 	void OnGenerateGraphDebugDraw(wxCommandEvent& event);
 	void OnNormalizeEdges(wxCommandEvent& event);
+	void OnReverseFaces(wxCommandEvent& event);
 	void OnUpdateUI(wxUpdateUIEvent& event);
 
 	enum
@@ -33,7 +34,8 @@ private:
 		ID_MakeDual,
 		ID_ClearFileSource,
 		ID_GenerateGraphDebugDraw,
-		ID_NormalizeEdges
+		ID_NormalizeEdges,
+		ID_ReverseFaces
 	};
 
 	Mesh* GetSelectedMesh();

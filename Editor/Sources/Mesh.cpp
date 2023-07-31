@@ -68,6 +68,11 @@ Mesh::Mesh()
 {
 }
 
+void Mesh::DirtyRenderFlag() const
+{
+	this->renderMeshDirty = true;
+}
+
 /*virtual*/ MeshNinja::Vector Mesh::GetPosition() const
 {
 	return this->transform.TransformPosition(this->mesh.CalcCenter());

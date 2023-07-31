@@ -32,12 +32,14 @@ void MeshListControl::OnListItemRightClick(wxListEvent& event)
 	contextMenu.Append(new wxMenuItem(&contextMenu, ID_ClearFileSource, "Clear File Source", "Unbind this mesh from any known file on the file system."));
 	contextMenu.Append(new wxMenuItem(&contextMenu, ID_GenerateGraphDebugDraw, "Generate Graph Debug Draw", "Generate points and lines to visualize a graph made as a function of the mesn."));
 	contextMenu.Append(new wxMenuItem(&contextMenu, ID_NormalizeEdges, "Normalize Edges", "Get rid of redundant edges."));
+	contextMenu.Append(new wxMenuItem(&contextMenu, ID_ReverseFaces, "Reverse Faces", "Reverse the winding on all polygons of the mesh."));
 
 	contextMenu.Bind(wxEVT_MENU, &MeshListControl::OnToggleVisibility, this, ID_ToggleVisibility);
 	contextMenu.Bind(wxEVT_MENU, &MeshListControl::OnMakeDual, this, ID_MakeDual);
 	contextMenu.Bind(wxEVT_MENU, &MeshListControl::OnClearFileSource, this, ID_ClearFileSource);
 	contextMenu.Bind(wxEVT_MENU, &MeshListControl::OnGenerateGraphDebugDraw, this, ID_GenerateGraphDebugDraw);
 	contextMenu.Bind(wxEVT_MENU, &MeshListControl::OnNormalizeEdges, this, ID_NormalizeEdges);
+	contextMenu.Bind(wxEVT_MENU, &MeshListControl::OnReverseFaces, this, ID_ReverseFaces);
 	contextMenu.Bind(wxEVT_UPDATE_UI, &MeshListControl::OnUpdateUI, this, ID_ClearFileSource);
 
 	this->PopupMenu(&contextMenu);
@@ -77,6 +79,18 @@ void MeshListControl::OnNormalizeEdges(wxCommandEvent& event)
 	if (mesh)
 	{
 		mesh->mesh.NormalizeEdges();
+		mesh->DirtyRenderFlag();
+		wxPostEvent(wxGetApp().GetFrame(), wxCommandEvent(EVT_SCENE_CHANGED));
+	}
+}
+
+void MeshListControl::OnReverseFaces(wxCommandEvent& event)
+{
+	Mesh* mesh = this->GetSelectedMesh();
+	if (mesh)
+	{
+		mesh->mesh.ReverseAllPolygons();
+		mesh->DirtyRenderFlag();
 		wxPostEvent(wxGetApp().GetFrame(), wxCommandEvent(EVT_SCENE_CHANGED));
 	}
 }
