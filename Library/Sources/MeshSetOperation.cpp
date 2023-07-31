@@ -116,6 +116,17 @@ bool MeshSetOperation::CalculatePolygonLists(const ConvexPolygonMesh& meshA, con
 	cutMeshA.NormalizeEdges();
 	cutMeshB.NormalizeEdges();
 
+	// We do this to make sure that each edge representing a cut in each cut-mesh is a sub-set of a cut-boundary-line.
+	for (const Polyline& polyline : polylineCollection.polylineList)
+	{
+		for (int i = 0; i < (signed)polyline.vertexArray->size(); i++)
+		{
+			const Vector& vertex = (*polyline.vertexArray)[i];
+			cutMeshA.AddRedundantVertex(vertex);
+			cutMeshB.AddRedundantVertex(vertex);
+		}
+	}
+
 #if defined MESH_NINJA_DEBUG
 	objFileFormat.SaveMesh("Meshes/CutMeshA.obj", cutMeshA);
 	objFileFormat.SaveMesh("Meshes/CutMeshB.obj", cutMeshB);
@@ -383,7 +394,7 @@ MeshSetOperation::Graph::Graph()
 	return new MeshSetOperation::Edge();
 }
 
-bool MeshSetOperation::Graph::ColorEdges(const std::vector<LineSegment>& lineSegmentArray)
+bool MeshSetOperation::Graph::ColorEdges(const std::vector<LineSegment>& lineSegmentArray, double eps /*= MESH_NINJA_EPS*/)
 {
 	for (Edge* edge : *this->edgeArray)
 	{
@@ -393,7 +404,7 @@ bool MeshSetOperation::Graph::ColorEdges(const std::vector<LineSegment>& lineSeg
 
 		for (const LineSegment& lineSegment : lineSegmentArray)
 		{
-			if (lineSegment.ContainsPoint(edgeSegment.vertexA) && lineSegment.ContainsPoint(edgeSegment.vertexB))
+			if (lineSegment.ContainsPoint(edgeSegment.vertexA, eps) && lineSegment.ContainsPoint(edgeSegment.vertexB, eps))
 			{
 				cutFound = true;
 				((MeshSetOperation::Edge*)edge)->type = MeshSetOperation::Edge::Type::CUT_BOUNDARY;

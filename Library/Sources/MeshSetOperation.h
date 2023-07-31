@@ -88,7 +88,7 @@ namespace MeshNinja
 			virtual Node* CreateNode() override;
 			virtual Edge* CreateEdge() override;
 
-			bool ColorEdges(const std::vector<LineSegment>& lineSegmentArray);
+			bool ColorEdges(const std::vector<LineSegment>& lineSegmentArray, double eps = MESH_NINJA_EPS);
 			bool ColorNodes(const Graph* otherGraph);
 
 			MeshSetOperation::Node* FindInitialOutsideNode(const Graph* otherGraph);

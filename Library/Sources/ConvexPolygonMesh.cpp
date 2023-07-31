@@ -542,6 +542,43 @@ void ConvexPolygonMesh::ReverseAllPolygons()
 		facet.Reverse();
 }
 
+// Sometimes it makes sense to add vertices to a mesh, even though doing so does not make any visual change to the mesh when rendered.
+// If the given vertex is not on this mesh, we return false.
+// If it is one of our vertices, nothing changes, and we return true.
+// If it is on one of our edges, then the edge is split for all polygons using it, and the vertex is added, and we return true.
+// If it is on a face, then for now, we just return false, but it would make sense to tessellate in this case.
+bool ConvexPolygonMesh::AddRedundantVertex(const Vector& vertex, double eps /*= MESH_NINJA_EPS*/)
+{
+	double smallestDistance = DBL_MAX;
+	int i = this->FindClosestPointTo(vertex, &smallestDistance);
+	if (i >= 0 && smallestDistance < eps)
+		return true;
+
+	bool addVertex = false;
+
+	for (Facet& facet : *this->facetArray)
+	{
+		for (int i = 0; i < (signed)facet.vertexArray->size(); i++)
+		{
+			int j = (i + 1) % facet.vertexArray->size();
+
+			LineSegment edgeSegment((*this->vertexArray)[facet[i]], (*this->vertexArray)[facet[j]]);
+
+			if (edgeSegment.ContainsPoint(vertex, eps))
+			{
+				facet.vertexArray->insert(facet.vertexArray->begin() + j, this->vertexArray->size());
+				addVertex = true;
+				break;
+			}
+		}
+	}
+
+	if (addVertex)
+		this->vertexArray->push_back(vertex);
+
+	return addVertex;
+}
+
 bool ConvexPolygonMesh::GenerateSphere(double radius, int segments, int slices)
 {
 	if (segments < 3 || slices < 3)

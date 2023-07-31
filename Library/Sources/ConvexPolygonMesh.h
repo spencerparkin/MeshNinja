@@ -52,6 +52,7 @@ namespace MeshNinja
 		void ApplyTransform(const Transform& transform);
 		void ReverseAllPolygons();
 		void CenterAndScale(double radius);
+		bool AddRedundantVertex(const Vector& vertex, double eps = MESH_NINJA_EPS);
 
 		struct MESH_NINJA_API Triangle
 		{
