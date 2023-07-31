@@ -4,6 +4,7 @@
 #include "ConvexPolygon.h"
 #include "Polyline.h"
 #include "MeshGraph.h"
+#include "DebugDraw.h"
 
 namespace MeshNinja
 {
@@ -48,6 +49,8 @@ namespace MeshNinja
 			Node();
 			virtual ~Node();
 
+			virtual Vector GetDebugColor() const override;
+
 			enum class Side
 			{
 				UNKNOWN,
@@ -63,6 +66,8 @@ namespace MeshNinja
 		public:
 			Edge();
 			virtual ~Edge();
+
+			virtual Vector GetDebugColor() const override;
 
 			enum class Type
 			{

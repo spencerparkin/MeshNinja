@@ -2,6 +2,7 @@
 
 #include "Common.h"
 #include "ConvexPolygonMesh.h"
+#include "DebugDraw.h"
 
 namespace MeshNinja
 {
@@ -22,6 +23,7 @@ namespace MeshNinja
 		bool Generate(const ConvexPolygonMesh& givenMesh);
 		bool GenerateDual(ConvexPolygonMesh& dualMesh) const;
 
+		virtual void GenerateDebugDrawObjects(DebugDraw& debugDraw) const;
 		virtual Node* CreateNode();
 		virtual Edge* CreateEdge();
 
@@ -30,6 +32,8 @@ namespace MeshNinja
 		public:
 			Node();
 			virtual ~Node();
+
+			virtual Vector GetDebugColor() const;
 
 			const ConvexPolygonMesh::Facet* facet;
 			std::vector<Edge*> edgeArray;
@@ -57,6 +61,8 @@ namespace MeshNinja
 		public:
 			Edge();
 			virtual ~Edge();
+
+			virtual Vector GetDebugColor() const;
 
 			Node* Fallow(Node* origin);
 

@@ -217,6 +217,7 @@ bool MazeGenerator::GenerateMazeMeshes(std::list<MeshNinja::ConvexPolygonMesh*>&
 			return false;
 		}
 
+		mazeMesh->ReverseAllPolygons();
 		meshList.push_back(mazeMesh);
 	}
 

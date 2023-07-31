@@ -24,6 +24,7 @@
     <ClInclude Include="Sources\Common.h" />
     <ClInclude Include="Sources\ConvexPolygon.h" />
     <ClInclude Include="Sources\ConvexPolygonMesh.h" />
+    <ClInclude Include="Sources\DebugDraw.h" />
     <ClInclude Include="Sources\FileFormats\glTF_FileFormat.h" />
     <ClInclude Include="Sources\FileFormats\ObjFileFormat.h" />
     <ClInclude Include="Sources\JSON\JsonValue.h" />
@@ -49,6 +50,7 @@
     <ClCompile Include="Sources\AxisAlignedBoundingBox.cpp" />
     <ClCompile Include="Sources\ConvexPolygon.cpp" />
     <ClCompile Include="Sources\ConvexPolygonMesh.cpp" />
+    <ClCompile Include="Sources\DebugDraw.cpp" />
     <ClCompile Include="Sources\FileFormats\glTF_FileFormat.cpp" />
     <ClCompile Include="Sources\FileFormats\ObjFileFormat.cpp" />
     <ClCompile Include="Sources\JSON\JsonValue.cpp" />

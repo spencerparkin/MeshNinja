@@ -85,6 +85,9 @@
     <ClInclude Include="Sources\FileFormats\glTF_FileFormat.h">
       <Filter>Sources\FileFormats</Filter>
     </ClInclude>
+    <ClInclude Include="Sources\DebugDraw.h">
+      <Filter>Sources</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sources\MeshBinaryOperation.cpp">
@@ -155,6 +158,9 @@
     </ClCompile>
     <ClCompile Include="Sources\FileFormats\glTF_FileFormat.cpp">
       <Filter>Sources\FileFormats</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\DebugDraw.cpp">
+      <Filter>Sources</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

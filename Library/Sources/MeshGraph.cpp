@@ -219,6 +219,24 @@ bool MeshGraph::GenerateDual(ConvexPolygonMesh& dualMesh) const
 	return true;
 }
 
+/*virtual*/ void MeshGraph::GenerateDebugDrawObjects(DebugDraw& debugDraw) const
+{
+	for (const Node* node : *this->nodeArray)
+	{
+		ConvexPolygon polygon;
+		node->facet->MakePolygon(polygon, this->mesh);
+		debugDraw.AddObject(new DebugDraw::Point(polygon.CalcCenter(), node->GetDebugColor()));
+
+		for (const Edge* edge : node->edgeArray)
+		{
+			const Vector& pointA = (*this->mesh->vertexArray)[edge->pair.i];
+			const Vector& pointB = (*this->mesh->vertexArray)[edge->pair.j];
+
+			debugDraw.AddObject(new DebugDraw::Line(polygon.CalcCenter(), (pointA + pointB) / 2.0, edge->GetDebugColor()));
+		}
+	}
+}
+
 //----------------------------------- MeshGraph::Node -----------------------------------
 
 MeshGraph::Node::Node()
@@ -228,6 +246,11 @@ MeshGraph::Node::Node()
 
 /*virtual*/ MeshGraph::Node::~Node()
 {
+}
+
+/*virtual*/ Vector MeshGraph::Node::GetDebugColor() const
+{
+	return Vector(1.0, 1.0, 1.0);
 }
 
 //----------------------------------- MeshGraph::Edge -----------------------------------
@@ -246,4 +269,9 @@ MeshGraph::Edge::Edge()
 MeshGraph::Node* MeshGraph::Edge::Fallow(Node* origin)
 {
 	return (origin == this->node[0]) ? this->node[1] : this->node[0];
+}
+
+/*virtual*/ Vector MeshGraph::Edge::GetDebugColor() const
+{
+	return Vector(0.5, 0.5, 0.5);
 }

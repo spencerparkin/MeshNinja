@@ -138,6 +138,15 @@ bool MeshSetOperation::CalculatePolygonLists(const ConvexPolygonMesh& meshA, con
 		return false;
 	}
 	
+#if defined MESH_NINJA_DEBUG
+	DebugDraw graphDebugDraw;
+
+	graphA.GenerateDebugDrawObjects(graphDebugDraw);
+	graphB.GenerateDebugDrawObjects(graphDebugDraw);
+
+	graphDebugDraw.Save("Meshes/GraphDebugDraw.json");
+#endif //MESH_NINJA_DEBUG
+
 	if (!graphA.ColorNodes(&graphB))
 	{
 		*this->error = "Failed to color nodes of graph A.";
@@ -307,6 +316,23 @@ MeshSetOperation::Node::Node()
 {
 }
 
+/*virtual*/ Vector MeshSetOperation::Node::GetDebugColor() const
+{
+	switch (this->side)
+	{
+		case Side::INSIDE:
+		{
+			return Vector(1.0, 0.0, 0.0);
+		}
+		case Side::OUTSIDE:
+		{
+			return Vector(0.0, 0.0, 1.0);
+		}
+	}
+
+	return Vector(0.5, 0.5, 0.5);
+}
+
 //----------------------------------- MeshSetOperation::Edge -----------------------------------
 
 MeshSetOperation::Edge::Edge()
@@ -316,6 +342,23 @@ MeshSetOperation::Edge::Edge()
 
 /*virtual*/ MeshSetOperation::Edge::~Edge()
 {
+}
+
+/*virtual*/ Vector MeshSetOperation::Edge::GetDebugColor() const
+{
+	switch (this->type)
+	{
+		case Type::NORMAL:
+		{
+			return Vector(0.0, 1.0, 0.0);
+		}
+		case Type::CUT_BOUNDARY:
+		{
+			return Vector(1.0, 0.0, 0.0);
+		}
+	}
+
+	return Vector(0.5, 0.5, 0.5);
 }
 
 //----------------------------------- MeshSetOperation::Graph -----------------------------------
