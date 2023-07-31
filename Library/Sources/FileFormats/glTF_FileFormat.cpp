@@ -121,8 +121,8 @@ glTF_FileFormat::glTF_FileFormat()
 		JsonObject* jsonPBRMetallicRoughness = new JsonObject();
 		jsonMaterial->SetValue("pbrMetallicRoughness", jsonPBRMetallicRoughness);
 		jsonPBRMetallicRoughness->SetValue("baseColorFactor", new JsonArray(std::vector<double>{ 1.0, 0.766, 0.336, 1.0 }));
-		jsonPBRMetallicRoughness->SetValue("metallicFactor", new JsonFloat(1.0));
-		jsonPBRMetallicRoughness->SetValue("roughnessFactor", new JsonFloat(0.0));
+		jsonPBRMetallicRoughness->SetValue("metallicFactor", new JsonFloat(0.5));
+		jsonPBRMetallicRoughness->SetValue("roughnessFactor", new JsonFloat(0.2));
 
 		std::string jsonString;
 		if (!jsonRootObject->PrintJson(jsonString))
