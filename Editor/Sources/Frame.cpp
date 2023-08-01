@@ -188,6 +188,8 @@ void Frame::OnGenerateMaze(wxCommandEvent& event)
 	if (depthDialog.ShowModal() == wxID_CANCEL)
 		return;
 
+	wxBusyCursor busyCursor;
+
 	int width = widthDialog.GetValue();
 	int height = heightDialog.GetValue();
 	int depth = depthDialog.GetValue();

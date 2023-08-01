@@ -67,6 +67,20 @@ Vector AxisAlignedBoundingBox::Center() const
 	return (this->min + this->max) / 2.0;
 }
 
+void AxisAlignedBoundingBox::ScaleAboutCenter(double scale)
+{
+	Vector center = this->Center();
+	
+	Vector minDelta = this->min - center;
+	Vector maxDelta = this->max - center;
+	
+	minDelta *= scale;
+	maxDelta *= scale;
+
+	this->min = center + minDelta;
+	this->max = center + maxDelta;
+}
+
 bool AxisAlignedBoundingBox::ContainsBox(const AxisAlignedBoundingBox& aabb) const
 {
 	return this->ContainsPoint(aabb.min) && this->ContainsPoint(aabb.max);

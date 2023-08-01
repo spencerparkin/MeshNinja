@@ -2,6 +2,7 @@
 #include "ConvexPolygonMesh.h"
 #include "LineSegment.h"
 #include "Plane.h"
+#include "AxisAlignedBoundingBox.h"
 #include "Ray.h"
 #if defined MESH_NINJA_DEBUG
 #	include "FileFormats/ObjFileFormat.h"
@@ -421,48 +422,52 @@ bool MeshSetOperation::Graph::ColorEdges(const std::vector<LineSegment>& lineSeg
 
 bool MeshSetOperation::Graph::ColorNodes(const Graph* otherGraph)
 {
-	MeshSetOperation::Node* node = this->FindInitialOutsideNode(otherGraph);
-	if (!node)
-		return false;
-
-	node->side = MeshSetOperation::Node::Side::OUTSIDE;
-
-	std::list<MeshSetOperation::Node*> nodeQueue;
-	nodeQueue.push_back(node);
-
-	while (nodeQueue.size() > 0)
+	while (true)
 	{
-		std::list<MeshSetOperation::Node*>::iterator iter = nodeQueue.begin();
-		node = *iter;
-		nodeQueue.erase(iter);
+		MeshSetOperation::Node* node = this->FindInitialOutsideNode(otherGraph);
+		if (!node)
+			break;
 
-		for (Edge* edge : node->edgeArray)
+		assert(node->side == MeshSetOperation::Node::Side::UNKNOWN);
+		node->side = MeshSetOperation::Node::Side::OUTSIDE;
+
+		std::list<MeshSetOperation::Node*> nodeQueue;
+		nodeQueue.push_back(node);
+
+		while (nodeQueue.size() > 0)
 		{
-			MeshSetOperation::Node* adjacentNode = (MeshSetOperation::Node*)edge->Fallow(node);
-			if (adjacentNode->side == MeshSetOperation::Node::Side::UNKNOWN)
-			{
-				switch(((MeshSetOperation::Edge*)edge)->type)
-				{
-					case MeshSetOperation::Edge::Type::CUT_BOUNDARY:
-					{
-						if (node->side == MeshSetOperation::Node::Side::INSIDE)
-							adjacentNode->side = MeshSetOperation::Node::Side::OUTSIDE;
-						else
-							adjacentNode->side = MeshSetOperation::Node::Side::INSIDE;
-						break;
-					}
-					case MeshSetOperation::Edge::Type::NORMAL:
-					{
-						adjacentNode->side = node->side;
-						break;
-					}
-					default:
-					{
-						return false;
-					}
-				}
+			std::list<MeshSetOperation::Node*>::iterator iter = nodeQueue.begin();
+			node = *iter;
+			nodeQueue.erase(iter);
 
-				nodeQueue.push_back(adjacentNode);
+			for (Edge* edge : node->edgeArray)
+			{
+				MeshSetOperation::Node* adjacentNode = (MeshSetOperation::Node*)edge->Fallow(node);
+				if (adjacentNode->side == MeshSetOperation::Node::Side::UNKNOWN)
+				{
+					switch (((MeshSetOperation::Edge*)edge)->type)
+					{
+						case MeshSetOperation::Edge::Type::CUT_BOUNDARY:
+						{
+							if (node->side == MeshSetOperation::Node::Side::INSIDE)
+								adjacentNode->side = MeshSetOperation::Node::Side::OUTSIDE;
+							else
+								adjacentNode->side = MeshSetOperation::Node::Side::INSIDE;
+							break;
+						}
+						case MeshSetOperation::Edge::Type::NORMAL:
+						{
+							adjacentNode->side = node->side;
+							break;
+						}
+						default:
+						{
+							return false;
+						}
+					}
+
+					nodeQueue.push_back(adjacentNode);
+				}
 			}
 		}
 	}
@@ -474,6 +479,9 @@ MeshSetOperation::Node* MeshSetOperation::Graph::FindInitialOutsideNode(const Gr
 {
 	for (Node* node : *this->nodeArray)
 	{
+		if (((MeshSetOperation::Node*)node)->side != MeshSetOperation::Node::Side::UNKNOWN)
+			continue;
+
 		ConvexPolygon polygon;
 		node->facet->MakePolygon(polygon, this->mesh);
 
@@ -485,6 +493,66 @@ MeshSetOperation::Node* MeshSetOperation::Graph::FindInitialOutsideNode(const Gr
 			return (MeshSetOperation::Node*)node;
 		}
 	}
+
+	// Okay, if we get here, that doesn't mean that there doesn't exist an
+	// outside polygon from which we can start the graph coloring algorithm.
+	// We just have to go about finding one a different way.
+
+	if (this->mesh->vertexArray->size() == 0)
+		return nullptr;
+
+	AxisAlignedBoundingBox aabb;
+	aabb.min = (*this->mesh->vertexArray)[0];
+	aabb.max = (*this->mesh->vertexArray)[0];
+	for (const Vector& vertex : *this->mesh->vertexArray)
+		aabb.ExpandToIncludePoint(vertex);
+	for (const Vector& vertex : *otherGraph->mesh->vertexArray)
+		aabb.ExpandToIncludePoint(vertex);
+
+	aabb.ScaleAboutCenter(1.5);
+
+	for (Node* node : *this->nodeArray)
+	{
+		if (((MeshSetOperation::Node*)node)->side != MeshSetOperation::Node::Side::UNKNOWN)
+			continue;
+
+		ConvexPolygon polygon;
+		node->facet->MakePolygon(polygon, this->mesh);
+
+		Vector center = polygon.CalcCenter();
+
+		for (int i = 0; i < 6; i++)
+		{
+			Ray ray;
+
+			switch (i)
+			{
+				case 0: ray.origin = Vector(center.x, center.y, aabb.max.z); break;
+				case 1: ray.origin = Vector(center.x, center.y, aabb.min.z); break;
+				case 2: ray.origin = Vector(center.x, aabb.max.y, center.z); break;
+				case 3: ray.origin = Vector(center.x, aabb.min.y, center.z); break;
+				case 4: ray.origin = Vector(aabb.max.x, center.y, center.z); break;
+				case 5: ray.origin = Vector(aabb.min.x, center.y, center.z); break;
+			}
+
+			ray.direction = center - ray.origin;
+		
+			// Does the ray hit the polygon center?
+			double alpha = 0.0;
+			if (ray.CastAgainst(*this->mesh, alpha) && ray.Lerp(alpha).IsEqualTo(center))
+			{
+				// And does the ray NOT hit something closer in the other mesh?
+				double beta = 0.0;
+				if (!ray.CastAgainst(*otherGraph->mesh, beta) || (beta > alpha && aabb.ContainsPoint(ray.Lerp(beta))))
+				{
+					return (MeshSetOperation::Node*)node;
+				}
+			}
+		}
+	}
+
+	// At this point, we may still have just not found an outside polygon,
+	// or indeed, one may not actually exist.
 
 	return nullptr;
 }

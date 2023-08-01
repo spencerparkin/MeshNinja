@@ -3,6 +3,7 @@
 #include "ConvexPolygon.h"
 #include "LineSegment.h"
 #include "AlgebraicSurface.h"
+#include "ConvexPolygonMesh.h"
 
 using namespace MeshNinja;
 
@@ -125,6 +126,27 @@ bool Ray::CastAgainst(const AlgebraicSurface& algebraicSurface, double& alpha,
 	}
 
 	return false;
+}
+
+// Of course, if the polygons of a mesh were thrown into a spacial sorting data-structure first,
+// and then we cast against that, then we would be more efficient.  This is fine for now.
+bool Ray::CastAgainst(const ConvexPolygonMesh& mesh, double& alpha, double eps /*= MESH_NINJA_EPS*/) const
+{
+	std::vector<ConvexPolygon> polygonArray;
+	mesh.ToConvexPolygonArray(polygonArray);
+
+	alpha = DBL_MAX;
+	for (const ConvexPolygon& polygon : polygonArray)
+	{
+		double beta = 0.0;
+		if (this->CastAgainst(polygon, beta, eps))
+		{
+			if (beta < alpha)
+				alpha = beta;
+		}
+	}
+
+	return alpha != DBL_MAX;
 }
 
 Vector Ray::Lerp(double alpha) const
