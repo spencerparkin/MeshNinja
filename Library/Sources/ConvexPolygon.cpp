@@ -2,6 +2,7 @@
 #include "Plane.h"
 #include "Ray.h"
 #include "LineSegment.h"
+#include "AxisAlignedBoundingBox.h"
 
 using namespace MeshNinja;
 
@@ -24,6 +25,20 @@ ConvexPolygon::ConvexPolygon(const ConvexPolygon& polygon)
 void ConvexPolygon::Clear()
 {
 	this->vertexArray->clear();
+}
+
+bool ConvexPolygon::CalcBox(AxisAlignedBoundingBox& box) const
+{
+	if (this->vertexArray->size() == 0)
+		return false;
+
+	box.min = (*this->vertexArray)[0];
+	box.max = (*this->vertexArray)[0];
+
+	for (const Vector& vertex : *this->vertexArray)
+		box.ExpandToIncludePoint(vertex);
+
+	return true;
 }
 
 bool ConvexPolygon::VerticesAreCoplanar(double eps /*= MESH_NINJA_EPS*/) const

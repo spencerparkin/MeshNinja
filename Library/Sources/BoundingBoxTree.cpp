@@ -80,7 +80,7 @@ void BoundingBoxTree::ForOverlappingObjects(const AxisAlignedBoundingBox& aabb, 
 	}
 }
 
-void BoundingBoxTree::ForHitObjects(const Ray& ray, std::function<bool(Object*, const Vector&)> callback)
+void BoundingBoxTree::ForHitObjects(const Ray& ray, std::function<bool(Object*, double)> callback)
 {
 	if (!this->rootNode)
 		return;
@@ -100,8 +100,11 @@ void BoundingBoxTree::ForHitObjects(const Ray& ray, std::function<bool(Object*, 
 			{
 				if (ray.CastAgainst(object->GetBoundingBox(), alpha))
 				{
-					if (!callback(object, ray.Lerp(alpha)))
-						return;
+					if (object->IsHitByRay(ray, alpha))
+					{
+						if (!callback(object, alpha))
+							return;
+					}
 				}
 			}
 
@@ -109,6 +112,36 @@ void BoundingBoxTree::ForHitObjects(const Ray& ray, std::function<bool(Object*, 
 				nodeQueue.push_back(childNode);
 		}
 	}
+}
+
+BoundingBoxTree::Object* BoundingBoxTree::FindClosestHit(const Ray& ray, double* beta /*= nullptr*/)
+{
+	BoundingBoxTree::Object* foundObject = nullptr;
+	double smallestAlpha = DBL_MAX;
+
+	this->ForHitObjects(ray, [&foundObject, &ray, &smallestAlpha](Object* object, double alpha) -> bool
+		{
+			if (alpha < smallestAlpha)
+			{
+				smallestAlpha = alpha;
+				foundObject = object;
+			}
+			return true;
+		});
+
+	if (beta)
+		*beta = smallestAlpha;
+
+	return foundObject;
+}
+
+bool BoundingBoxTree::GetBoundingBox(AxisAlignedBoundingBox& box) const
+{
+	if (!this->rootNode)
+		return false;
+
+	box = this->rootNode->aabb;
+	return true;
 }
 
 //------------------------------ BoundingBoxTree::Object ------------------------------
@@ -132,6 +165,9 @@ BoundingBoxTree::Node::Node(const AxisAlignedBoundingBox& aabb)
 {
 	for (Node* childNode : this->childArray)
 		delete childNode;
+
+	for (Object* object : this->objectArray)
+		delete object;
 }
 
 bool BoundingBoxTree::Node::Insert(Object* object)

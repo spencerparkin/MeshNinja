@@ -4,6 +4,7 @@
 #include "Plane.h"
 #include "AxisAlignedBoundingBox.h"
 #include "Ray.h"
+#include "BoundingBoxTree.h"
 #if defined MESH_NINJA_DEBUG
 #	include "FileFormats/ObjFileFormat.h"
 #endif
@@ -498,6 +499,50 @@ MeshSetOperation::Node* MeshSetOperation::Graph::FindInitialOutsideNode(const Gr
 	// outside polygon from which we can start the graph coloring algorithm.
 	// We just have to go about finding one a different way.
 
+	BoundingBoxTree thisTree, otherTree;
+
+	class Entry : public BoundingBoxTree::Object
+	{
+	public:
+		Entry(MeshSetOperation::Node* node, const Graph* graph)
+		{
+			this->node = node;
+			this->graph = graph;
+			this->node->facet->MakePolygon(this->polygon, this->graph->mesh);
+			this->polygon.CalcBox(this->box);
+		}
+
+		virtual ~Entry()
+		{
+		}
+
+		virtual AxisAlignedBoundingBox GetBoundingBox() const override
+		{
+			return box;
+		}
+
+		virtual bool IsHitByRay(const Ray& ray, double& alpha) const override
+		{
+			return ray.CastAgainst(this->polygon, alpha);
+		}
+
+		MeshSetOperation::Node* node;
+		const Graph* graph;
+		ConvexPolygon polygon;
+		AxisAlignedBoundingBox box;
+	};
+
+	// TODO: Refactor the code so that we're not building these trees with every call.
+	std::vector<BoundingBoxTree::Object*> objectArray;
+	for (Node* node : *this->nodeArray)
+		objectArray.push_back(new Entry((MeshSetOperation::Node*)node, this));
+	thisTree.Rebuild(objectArray);
+	objectArray.clear();
+	for (Node* node : *otherGraph->nodeArray)
+		objectArray.push_back(new Entry((MeshSetOperation::Node*)node, otherGraph));
+	otherTree.Rebuild(objectArray);
+	objectArray.clear();
+
 	if (this->mesh->vertexArray->size() == 0)
 		return nullptr;
 
@@ -508,7 +553,6 @@ MeshSetOperation::Node* MeshSetOperation::Graph::FindInitialOutsideNode(const Gr
 		aabb.ExpandToIncludePoint(vertex);
 	for (const Vector& vertex : *otherGraph->mesh->vertexArray)
 		aabb.ExpandToIncludePoint(vertex);
-
 	aabb.ScaleAboutCenter(1.5);
 
 	for (Node* node : *this->nodeArray)
@@ -536,9 +580,8 @@ MeshSetOperation::Node* MeshSetOperation::Graph::FindInitialOutsideNode(const Gr
 			}
 
 			ray.direction = center - ray.origin;
-		
-			// TODO: Can we speed this up using the bounding-box tree?
 
+#if 0
 			// Does the ray hit the polygon center?
 			double alpha = 0.0;
 			if (ray.CastAgainst(*this->mesh, alpha) && ray.Lerp(alpha).IsEqualTo(center))
@@ -550,6 +593,21 @@ MeshSetOperation::Node* MeshSetOperation::Graph::FindInitialOutsideNode(const Gr
 					return (MeshSetOperation::Node*)node;
 				}
 			}
+#else
+			// Does the ray hit the polygon center?
+			double alpha = 0.0;
+			Entry* thisEntry = (Entry*)thisTree.FindClosestHit(ray, &alpha);
+			if (thisEntry && thisEntry->node == (MeshSetOperation::Node*)node)
+			{
+				// And does the ray NOT hit something closer in the other mesh?
+				double beta = 0.0;
+				Entry* otherEntry = (Entry*)otherTree.FindClosestHit(ray, &beta);
+				if (!otherEntry || alpha < beta)
+				{
+					return (MeshSetOperation::Node*)node;
+				}
+			}
+#endif
 		}
 	}
 

@@ -5,6 +5,8 @@
 
 namespace MeshNinja
 {
+	class AxisAlignedBoundingBox;
+
 	// We assume here that the list of points are coplanar and form a
 	// convex polygon.  If this is not the case, then the result of any
 	// algorithm is left undefined.  Polygons of 0, 1, or 2 vertices
@@ -24,6 +26,7 @@ namespace MeshNinja
 		bool IsConcave(double eps = MESH_NINJA_EPS) const;
 		bool CalcPlane(Plane& plane, double eps = MESH_NINJA_EPS) const;
 		Vector CalcCenter() const;
+		bool CalcBox(AxisAlignedBoundingBox& box) const;
 		bool Intersect(const ConvexPolygon& polygonA, const ConvexPolygon& polygonB, double eps = MESH_NINJA_EPS);
 		bool IntersectWithLineSegment(const Vector& pointA, const Vector& pointB, Vector& intersectionPoint, double eps = MESH_NINJA_EPS) const;
 		bool ContainsPoint(const Vector& point, bool* isInteriorPoint = nullptr, double eps = MESH_NINJA_EPS) const;

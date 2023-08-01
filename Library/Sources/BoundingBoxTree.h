@@ -19,7 +19,9 @@ namespace MeshNinja
 		bool Insert(Object* object);
 		void Rebuild(const std::vector<Object*>& objectArray);
 		void ForOverlappingObjects(const AxisAlignedBoundingBox& aabb, std::function<bool(Object*)> callback);
-		void ForHitObjects(const Ray& ray, std::function<bool(Object*, const Vector&)> callback);
+		void ForHitObjects(const Ray& ray, std::function<bool(Object*, double)> callback);
+		bool GetBoundingBox(AxisAlignedBoundingBox& box) const;
+		Object* FindClosestHit(const Ray& ray, double* beta = nullptr);
 
 		class MESH_NINJA_API Object
 		{
@@ -28,6 +30,7 @@ namespace MeshNinja
 			virtual ~Object();
 
 			virtual AxisAlignedBoundingBox GetBoundingBox() const = 0;
+			virtual bool IsHitByRay(const Ray& ray, double& alpha) const = 0;
 		};
 
 		template<typename T>
