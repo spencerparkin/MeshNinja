@@ -507,8 +507,7 @@ MeshSetOperation::Node* MeshSetOperation::Graph::FindInitialOutsideNode(const Gr
 		Entry(MeshSetOperation::Node* node, const Graph* graph)
 		{
 			this->node = node;
-			this->graph = graph;
-			this->node->facet->MakePolygon(this->polygon, this->graph->mesh);
+			this->node->facet->MakePolygon(this->polygon, graph->mesh);
 			this->polygon.CalcBox(this->box);
 		}
 
@@ -527,7 +526,6 @@ MeshSetOperation::Node* MeshSetOperation::Graph::FindInitialOutsideNode(const Gr
 		}
 
 		MeshSetOperation::Node* node;
-		const Graph* graph;
 		ConvexPolygon polygon;
 		AxisAlignedBoundingBox box;
 	};
@@ -549,12 +547,7 @@ MeshSetOperation::Node* MeshSetOperation::Graph::FindInitialOutsideNode(const Gr
 		return nullptr;
 
 	AxisAlignedBoundingBox aabb;
-	aabb.min = (*this->mesh->vertexArray)[0];
-	aabb.max = (*this->mesh->vertexArray)[0];
-	for (const Vector& vertex : *this->mesh->vertexArray)
-		aabb.ExpandToIncludePoint(vertex);
-	for (const Vector& vertex : *otherGraph->mesh->vertexArray)
-		aabb.ExpandToIncludePoint(vertex);
+	tree.GetBoundingBox(aabb);
 	aabb.ScaleAboutCenter(1.5);
 
 	for (Node* node : *this->nodeArray)
