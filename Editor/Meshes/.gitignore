@@ -1,0 +1,6 @@
+# Ignore mesh stuff in this directory.
+
+*.obj
+*.gltf
+*.bin
+*.json
