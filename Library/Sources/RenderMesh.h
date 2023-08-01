@@ -19,9 +19,27 @@ namespace MeshNinja
 		RenderMesh(const RenderMesh& renderMesh);
 		virtual ~RenderMesh();
 
+		struct Options
+		{
+			enum class NormalType
+			{
+				VERTEX_BASED,
+				FACET_BASED
+			};
+
+			Options()
+			{
+				this->normalType = NormalType::FACET_BASED;
+				this->color = Vector(1.0, 0.0, 0.0);
+			}
+
+			NormalType normalType;
+			Vector color;
+		};
+
 		void Clear();
 		void Copy(const RenderMesh& renderMesh);
-		void FromConvexPolygonMesh(const ConvexPolygonMesh& mesh);
+		void FromConvexPolygonMesh(const ConvexPolygonMesh& mesh, const Options& options);
 		void ToConvexPolygonMesh(ConvexPolygonMesh& mesh) const;
 		void ApplyTransform(const Transform& transform);
 		bool IsTriangleMesh() const;

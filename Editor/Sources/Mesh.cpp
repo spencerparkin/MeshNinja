@@ -90,7 +90,10 @@ void Mesh::DirtyRenderFlag() const
 		MeshNinja::ConvexPolygonMesh tessellatedMesh(this->mesh);
 		tessellatedMesh.TessellateFaces();
 
-		this->renderMesh.FromConvexPolygonMesh(tessellatedMesh);
+		MeshNinja::RenderMesh::Options options;
+		options.normalType = MeshNinja::RenderMesh::Options::NormalType::FACET_BASED;
+
+		this->renderMesh.FromConvexPolygonMesh(tessellatedMesh, options);
 
 		this->meshGraph.Generate(this->mesh);
 	}

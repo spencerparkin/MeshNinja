@@ -74,21 +74,11 @@ void RenderMesh::ApplyTransform(const Transform& transform)
 	}
 }
 
-void RenderMesh::FromConvexPolygonMesh(const ConvexPolygonMesh& mesh)
+void RenderMesh::FromConvexPolygonMesh(const ConvexPolygonMesh& mesh, const Options& options)
 {
 	this->Clear();
 
-	for (const Vector& vertex : *mesh.vertexArray)
-	{
-		Vertex renderVertex;
-		
-		renderVertex.position = vertex;
-		renderVertex.normal = Vector(0.0, 0.0, 0.0);
-		renderVertex.color = Vector(1.0, 1.0, 1.0);
-		renderVertex.texCoords = Vector(0.0, 0.0, 0.0);
-
-		this->vertexArray->push_back(renderVertex);
-	}
+	int vertexCounter = 0;
 
 	for (const ConvexPolygonMesh::Facet& facet : *mesh.facetArray)
 	{
@@ -97,7 +87,11 @@ void RenderMesh::FromConvexPolygonMesh(const ConvexPolygonMesh& mesh)
 
 		for (int i = 0; i < (signed)facet.vertexArray->size(); i++)
 		{
-			renderFacet.vertexArray->push_back(facet[i]);
+			if (options.normalType == Options::NormalType::VERTEX_BASED)
+				renderFacet.vertexArray->push_back(facet[i]);
+			else if (options.normalType == Options::NormalType::FACET_BASED)
+				renderFacet.vertexArray->push_back(vertexCounter++);
+
 			renderFacet.center += (*mesh.vertexArray)[facet[i]];
 		}
 
@@ -116,17 +110,54 @@ void RenderMesh::FromConvexPolygonMesh(const ConvexPolygonMesh& mesh)
 		this->facetArray->push_back(renderFacet);
 	}
 
-	for (Facet& facet : *this->facetArray)
+	if (options.normalType == Options::NormalType::VERTEX_BASED)
 	{
-		for (int i = 0; i < (signed)facet.vertexArray->size(); i++)
+		for (const Vector& vertex : *mesh.vertexArray)
 		{
-			Vertex& vertex = (*this->vertexArray)[facet[i]];
-			vertex.normal += facet.normal;
+			Vertex renderVertex;
+
+			renderVertex.position = vertex;
+			renderVertex.normal = Vector(0.0, 0.0, 0.0);
+			renderVertex.color = options.color;
+			renderVertex.texCoords = Vector(0.0, 0.0, 0.0);
+
+			this->vertexArray->push_back(renderVertex);
+		}
+
+		for (Facet& facet : *this->facetArray)
+		{
+			for (int i = 0; i < (signed)facet.vertexArray->size(); i++)
+			{
+				Vertex& vertex = (*this->vertexArray)[facet[i]];
+				vertex.normal += facet.normal;
+			}
+		}
+
+		for (Vertex& vertex : *this->vertexArray)
+			vertex.normal.Normalize();
+	}
+	else if (options.normalType == Options::NormalType::FACET_BASED)
+	{
+		for (int i = 0; i < (signed)mesh.facetArray->size(); i++)
+		{
+			const ConvexPolygonMesh::Facet& facet = (*mesh.facetArray)[i];
+			const Facet& renderFacet = (*this->facetArray)[i];
+
+			for (int j = 0; j < (signed)facet.vertexArray->size(); j++)
+			{
+				const Vector& vertex = (*mesh.vertexArray)[facet[j]];
+
+				Vertex renderVertex;
+
+				renderVertex.position = vertex;
+				renderVertex.normal = renderFacet.normal;
+				renderVertex.color = options.color;
+				renderVertex.texCoords = Vector(0.0, 0.0, 0.0);
+
+				this->vertexArray->push_back(renderVertex);
+			}
 		}
 	}
-
-	for (Vertex& vertex : *this->vertexArray)
-		vertex.normal.Normalize();
 }
 
 void RenderMesh::ToConvexPolygonMesh(ConvexPolygonMesh& mesh) const
