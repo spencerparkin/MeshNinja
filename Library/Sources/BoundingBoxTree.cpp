@@ -144,6 +144,19 @@ bool BoundingBoxTree::GetBoundingBox(AxisAlignedBoundingBox& box) const
 	return true;
 }
 
+bool BoundingBoxTree::IsEmpty() const
+{
+	return this->Size() == 0;
+}
+
+int BoundingBoxTree::Size() const
+{
+	if (!this->rootNode)
+		return 0;
+
+	return this->rootNode->Count();
+}
+
 //------------------------------ BoundingBoxTree::Object ------------------------------
 
 BoundingBoxTree::Object::Object()
@@ -189,4 +202,14 @@ bool BoundingBoxTree::Node::Insert(Object* object)
 
 	this->objectArray.push_back(object);
 	return true;
+}
+
+int BoundingBoxTree::Node::Count() const
+{
+	int count = this->objectArray.size();
+
+	for (Node* childNode : this->childArray)
+		count += childNode->Count();
+
+	return count;
 }

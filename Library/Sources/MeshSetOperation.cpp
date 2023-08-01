@@ -423,9 +423,11 @@ bool MeshSetOperation::Graph::ColorEdges(const std::vector<LineSegment>& lineSeg
 
 bool MeshSetOperation::Graph::ColorNodes(const Graph* otherGraph)
 {
+	BoundingBoxTree tree;
+
 	while (true)
 	{
-		MeshSetOperation::Node* node = this->FindInitialOutsideNode(otherGraph);
+		MeshSetOperation::Node* node = this->FindInitialOutsideNode(otherGraph, tree);
 		if (!node)
 			break;
 
@@ -476,7 +478,7 @@ bool MeshSetOperation::Graph::ColorNodes(const Graph* otherGraph)
 	return true;
 }
 
-MeshSetOperation::Node* MeshSetOperation::Graph::FindInitialOutsideNode(const Graph* otherGraph)
+MeshSetOperation::Node* MeshSetOperation::Graph::FindInitialOutsideNode(const Graph* otherGraph, BoundingBoxTree& tree)
 {
 	for (Node* node : *this->nodeArray)
 	{
@@ -498,8 +500,6 @@ MeshSetOperation::Node* MeshSetOperation::Graph::FindInitialOutsideNode(const Gr
 	// Okay, if we get here, that doesn't mean that there doesn't exist an
 	// outside polygon from which we can start the graph coloring algorithm.
 	// We just have to go about finding one a different way.
-
-	BoundingBoxTree thisTree, otherTree;
 
 	class Entry : public BoundingBoxTree::Object
 	{
@@ -532,16 +532,18 @@ MeshSetOperation::Node* MeshSetOperation::Graph::FindInitialOutsideNode(const Gr
 		AxisAlignedBoundingBox box;
 	};
 
-	// TODO: Refactor the code so that we're not building these trees with every call.
-	std::vector<BoundingBoxTree::Object*> objectArray;
-	for (Node* node : *this->nodeArray)
-		objectArray.push_back(new Entry((MeshSetOperation::Node*)node, this));
-	thisTree.Rebuild(objectArray);
-	objectArray.clear();
-	for (Node* node : *otherGraph->nodeArray)
-		objectArray.push_back(new Entry((MeshSetOperation::Node*)node, otherGraph));
-	otherTree.Rebuild(objectArray);
-	objectArray.clear();
+	if (tree.IsEmpty())
+	{
+		std::vector<BoundingBoxTree::Object*> objectArray;
+
+		for (Node* node : *this->nodeArray)
+			objectArray.push_back(new Entry((MeshSetOperation::Node*)node, this));
+
+		for (Node* node : *otherGraph->nodeArray)
+			objectArray.push_back(new Entry((MeshSetOperation::Node*)node, otherGraph));
+
+		tree.Rebuild(objectArray);
+	}
 
 	if (this->mesh->vertexArray->size() == 0)
 		return nullptr;
@@ -580,34 +582,9 @@ MeshSetOperation::Node* MeshSetOperation::Graph::FindInitialOutsideNode(const Gr
 			}
 
 			ray.direction = center - ray.origin;
-
-#if 0
-			// Does the ray hit the polygon center?
-			double alpha = 0.0;
-			if (ray.CastAgainst(*this->mesh, alpha) && ray.Lerp(alpha).IsEqualTo(center))
-			{
-				// And does the ray NOT hit something closer in the other mesh?
-				double beta = 0.0;
-				if (!ray.CastAgainst(*otherGraph->mesh, beta) || (beta > alpha && aabb.ContainsPoint(ray.Lerp(beta))))
-				{
-					return (MeshSetOperation::Node*)node;
-				}
-			}
-#else
-			// Does the ray hit the polygon center?
-			double alpha = 0.0;
-			Entry* thisEntry = (Entry*)thisTree.FindClosestHit(ray, &alpha);
-			if (thisEntry && thisEntry->node == (MeshSetOperation::Node*)node)
-			{
-				// And does the ray NOT hit something closer in the other mesh?
-				double beta = 0.0;
-				Entry* otherEntry = (Entry*)otherTree.FindClosestHit(ray, &beta);
-				if (!otherEntry || alpha < beta)
-				{
-					return (MeshSetOperation::Node*)node;
-				}
-			}
-#endif
+			Entry* entry = (Entry*)tree.FindClosestHit(ray);
+			if (entry && entry->node == (MeshSetOperation::Node*)node)
+				return entry->node;
 		}
 	}
 

@@ -16,6 +16,8 @@ namespace MeshNinja
 		class Object;
 
 		void Clear();
+		bool IsEmpty() const;
+		int Size() const;
 		bool Insert(Object* object);
 		void Rebuild(const std::vector<Object*>& objectArray);
 		void ForOverlappingObjects(const AxisAlignedBoundingBox& aabb, std::function<bool(Object*)> callback);
@@ -63,6 +65,7 @@ namespace MeshNinja
 			virtual ~Node();
 
 			bool Insert(Object* object);
+			int Count() const;
 
 			std::vector<Object*> objectArray;
 			std::vector<Node*> childArray;
