@@ -149,8 +149,7 @@ bool MazeGenerator::GenerateMazeMeshes(std::list<MeshNinja::ConvexPolygonMesh*>&
 		MeshNinja::ConvexPolygonMesh* mesh = new MeshNinja::ConvexPolygonMesh();
 		meshList.push_back(mesh);
 
-		// TODO: Select random polyhedron.
-		if (!mesh->GeneratePolyhedron(MeshNinja::ConvexPolygonMesh::Polyhedron::HEXADRON))
+		if (!mesh->GeneratePolyhedron(MeshNinja::ConvexPolygonMesh::Polyhedron::ICOSAHEDRON))
 			return false;
 
 		mesh->CenterAndScale(radius);
@@ -182,7 +181,7 @@ bool MazeGenerator::GenerateMazeMeshes(std::list<MeshNinja::ConvexPolygonMesh*>&
 				MeshNinja::Vector pointA = nodeA->location + vector * radius / 2.0;
 				MeshNinja::Vector pointB = nodeB->location - vector * radius / 2.0;
 
-				if (!this->GenerateTunnelMesh(mesh, pointA, pointB, 4, radius / 4.0))
+				if (!this->GenerateTunnelMesh(mesh, pointA, pointB, 8, radius / 4.0))
 					return false;
 			}
 		}
