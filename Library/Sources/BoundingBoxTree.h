@@ -5,6 +5,8 @@
 
 namespace MeshNinja
 {
+	class Ray;
+
 	class MESH_NINJA_API BoundingBoxTree
 	{
 	public:
@@ -17,6 +19,7 @@ namespace MeshNinja
 		bool Insert(Object* object);
 		void Rebuild(const std::vector<Object*>& objectArray);
 		void ForOverlappingObjects(const AxisAlignedBoundingBox& aabb, std::function<bool(Object*)> callback);
+		void ForHitObjects(const Ray& ray, std::function<bool(Object*, const Vector&)> callback);
 
 		class MESH_NINJA_API Object
 		{

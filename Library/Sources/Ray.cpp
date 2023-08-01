@@ -4,6 +4,7 @@
 #include "LineSegment.h"
 #include "AlgebraicSurface.h"
 #include "ConvexPolygonMesh.h"
+#include "AxisAlignedBoundingBox.h"
 
 using namespace MeshNinja;
 
@@ -147,6 +148,32 @@ bool Ray::CastAgainst(const ConvexPolygonMesh& mesh, double& alpha, double eps /
 	}
 
 	return alpha != DBL_MAX;
+}
+
+bool Ray::CastAgainst(const AxisAlignedBoundingBox& aabb, double& alpha, double eps /*= MESH_NINJA_EPS*/) const
+{
+	Plane plane;
+
+	for (int i = 0; i < 6; i++)
+	{
+		switch (i)
+		{
+			case 0: plane = Plane(aabb.min, Vector(-1.0, 0.0, 0.0)); break;
+			case 1: plane = Plane(aabb.min, Vector(0.0, -1.0, 0.0)); break;
+			case 2: plane = Plane(aabb.min, Vector(0.0, 0.0, -1.0)); break;
+			case 3: plane = Plane(aabb.max, Vector(+1.0, 0.0, 0.0)); break;
+			case 4: plane = Plane(aabb.max, Vector(0.0, +1.0, 0.0)); break;
+			case 5: plane = Plane(aabb.max, Vector(0.0, 0.0, +1.0)); break;
+		}
+
+		if (this->CastAgainst(plane, alpha, eps))
+		{
+			if (aabb.ContainsPoint(this->Lerp(alpha), eps))
+				return true;
+		}
+	}
+
+	return false;
 }
 
 Vector Ray::Lerp(double alpha) const

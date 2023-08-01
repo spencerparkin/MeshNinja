@@ -537,6 +537,8 @@ MeshSetOperation::Node* MeshSetOperation::Graph::FindInitialOutsideNode(const Gr
 
 			ray.direction = center - ray.origin;
 		
+			// TODO: Can we speed this up using the bounding-box tree?
+
 			// Does the ray hit the polygon center?
 			double alpha = 0.0;
 			if (ray.CastAgainst(*this->mesh, alpha) && ray.Lerp(alpha).IsEqualTo(center))

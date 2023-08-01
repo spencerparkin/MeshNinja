@@ -1,4 +1,5 @@
 #include "BoundingBoxTree.h"
+#include "Ray.h"
 
 using namespace MeshNinja;
 
@@ -65,8 +66,44 @@ void BoundingBoxTree::ForOverlappingObjects(const AxisAlignedBoundingBox& aabb, 
 		if (node->aabb.OverlapsWith(aabb))
 		{
 			for (Object* object : node->objectArray)
-				if (!callback(object))
-					return;
+			{
+				if (aabb.OverlapsWith(object->GetBoundingBox()))
+				{
+					if (!callback(object))
+						return;
+				}
+			}
+
+			for (Node* childNode : node->childArray)
+				nodeQueue.push_back(childNode);
+		}
+	}
+}
+
+void BoundingBoxTree::ForHitObjects(const Ray& ray, std::function<bool(Object*, const Vector&)> callback)
+{
+	if (!this->rootNode)
+		return;
+
+	std::list<Node*> nodeQueue;
+	nodeQueue.push_back(this->rootNode);
+	while (nodeQueue.size() > 0)
+	{
+		std::list<Node*>::iterator iter = nodeQueue.begin();
+		Node* node = *iter;
+		nodeQueue.erase(iter);
+
+		double alpha = 0.0;
+		if (ray.CastAgainst(node->aabb, alpha))
+		{
+			for (Object* object : node->objectArray)
+			{
+				if (ray.CastAgainst(object->GetBoundingBox(), alpha))
+				{
+					if (!callback(object, ray.Lerp(alpha)))
+						return;
+				}
+			}
 
 			for (Node* childNode : node->childArray)
 				nodeQueue.push_back(childNode);

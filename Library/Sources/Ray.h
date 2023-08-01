@@ -11,6 +11,7 @@ namespace MeshNinja
 	class LineSegment;
 	class AlgebraicSurface;
 	class ConvexPolygonMesh;
+	class AxisAlignedBoundingBox;
 
 	class MESH_NINJA_API Ray
 	{
@@ -25,6 +26,7 @@ namespace MeshNinja
 		bool CastAgainst(const LineSegment& lineSegment, double& alpha, double eps = MESH_NINJA_EPS) const;
 		bool CastAgainst(const AlgebraicSurface& algebraicSurface, double& alpha, double eps = MESH_NINJA_EPS, int maxIterations = 100, double initialStepSize = 1.0, bool forwardOrBackward = false) const;
 		bool CastAgainst(const ConvexPolygonMesh& mesh, double& alpha, double eps = MESH_NINJA_EPS) const;
+		bool CastAgainst(const AxisAlignedBoundingBox& aabb, double& alpha, double eps = MESH_NINJA_EPS) const;
 		Vector Lerp(double alpha) const;
 		double LerpInverse(const Vector& point) const;
 
