@@ -1,6 +1,7 @@
 #include "MazeGenerator.h"
 #include "MeshGraph.h"
 #include "MeshSetOperation.h"
+#include "JSON/JsonValue.h"
 
 //------------------------------- MazeGenerator -------------------------------
 
@@ -268,6 +269,54 @@ bool MazeGenerator::GenerateTunnelMesh(MeshNinja::ConvexPolygonMesh* mesh, const
 
 	mesh->FromConvexPolygonArray(polygonArray);
 	return true;
+}
+
+bool MazeGenerator::WriteJsonNavigationFile(const std::string& filePath) const
+{
+	bool success = false;
+	MeshNinja::JsonArray* jsonArray = nullptr;
+
+	do
+	{
+		std::ofstream fileStream(filePath, std::ios::out);
+		if (!fileStream.is_open())
+			break;
+
+		jsonArray = new MeshNinja::JsonArray();
+
+		for (int i = 0; i < (signed)this->nodeArray.size(); i++)
+			this->nodeArray[i]->i = i;
+
+		for (const Node* node : this->nodeArray)
+		{
+			MeshNinja::JsonObject* jsonNode = new MeshNinja::JsonObject();
+			jsonArray->PushValue(jsonNode);
+
+			MeshNinja::JsonObject* jsonLocation = new MeshNinja::JsonObject();
+			jsonNode->SetValue("location", jsonLocation);
+			jsonLocation->SetValue("x", new MeshNinja::JsonFloat(node->location.x));
+			jsonLocation->SetValue("y", new MeshNinja::JsonFloat(node->location.y));
+			jsonLocation->SetValue("z", new MeshNinja::JsonFloat(node->location.z));
+			
+			MeshNinja::JsonArray* jsonAdjacencies = new MeshNinja::JsonArray();
+			jsonNode->SetValue("adjacencies", jsonAdjacencies);
+			for (int i = 0; i < (signed)node->adjacencyArray.size(); i++)
+				jsonAdjacencies->PushValue(new MeshNinja::JsonInt(node->adjacencyArray[i]->i));
+		}
+
+		std::string jsonString;
+		if (!jsonArray->PrintJson(jsonString))
+			break;
+
+		fileStream << jsonString;
+		fileStream.close();
+
+		success = true;
+	} while (false);
+
+	delete jsonArray;
+
+	return success;
 }
 
 //------------------------------- MazeGenerator::Node -------------------------------

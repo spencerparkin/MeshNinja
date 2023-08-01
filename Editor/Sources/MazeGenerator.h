@@ -12,6 +12,7 @@ public:
 	void Clear();
 	bool GenerateGridMaze(int width, int height, int depth, double scale);
 	bool GenerateMazeMeshes(std::list<MeshNinja::ConvexPolygonMesh*>& meshList, double radius, bool unionize) const;
+	bool WriteJsonNavigationFile(const std::string& filePath) const;
 
 private:
 

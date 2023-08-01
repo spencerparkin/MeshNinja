@@ -215,6 +215,16 @@ void Frame::OnGenerateMaze(wxCommandEvent& event)
 		delete polygonMesh;
 	}
 
+	wxFileDialog fileDialog(this, "Choose where to write maze JSON file.", wxEmptyString, wxEmptyString, "JSON file (*.json)|*.json", wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+	if (wxID_OK == fileDialog.ShowModal())
+	{
+		std::string filePath = (const char*)fileDialog.GetPath().c_str();
+		if (!mazeGenerator.WriteJsonNavigationFile(filePath))
+		{
+			wxMessageBox("Failed to write file: " + filePath, "Error", wxICON_ERROR | wxOK, this);
+		}
+	}
+
 	wxCommandEvent sceneChangedEvent(EVT_SCENE_CHANGED);
 	wxPostEvent(this, sceneChangedEvent);
 }
