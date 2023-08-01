@@ -21,6 +21,7 @@ namespace MeshNinja
 		double Volume() const;
 		Vector Center() const;
 
+		bool ContainsBox(const AxisAlignedBoundingBox& aabb) const;
 		bool ContainsPoint(const Vector& point, double eps = MESH_NINJA_EPS) const;
 		bool ContainsInteriorPoint(const Vector& point, double eps = MESH_NINJA_EPS) const;
 		bool ContainsPointOnBoundary(const Vector& point, double eps = MESH_NINJA_EPS) const;

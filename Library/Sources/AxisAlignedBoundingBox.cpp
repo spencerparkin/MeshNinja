@@ -67,6 +67,11 @@ Vector AxisAlignedBoundingBox::Center() const
 	return (this->min + this->max) / 2.0;
 }
 
+bool AxisAlignedBoundingBox::ContainsBox(const AxisAlignedBoundingBox& aabb) const
+{
+	return this->ContainsPoint(aabb.min) && this->ContainsPoint(aabb.max);
+}
+
 bool AxisAlignedBoundingBox::ContainsPoint(const Vector& point, double eps /*= MESH_NINJA_EPS*/) const
 {
 	return (

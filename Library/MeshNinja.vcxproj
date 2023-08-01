@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClInclude Include="Sources\AlgebraicSurface.h" />
     <ClInclude Include="Sources\AxisAlignedBoundingBox.h" />
+    <ClInclude Include="Sources\BoundingBoxTree.h" />
     <ClInclude Include="Sources\Common.h" />
     <ClInclude Include="Sources\ConvexPolygon.h" />
     <ClInclude Include="Sources\ConvexPolygonMesh.h" />
@@ -48,6 +49,7 @@
   <ItemGroup>
     <ClCompile Include="Sources\AlgebraicSurface.cpp" />
     <ClCompile Include="Sources\AxisAlignedBoundingBox.cpp" />
+    <ClCompile Include="Sources\BoundingBoxTree.cpp" />
     <ClCompile Include="Sources\ConvexPolygon.cpp" />
     <ClCompile Include="Sources\ConvexPolygonMesh.cpp" />
     <ClCompile Include="Sources\DebugDraw.cpp" />
