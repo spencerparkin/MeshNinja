@@ -1,10 +1,8 @@
 [
 	{
-		"adjacencies":
+		"connections":
 		[
-			6,
-			2,
-			1
+			6
 		],
 		"location":
 		{
@@ -14,41 +12,34 @@
 		}
 	},
 	{
-		"adjacencies":
+		"connections":
 		[
-			7,
-			3,
-			0
-		],
-		"location":
-		{
-			"x": -15.000000,
-			"y": -10.000000,
-			"z": 5.000000
-		}
-	},
-	{
-		"adjacencies":
-		[
-			8,
-			0,
-			4,
 			3
 		],
 		"location":
 		{
 			"x": -15.000000,
+			"y": -10.000000,
+			"z": 5.000000
+		}
+	},
+	{
+		"connections":
+		[
+			4
+		],
+		"location":
+		{
+			"x": -15.000000,
 			"y": 0.000000,
 			"z": -5.000000
 		}
 	},
 	{
-		"adjacencies":
+		"connections":
 		[
-			9,
 			1,
-			5,
-			2
+			5
 		],
 		"location":
 		{
@@ -58,11 +49,11 @@
 		}
 	},
 	{
-		"adjacencies":
+		"connections":
 		[
 			10,
-			2,
-			5
+			5,
+			2
 		],
 		"location":
 		{
@@ -72,7 +63,7 @@
 		}
 	},
 	{
-		"adjacencies":
+		"connections":
 		[
 			11,
 			3,
@@ -86,12 +77,10 @@
 		}
 	},
 	{
-		"adjacencies":
+		"connections":
 		[
 			0,
-			12,
-			8,
-			7
+			12
 		],
 		"location":
 		{
@@ -101,12 +90,9 @@
 		}
 	},
 	{
-		"adjacencies":
+		"connections":
 		[
-			1,
-			13,
-			9,
-			6
+			13
 		],
 		"location":
 		{
@@ -116,11 +102,8 @@
 		}
 	},
 	{
-		"adjacencies":
+		"connections":
 		[
-			2,
-			14,
-			6,
 			10,
 			9
 		],
@@ -132,12 +115,9 @@
 		}
 	},
 	{
-		"adjacencies":
+		"connections":
 		[
-			3,
 			15,
-			7,
-			11,
 			8
 		],
 		"location":
@@ -148,12 +128,11 @@
 		}
 	},
 	{
-		"adjacencies":
+		"connections":
 		[
-			4,
 			16,
-			8,
-			11
+			4,
+			8
 		],
 		"location":
 		{
@@ -163,12 +142,9 @@
 		}
 	},
 	{
-		"adjacencies":
+		"connections":
 		[
-			5,
-			17,
-			9,
-			10
+			5
 		],
 		"location":
 		{
@@ -178,12 +154,11 @@
 		}
 	},
 	{
-		"adjacencies":
+		"connections":
 		[
 			6,
-			18,
 			14,
-			13
+			18
 		],
 		"location":
 		{
@@ -193,12 +168,10 @@
 		}
 	},
 	{
-		"adjacencies":
+		"connections":
 		[
-			7,
 			19,
-			15,
-			12
+			7
 		],
 		"location":
 		{
@@ -208,73 +181,62 @@
 		}
 	},
 	{
-		"adjacencies":
+		"connections":
 		[
-			8,
 			20,
 			12,
-			16,
-			15
-		],
-		"location":
-		{
-			"x": 5.000000,
-			"y": 0.000000,
-			"z": -5.000000
-		}
-	},
-	{
-		"adjacencies":
-		[
-			9,
-			21,
-			13,
-			17,
-			14
-		],
-		"location":
-		{
-			"x": 5.000000,
-			"y": 0.000000,
-			"z": 5.000000
-		}
-	},
-	{
-		"adjacencies":
-		[
-			10,
-			22,
-			14,
-			17
-		],
-		"location":
-		{
-			"x": 5.000000,
-			"y": 10.000000,
-			"z": -5.000000
-		}
-	},
-	{
-		"adjacencies":
-		[
-			11,
-			23,
-			15,
 			16
 		],
 		"location":
 		{
 			"x": 5.000000,
+			"y": 0.000000,
+			"z": -5.000000
+		}
+	},
+	{
+		"connections":
+		[
+			21,
+			9,
+			17
+		],
+		"location":
+		{
+			"x": 5.000000,
+			"y": 0.000000,
+			"z": 5.000000
+		}
+	},
+	{
+		"connections":
+		[
+			10,
+			14
+		],
+		"location":
+		{
+			"x": 5.000000,
+			"y": 10.000000,
+			"z": -5.000000
+		}
+	},
+	{
+		"connections":
+		[
+			15
+		],
+		"location":
+		{
+			"x": 5.000000,
 			"y": 10.000000,
 			"z": 5.000000
 		}
 	},
 	{
-		"adjacencies":
+		"connections":
 		[
-			12,
-			20,
-			19
+			12
 		],
 		"location":
 		{
@@ -284,41 +246,37 @@
 		}
 	},
 	{
-		"adjacencies":
+		"connections":
 		[
 			13,
-			21,
-			18
-		],
-		"location":
-		{
-			"x": 15.000000,
-			"y": -10.000000,
-			"z": 5.000000
-		}
-	},
-	{
-		"adjacencies":
-		[
-			14,
-			18,
-			22,
 			21
 		],
 		"location":
 		{
 			"x": 15.000000,
+			"y": -10.000000,
+			"z": 5.000000
+		}
+	},
+	{
+		"connections":
+		[
+			14,
+			22
+		],
+		"location":
+		{
+			"x": 15.000000,
 			"y": 0.000000,
 			"z": -5.000000
 		}
 	},
 	{
-		"adjacencies":
+		"connections":
 		[
-			15,
 			19,
-			23,
-			20
+			15,
+			23
 		],
 		"location":
 		{
@@ -328,11 +286,9 @@
 		}
 	},
 	{
-		"adjacencies":
+		"connections":
 		[
-			16,
-			20,
-			23
+			20
 		],
 		"location":
 		{
@@ -342,11 +298,9 @@
 		}
 	},
 	{
-		"adjacencies":
+		"connections":
 		[
-			17,
-			21,
-			22
+			21
 		],
 		"location":
 		{

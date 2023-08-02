@@ -287,8 +287,10 @@ bool MazeGenerator::WriteJsonNavigationFile(const std::string& filePath) const
 		for (int i = 0; i < (signed)this->nodeArray.size(); i++)
 			this->nodeArray[i]->i = i;
 
-		for (const Node* node : this->nodeArray)
+		for (int i = 0; i < (signed)this->nodeArray.size(); i++)
 		{
+			const Node* node = this->nodeArray[i];
+
 			MeshNinja::JsonObject* jsonNode = new MeshNinja::JsonObject();
 			jsonArray->PushValue(jsonNode);
 
@@ -298,10 +300,10 @@ bool MazeGenerator::WriteJsonNavigationFile(const std::string& filePath) const
 			jsonLocation->SetValue("y", new MeshNinja::JsonFloat(node->location.y));
 			jsonLocation->SetValue("z", new MeshNinja::JsonFloat(node->location.z));
 			
-			MeshNinja::JsonArray* jsonAdjacencies = new MeshNinja::JsonArray();
-			jsonNode->SetValue("adjacencies", jsonAdjacencies);
-			for (int i = 0; i < (signed)node->adjacencyArray.size(); i++)
-				jsonAdjacencies->PushValue(new MeshNinja::JsonInt(node->adjacencyArray[i]->i));
+			MeshNinja::JsonArray* jsonConnections = new MeshNinja::JsonArray();
+			jsonNode->SetValue("connections", jsonConnections);
+			for (int j = 0; j < (signed)node->connectionArray.size(); j++)
+				jsonConnections->PushValue(new MeshNinja::JsonInt(node->connectionArray[j]->i));
 		}
 
 		std::string jsonString;
