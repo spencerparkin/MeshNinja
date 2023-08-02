@@ -36,6 +36,7 @@ async function GetMazeData() {
     for(let i = 0; i < mazeData.length; i++) {
         let node = mazeData[i];
         node.location = new THREE.Vector3(node.location.x, node.location.y, node.location.z);
+        node["lastVisitTime"] = 0.0;
     }
     console.log(mazeData);
 }
@@ -61,17 +62,26 @@ class Pilot {
         this.speed = 4.0;
     }
     
-    tick(deltaTime) {
+    tick(deltaTime, elapsedTime) {
         if(this.state === "initialize") {
             this.node = mazeData[0];
+            this.node.lastVisitTime = elapsedTime;
             this.position.copy(this.node.location);
             this.state = "choose_next_node";
         } else if(this.state === "choose_next_node") {
-            // TODO: Choose a node at random that we have not yet visited.  Once we have visited all nodes, reset.
-            let i = Math.floor(Math.random() * this.node.connections.length);
-            if(i === this.node.connections.length)
-                i = this.node.connections.length - 1;
-            this.nextNode = mazeData[this.node.connections[i]];
+            let bestTime = 0.0;
+            let chosenNode = undefined;
+            for(let i = 0; i < this.node.connections.length; i++) {
+                let adjacentNode = mazeData[this.node.connections[i]];
+                if(adjacentNode.lastVisitTime <= bestTime) {
+                    bestTime = adjacentNode.lastVisitTime;
+                    chosenNode = adjacentNode;
+                }
+            }
+            if(chosenNode === undefined) {
+                chosenNode = mazeData[this.node.connections[0]];
+            }
+            this.nextNode = chosenNode;
             this.state = "acquire_heading";
         } else if(this.state === "acquire_heading") {
             let targetDirection = new THREE.Vector3();
@@ -96,8 +106,8 @@ class Pilot {
             let newDistanceToTarget = Math.sqrt(this.position.distanceToSquared(this.nextNode.location));
             
             if(newDistanceToTarget > oldDistanceToTarget) {
-                this.position.copy(this.nextNode.location);
                 this.node = this.nextNode;
+                this.node.lastVisitTime = elapsedTime;
                 this.state = "choose_next_node";
             }
         }
@@ -118,7 +128,8 @@ let pilot = new Pilot();
 
 function Tick() {
     let deltaTime = clock.getDelta();
-    pilot.tick(deltaTime);
+    let elapsedTime = clock.getElapsedTime();
+    pilot.tick(deltaTime, elapsedTime);
     pilot.updateScene();
 }
 
