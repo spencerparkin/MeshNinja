@@ -29,6 +29,7 @@ loader.load('Maze.gltf', function(data) {
 
 let mazeData = undefined;
 let eps = 0.0001;
+let masterVisitCount = 1;
 
 async function GetMazeData() {
     let response = await fetch("Maze.json");
@@ -36,7 +37,7 @@ async function GetMazeData() {
     for(let i = 0; i < mazeData.length; i++) {
         let node = mazeData[i];
         node.location = new THREE.Vector3(node.location.x, node.location.y, node.location.z);
-        node["lastVisitTime"] = 0.0;
+        node["visitCount"] = 0;
     }
     console.log(mazeData);
 }
@@ -65,16 +66,16 @@ class Pilot {
     tick(deltaTime, elapsedTime) {
         if(this.state === "initialize") {
             this.node = mazeData[0];
-            this.node.lastVisitTime = elapsedTime;
+            this.node.visitCount = masterVisitCount++;
             this.position.copy(this.node.location);
             this.state = "choose_next_node";
         } else if(this.state === "choose_next_node") {
-            let bestTime = 0.0;
+            let smallestCount = 9999999;
             let chosenNode = undefined;
             for(let i = 0; i < this.node.connections.length; i++) {
                 let adjacentNode = mazeData[this.node.connections[i]];
-                if(adjacentNode.lastVisitTime <= bestTime) {
-                    bestTime = adjacentNode.lastVisitTime;
+                if(adjacentNode.visitCount < smallestCount) {
+                    smallestCount = adjacentNode.visitCount;
                     chosenNode = adjacentNode;
                 }
             }
@@ -107,7 +108,7 @@ class Pilot {
             
             if(newDistanceToTarget > oldDistanceToTarget) {
                 this.node = this.nextNode;
-                this.node.lastVisitTime = elapsedTime;
+                this.node.visitCount = masterVisitCount++;
                 this.state = "choose_next_node";
             }
         }
