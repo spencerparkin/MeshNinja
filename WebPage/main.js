@@ -3,12 +3,12 @@ import WebGL from "/node_modules/.vite/deps/three_addons_capabilities_WebGL__js.
 import { GLTFLoader } from "/node_modules/.vite/deps/three_addons_loaders_GLTFLoader__js.js?v=11ed29e3";
 
 let scene = new THREE.Scene();
-let camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+let camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
 let renderer = new THREE.WebGLRenderer();
 let spotLight = new THREE.SpotLight(0xffffff);
+let ambientLight = new THREE.AmbientLight(0x303030);
+let directionalLight = new THREE.DirectionalLight(0xffffff, 1);
 let clock = new THREE.Clock(true);
-
-// TODO: Lighting is terrible.  Can we make it any better?
 
 renderer.setClearColor(0x000000);
 renderer.setSize(window.innerWidth, window.innerHeight);
@@ -17,7 +17,22 @@ spotLight.angle = Math.PI / 3.0;
 spotLight.penumbra = 0.5;
 scene.add(spotLight);
 
+directionalLight.position.set(0, 1, 0);
+directionalLight.castShadow = true;
+scene.add(directionalLight);
+
+scene.add(ambientLight);
+
 document.body.appendChild(renderer.domElement);
+
+addEventListener("resize", (event) => {
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+});
+
+// TODO: Textures and texture mapping?
+// TODO: Add ambient sound and positional sounds?
 
 let loader = new GLTFLoader();
 
@@ -39,7 +54,7 @@ async function GetMazeData() {
         node.location = new THREE.Vector3(node.location.x, node.location.y, node.location.z);
         node["visitCount"] = 0;
     }
-    console.log(mazeData);
+    //console.log(mazeData);
 }
 
 await GetMazeData();
@@ -65,6 +80,7 @@ class Pilot {
     
     tick(deltaTime, elapsedTime) {
         if(this.state === "initialize") {
+            // TODO: Start in a random location.
             this.node = mazeData[0];
             this.node.visitCount = masterVisitCount++;
             this.position.copy(this.node.location);
@@ -89,7 +105,7 @@ class Pilot {
             targetDirection.subVectors(this.nextNode.location, this.node.location);
             targetDirection.normalize();
             if(this.direction.angleTo(targetDirection) >= Math.PI - eps) {
-                this.direction.x += 0.1;
+                this.direction.x += 0.1;    // TODO: This is actually dumb.  Fix it.
             } else {
                 this.direction = Lerp(this.direction, targetDirection, 0.05);
             }
