@@ -97,7 +97,7 @@ void ConvexPolygon::Compress(double eps /*= MESH_NINJA_EPS*/)
 
 			if (vertexA.IsEqualTo(vertexB, eps))
 			{
-				this->vertexArray->erase(vertexArray->begin() + i);
+				this->vertexArray->erase(this->vertexArray->begin() + i);
 				makeAnotherPass = true;
 				break;
 			}
@@ -168,6 +168,24 @@ Vector ConvexPolygon::CalcCenter() const
 		center *= 1.0 / double(this->vertexArray->size());
 
 	return center;
+}
+
+double ConvexPolygon::CalcArea() const
+{
+	Vector center = this->CalcCenter();
+	double area = 0.0;
+
+	for (int i = 0; i < (signed)this->vertexArray->size(); i++)
+	{
+		int j = (i + 1) % this->vertexArray->size();
+
+		const Vector& vertexA = (*this->vertexArray)[i];
+		const Vector& vertexB = (*this->vertexArray)[j];
+
+		area += (vertexA - center).Cross(vertexB - center).Length() / 2.0;
+	}
+
+	return area;
 }
 
 bool ConvexPolygon::IntersectWithLineSegment(const Vector& pointA, const Vector& pointB, Vector& intersectionPoint, double eps /*= MESH_NINJA_EPS*/) const
@@ -373,7 +391,7 @@ bool ConvexPolygon::SplitAgainst(const Plane& cuttingPlane, ConvexPolygon& polyg
 		else if (vertexASide == Plane::Side::NEITHER)
 		{
 			polygonA.vertexArray->push_back(vertexA);
-			polygonB.vertexArray->push_back(vertexB);
+			polygonB.vertexArray->push_back(vertexA);
 		}
 	}
 
