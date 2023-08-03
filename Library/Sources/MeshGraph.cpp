@@ -94,8 +94,7 @@ bool MeshGraph::Generate(const ConvexPolygonMesh& givenMesh)
 	return new Edge();
 }
 
-// TODO: This isn't quite right.  I wonder if it's accurate in an orthographic project, but not a perspective one?
-void MeshGraph::CollectSilhouetteEdges(const Vector& viewPoint, std::set<VertexPair<false>>& edgeSet, const Transform& transform) const
+void MeshGraph::CollectSilhouetteEdges(const Vector& viewDirection, std::set<VertexPair<false>>& edgeSet, const Transform& transform) const
 {
 	edgeSet.clear();
 
@@ -109,26 +108,21 @@ void MeshGraph::CollectSilhouetteEdges(const Vector& viewPoint, std::set<VertexP
 		nodeA->facet->MakePolygon(polygonA, this->mesh);
 		nodeB->facet->MakePolygon(polygonB, this->mesh);
 
+		transform.TransformPolygon(polygonA);
+		transform.TransformPolygon(polygonB);
+
 		Plane planeA, planeB;
 
 		polygonA.CalcPlane(planeA);
 		polygonB.CalcPlane(planeB);
 
-		Vector normalA = transform.TransformVector(planeA.normal);
-		Vector normalB = transform.TransformVector(planeB.normal);
+		double dotA = viewDirection.Dot(planeA.normal);
+		double dotB = viewDirection.Dot(planeB.normal);
 
-		Vector vertexA = transform.TransformPosition((*this->mesh->vertexArray)[edge->pair.i]);
-		Vector vertexB = transform.TransformPosition((*this->mesh->vertexArray)[edge->pair.j]);
+		double signA = MESH_NINJA_SIGN(dotA);
+		double signB = MESH_NINJA_SIGN(dotB);
 
-		Vector viewVector = viewPoint - (vertexA + vertexB) / 2.0;
-
-		double angleA = normalA.AngleBetweenThisAnd(viewVector);
-		double angleB = normalB.AngleBetweenThisAnd(viewVector);
-
-		bool facingAwayA = (angleA >= MESH_NINJA_PI / 2.0);
-		bool facingAwayB = (angleB >= MESH_NINJA_PI / 2.0);
-
-		if (facingAwayA != facingAwayB)
+		if (signA != signB)
 			edgeSet.insert(edge->pair);
 	}
 }

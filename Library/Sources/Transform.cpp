@@ -1,4 +1,5 @@
 #include "Transform.h"
+#include "ConvexPolygon.h"
 
 using namespace MeshNinja;
 
@@ -30,6 +31,12 @@ Vector Transform::TransformPosition(const Vector& position) const
 	this->matrix.MultiplyRight(position, result);
 	result += this->translation;
 	return result;
+}
+
+void Transform::TransformPolygon(ConvexPolygon& polygon) const
+{
+	for (Vector& vertex : *polygon.vertexArray)
+		vertex = this->TransformPosition(vertex);
 }
 
 bool Transform::SetInverse(const Transform& transform)

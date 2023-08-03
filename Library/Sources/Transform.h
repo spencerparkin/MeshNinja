@@ -4,6 +4,8 @@
 
 namespace MeshNinja
 {
+	class ConvexPolygon;
+
 	class MESH_NINJA_API Transform
 	{
 	public:
@@ -14,6 +16,7 @@ namespace MeshNinja
 		
 		Vector TransformVector(const Vector& vector) const;
 		Vector TransformPosition(const Vector& position) const;
+		void TransformPolygon(ConvexPolygon& polygon) const;
 		
 		bool SetInverse(const Transform& transform);
 		bool GetInverse(Transform& transform) const;

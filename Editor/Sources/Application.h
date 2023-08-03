@@ -27,6 +27,7 @@ public:
 
 	enum ColoringMode
 	{
+		USE_MESH_COLOR,
 		USE_FACE_COLORS,
 		USE_VERTEX_COLORS
 	};

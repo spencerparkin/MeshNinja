@@ -24,6 +24,11 @@ Camera::Camera()
 {
 }
 
+MeshNinja::Vector Camera::GetViewDirection() const
+{
+	return this->target - this->position;
+}
+
 /*virtual*/ void Camera::PreRender(int renderMode, const wxPoint* pickingPoint)
 {
 	if (renderMode == GL_SELECT)

@@ -46,6 +46,7 @@ public:
 		ID_ToggleEdgeRender,
 		ID_ToggleFaceNormalRender,
 		ID_ToggleVertexNormalRender,
+		ID_UseMeshColor,
 		ID_UseFaceColors,
 		ID_UseVertexColors,
 		ID_ClearScene,

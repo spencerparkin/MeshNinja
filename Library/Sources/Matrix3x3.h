@@ -37,6 +37,8 @@ namespace MeshNinja
 		void SetTranspose(const Matrix3x3& matrix);
 		void GetTranspose(Matrix3x3& matrix) const;
 
+		bool SetInverseTranspose(const Matrix3x3& matrix);
+
 		void SetProduct(const Matrix3x3& matrixA, const Matrix3x3& matrixB);
 
 		void MultiplyLeft(const Vector& inVector, Vector& outVector) const;

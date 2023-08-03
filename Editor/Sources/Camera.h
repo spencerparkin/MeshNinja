@@ -24,6 +24,8 @@ public:
 	void MakeFrame(MeshNinja::Vector& xAxis, MeshNinja::Vector& yAxis, MeshNinja::Vector& zAxis) const;
 	void RotateLookDirection(const MeshNinja::Vector& axis, double angleDelta, bool pivotAboutTarget);
 
+	MeshNinja::Vector GetViewDirection() const;
+
 	MeshNinja::Vector position;
 	MeshNinja::Vector target;
 	double foviAngle;

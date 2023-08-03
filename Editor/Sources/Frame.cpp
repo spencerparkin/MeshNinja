@@ -43,7 +43,7 @@ Frame::Frame(wxWindow* parent, const wxPoint& pos, const wxSize& size) : wxFrame
 	wxBitmap unionBitmap, intersectionBitmap, subtractionBitmap;
 	wxBitmap addMeshBitmap, unlitBitmap, faceLitBitmap, vertexLitBitmap;
 	wxBitmap faceNormalsBitmap, vertexNormalsBitmap, edgesBitmap;
-	wxBitmap axesBitmap, mazeBitmap, debugBitmap, colorFacetsBitmap, colorVertsBitmap;
+	wxBitmap axesBitmap, mazeBitmap, debugBitmap, colorMeshBitmap, colorFacetsBitmap, colorVertsBitmap;
 
 	intersectionBitmap.LoadFile(wxGetCwd() + "/Textures/IntersectionIcon.png", wxBITMAP_TYPE_PNG);
 	unionBitmap.LoadFile(wxGetCwd() + "/Textures/UnionIcon.png", wxBITMAP_TYPE_PNG);
@@ -58,6 +58,7 @@ Frame::Frame(wxWindow* parent, const wxPoint& pos, const wxSize& size) : wxFrame
 	axesBitmap.LoadFile(wxGetCwd() + "/Textures/AxesIcon.png", wxBITMAP_TYPE_PNG);
 	mazeBitmap.LoadFile(wxGetCwd() + "/Textures/MazeIcon.png", wxBITMAP_TYPE_PNG);
 	debugBitmap.LoadFile(wxGetCwd() + "/Textures/DebugIcon.png", wxBITMAP_TYPE_PNG);
+	colorMeshBitmap.LoadFile(wxGetCwd() + "/Textures/ColorMeshIcon.png", wxBITMAP_TYPE_PNG);
 	colorFacetsBitmap.LoadFile(wxGetCwd() + "/Textures/ColorFacetsIcon.png", wxBITMAP_TYPE_PNG);
 	colorVertsBitmap.LoadFile(wxGetCwd() + "/Textures/ColorVertsIcon.png", wxBITMAP_TYPE_PNG);
 
@@ -72,6 +73,7 @@ Frame::Frame(wxWindow* parent, const wxPoint& pos, const wxSize& size) : wxFrame
 	toolBar->AddSeparator();
 	toolBar->AddTool(ID_RenderAxes, "Render XYZ Axes", axesBitmap, "Render the X, Y and Z-axis near the origin.", wxITEM_CHECK);
 	toolBar->AddSeparator();
+	toolBar->AddTool(ID_UseMeshColor, "Color Mesh", colorMeshBitmap, "Color the entire mesh a single color", wxITEM_CHECK);
 	toolBar->AddTool(ID_UseFaceColors, "Color Faces", colorFacetsBitmap, "Color each face its own color.", wxITEM_CHECK);
 	toolBar->AddTool(ID_UseVertexColors, "Color Vertices", colorVertsBitmap, "Color each vertex its own color.", wxITEM_CHECK);
 	toolBar->AddSeparator();
@@ -124,6 +126,7 @@ Frame::Frame(wxWindow* parent, const wxPoint& pos, const wxSize& size) : wxFrame
 	this->Bind(wxEVT_MENU, &Frame::OnToggle, this, ID_ToggleEdgeRender);
 	this->Bind(wxEVT_MENU, &Frame::OnToggle, this, ID_ToggleFaceNormalRender);
 	this->Bind(wxEVT_MENU, &Frame::OnToggle, this, ID_ToggleVertexNormalRender);
+	this->Bind(wxEVT_MENU, &Frame::OnToggle, this, ID_UseMeshColor);
 	this->Bind(wxEVT_MENU, &Frame::OnToggle, this, ID_UseFaceColors);
 	this->Bind(wxEVT_MENU, &Frame::OnToggle, this, ID_UseVertexColors);
 	this->Bind(wxEVT_MENU, &Frame::OnClearScene, this, ID_ClearScene);
@@ -136,6 +139,7 @@ Frame::Frame(wxWindow* parent, const wxPoint& pos, const wxSize& size) : wxFrame
 	this->Bind(wxEVT_UPDATE_UI, &Frame::OnUpdateUI, this, ID_ToggleEdgeRender);
 	this->Bind(wxEVT_UPDATE_UI, &Frame::OnUpdateUI, this, ID_ToggleFaceNormalRender);
 	this->Bind(wxEVT_UPDATE_UI, &Frame::OnUpdateUI, this, ID_ToggleVertexNormalRender);
+	this->Bind(wxEVT_UPDATE_UI, &Frame::OnUpdateUI, this, ID_UseMeshColor);
 	this->Bind(wxEVT_UPDATE_UI, &Frame::OnUpdateUI, this, ID_UseFaceColors);
 	this->Bind(wxEVT_UPDATE_UI, &Frame::OnUpdateUI, this, ID_UseVertexColors);
 	this->Bind(wxEVT_UPDATE_UI, &Frame::OnUpdateUI, this, ID_ClearScene);
@@ -277,6 +281,11 @@ void Frame::OnToggle(wxCommandEvent& event)
 			wxGetApp().renderVertexNormals = !wxGetApp().renderVertexNormals;
 			break;
 		}
+		case ID_UseMeshColor:
+		{
+			wxGetApp().coloringMode = Application::ColoringMode::USE_MESH_COLOR;
+			break;
+		}
 		case ID_UseFaceColors:
 		{
 			wxGetApp().coloringMode = Application::ColoringMode::USE_FACE_COLORS;
@@ -340,6 +349,11 @@ void Frame::OnUpdateUI(wxUpdateUIEvent& event)
 		case ID_ExportMesh:
 		{
 			event.Enable(wxGetApp().GetMeshScene()->FindFirstSelectedMesh() != nullptr);
+			break;
+		}
+		case ID_UseMeshColor:
+		{
+			event.Check(wxGetApp().coloringMode == Application::ColoringMode::USE_MESH_COLOR);
 			break;
 		}
 		case ID_UseFaceColors:

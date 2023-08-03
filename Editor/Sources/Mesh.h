@@ -45,6 +45,8 @@ public:
 
 private:
 
+	void IssueColor(const MeshNinja::Vector& givenColor) const;
+
 	mutable MeshNinja::RenderMesh renderMesh;
 	mutable MeshNinja::MeshGraph meshGraph;
 	mutable bool isSelected;

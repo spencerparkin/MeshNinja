@@ -66,9 +66,10 @@ void RenderMesh::MakeRainbowColors()
 	if (this->CalcBoundingBox(box))
 	{
 		for (Vertex& vertex : *this->vertexArray)
-		{
 			box.CalcUVWs(vertex.position, vertex.color);
-		}
+
+		for (Facet& facet : *this->facetArray)
+			box.CalcUVWs(facet.center, facet.color);
 	}
 }
 
@@ -88,16 +89,19 @@ bool RenderMesh::CalcBoundingBox(AxisAlignedBoundingBox& box) const
 
 void RenderMesh::ApplyTransform(const Transform& transform)
 {
+	Matrix3x3 matrixInvT;
+	matrixInvT.SetInverseTranspose(transform.matrix);
+
 	for (Facet& facet : *this->facetArray)
 	{
-		facet.normal = transform.TransformVector(facet.normal);
+		matrixInvT.MultiplyRight(facet.normal, facet.normal);
 		facet.center = transform.TransformPosition(facet.center);
 	}
 
 	for (Vertex& vertex : *this->vertexArray)
 	{
+		matrixInvT.MultiplyRight(vertex.normal, vertex.normal);
 		vertex.position = transform.TransformPosition(vertex.position);
-		vertex.normal = transform.TransformVector(vertex.normal);
 	}
 }
 

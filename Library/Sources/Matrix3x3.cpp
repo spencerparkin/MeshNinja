@@ -184,6 +184,16 @@ void Matrix3x3::GetTranspose(Matrix3x3& matrix) const
 			matrix.ele[i][j] = this->ele[j][i];
 }
 
+bool Matrix3x3::SetInverseTranspose(const Matrix3x3& matrix)
+{
+	Matrix3x3 matrixInv;
+	if (!matrix.GetInverse(matrixInv))
+		return false;
+
+	this->GetTranspose(matrixInv);
+	return true;
+}
+
 void Matrix3x3::SetProduct(const Matrix3x3& matrixA, const Matrix3x3& matrixB)
 {
 	Vector row[3], col[3];

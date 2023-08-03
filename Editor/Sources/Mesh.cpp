@@ -78,6 +78,29 @@ void Mesh::DirtyRenderFlag() const
 	return this->transform.TransformPosition(this->mesh.CalcCenter());
 }
 
+void Mesh::IssueColor(const MeshNinja::Vector& givenColor) const
+{
+	if (wxGetApp().lightingMode == Application::LightingMode::UNLIT)
+		glColor3d(givenColor.x, givenColor.y, givenColor.z);
+	else
+	{
+		GLfloat diffuseColor[] = { (GLfloat)givenColor.x, (GLfloat)givenColor.y, (GLfloat)givenColor.z, 1.0f };
+		GLfloat specularColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+		GLfloat ambientColor[] = { (GLfloat)givenColor.x, (GLfloat)givenColor.y, (GLfloat)givenColor.z, 1.0f };
+		GLfloat shininess[] = { 30.0f };
+
+		glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuseColor);
+		glMaterialfv(GL_FRONT, GL_SPECULAR, specularColor);
+		glMaterialfv(GL_FRONT, GL_AMBIENT, ambientColor);
+		glMaterialfv(GL_FRONT, GL_SHININESS, shininess);
+
+		glMaterialfv(GL_BACK, GL_DIFFUSE, diffuseColor);
+		glMaterialfv(GL_BACK, GL_SPECULAR, specularColor);
+		glMaterialfv(GL_BACK, GL_AMBIENT, ambientColor);
+		glMaterialfv(GL_BACK, GL_SHININESS, shininess);
+	}
+}
+
 /*virtual*/ void Mesh::Render(GLint renderMode, const Camera* camera) const
 {
 	if (!this->isVisible)
@@ -94,6 +117,7 @@ void Mesh::DirtyRenderFlag() const
 		options.normalType = MeshNinja::RenderMesh::Options::NormalType::FACET_BASED;
 
 		this->renderMesh.FromConvexPolygonMesh(tessellatedMesh, options);
+		this->renderMesh.MakeRainbowColors();
 
 		this->meshGraph.Generate(this->mesh);
 	}
@@ -109,25 +133,11 @@ void Mesh::DirtyRenderFlag() const
 
 	glBegin(GL_TRIANGLES);
 
-	if (wxGetApp().lightingMode == Application::LightingMode::UNLIT)
-		glColor3d(this->color.x, this->color.y, this->color.z);
-	else
-	{
-		GLfloat diffuseColor[] = { (GLfloat)this->color.x, (GLfloat)this->color.y, (GLfloat)this->color.z, 1.0f };
-		GLfloat specularColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-		GLfloat ambientColor[] = { (GLfloat)this->color.x, (GLfloat)this->color.y, (GLfloat)this->color.z, 1.0f };
-		GLfloat shininess[] = { 30.0f };
+	if (wxGetApp().coloringMode == Application::ColoringMode::USE_MESH_COLOR)
+		this->IssueColor(this->color);
 
-		glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuseColor);
-		glMaterialfv(GL_FRONT, GL_SPECULAR, specularColor);
-		glMaterialfv(GL_FRONT, GL_AMBIENT, ambientColor);
-		glMaterialfv(GL_FRONT, GL_SHININESS, shininess);
-
-		glMaterialfv(GL_BACK, GL_DIFFUSE, diffuseColor);
-		glMaterialfv(GL_BACK, GL_SPECULAR, specularColor);
-		glMaterialfv(GL_BACK, GL_AMBIENT, ambientColor);
-		glMaterialfv(GL_BACK, GL_SHININESS, shininess);
-	}
+	MeshNinja::Matrix3x3 matrixInvT;
+	matrixInvT.SetInverseTranspose(this->transform.matrix);
 
 	for(int i = 0; i < (signed)this->renderMesh.facetArray->size(); i++)
 	{
@@ -135,9 +145,13 @@ void Mesh::DirtyRenderFlag() const
 
 		if (facet.vertexArray->size() == 3)
 		{
+			if (wxGetApp().coloringMode == Application::ColoringMode::USE_FACE_COLORS)
+				this->IssueColor(facet.color);
+
 			if (wxGetApp().lightingMode == Application::LightingMode::FACE_LIT)
 			{
-				MeshNinja::Vector faceNormal = this->transform.TransformVector(facet.normal);
+				MeshNinja::Vector faceNormal;
+				matrixInvT.MultiplyRight(facet.normal, faceNormal);
 				faceNormal.Normalize();
 				glNormal3d(faceNormal.x, faceNormal.y, faceNormal.z);
 			}
@@ -147,9 +161,13 @@ void Mesh::DirtyRenderFlag() const
 				const MeshNinja::RenderMesh::Vertex& vertex = (*this->renderMesh.vertexArray)[j];
 				MeshNinja::Vector vertexPosition = this->transform.TransformPosition(vertex.position);
 
+				if (wxGetApp().coloringMode == Application::ColoringMode::USE_VERTEX_COLORS)
+					this->IssueColor(vertex.color);
+
 				if (wxGetApp().lightingMode == Application::LightingMode::VERTEX_LIT)
 				{
-					MeshNinja::Vector vertexNormal = this->transform.TransformVector(vertex.normal);
+					MeshNinja::Vector vertexNormal;
+					matrixInvT.MultiplyRight(vertex.normal, vertexNormal);
 					vertexNormal.Normalize();
 					glNormal3d(vertexNormal.x, vertexNormal.y, vertexNormal.z);
 				}
@@ -179,8 +197,11 @@ void Mesh::DirtyRenderFlag() const
 
 		for (const MeshNinja::RenderMesh::Facet& facet : *this->renderMesh.facetArray)
 		{
+			MeshNinja::Vector faceNormal;
+			matrixInvT.MultiplyRight(facet.normal, faceNormal);
+
 			const MeshNinja::Vector pointA = this->transform.TransformPosition(facet.center);
-			const MeshNinja::Vector pointB = pointA + this->transform.TransformVector(facet.normal);
+			const MeshNinja::Vector pointB = pointA + faceNormal;
 
 			glVertex3dv(&pointA.x);
 			glVertex3dv(&pointB.x);
@@ -198,8 +219,11 @@ void Mesh::DirtyRenderFlag() const
 		{
 			const MeshNinja::RenderMesh::Vertex& vertex = (*this->renderMesh.vertexArray)[i];
 
+			MeshNinja::Vector vertexNormal;
+			matrixInvT.MultiplyRight(vertex.normal, vertexNormal);
+
 			const MeshNinja::Vector pointA = this->transform.TransformPosition(vertex.position);
-			const MeshNinja::Vector pointB = pointA + this->transform.TransformVector(vertex.normal);
+			const MeshNinja::Vector pointB = pointA + vertexNormal;
 
 			glVertex3dv(&pointA.x);
 			glVertex3dv(&pointB.x);
@@ -250,8 +274,9 @@ void Mesh::DirtyRenderFlag() const
 
 	if (renderMode == GL_RENDER && this->isSelected)
 	{
+		// TODO: I think we actually need to send in a transform that takes us form object space all the way to projective space for this to really work.
 		std::set<MeshNinja::MeshGraph::VertexPair<false>> edgeSet;
-		this->meshGraph.CollectSilhouetteEdges(camera->position, edgeSet, this->transform);
+		this->meshGraph.CollectSilhouetteEdges(camera->GetViewDirection(), edgeSet, this->transform);
 
 		glLineWidth(4.0f);
 		glBegin(GL_LINES);
@@ -308,8 +333,6 @@ bool Mesh::Save(bool saveRenderMesh /*= false*/)
 		{
 			MeshNinja::RenderMesh transformedMesh(this->renderMesh);
 			transformedMesh.ApplyTransform(this->transform);
-			//transformedMesh.SetColor(this->color);
-			transformedMesh.MakeRainbowColors();
 			success = fileFormat->SaveRenderMesh((const char*)this->fileSource.c_str(), transformedMesh);
 		}
 		else
