@@ -480,11 +480,16 @@ bool MeshSetOperation::Graph::ColorNodes(const Graph* otherGraph)
 
 MeshSetOperation::Node* MeshSetOperation::Graph::FindInitialOutsideNode(const Graph* otherGraph, BoundingBoxTree& tree)
 {
+	std::vector<MeshSetOperation::Node*> uncoloredNodesArray;
 	for (Node* node : *this->nodeArray)
-	{
-		if (((MeshSetOperation::Node*)node)->side != MeshSetOperation::Node::Side::UNKNOWN)
-			continue;
+		if (((MeshSetOperation::Node*)node)->side == MeshSetOperation::Node::Side::UNKNOWN)
+			uncoloredNodesArray.push_back((MeshSetOperation::Node*)node);
 
+	if (uncoloredNodesArray.size() == 0)
+		return nullptr;
+
+	for (MeshSetOperation::Node* node : uncoloredNodesArray)
+	{
 		ConvexPolygon polygon;
 		node->facet->MakePolygon(polygon, this->mesh);
 
@@ -492,9 +497,7 @@ MeshSetOperation::Node* MeshSetOperation::Graph::FindInitialOutsideNode(const Gr
 		polygon.CalcPlane(plane);
 
 		if (plane.AllPointsNotOnSide(*this->mesh->vertexArray, Plane::Side::FRONT) && plane.AllPointsNotOnSide(*otherGraph->mesh->vertexArray, Plane::Side::FRONT))
-		{
-			return (MeshSetOperation::Node*)node;
-		}
+			return node;
 	}
 
 	// Okay, if we get here, that doesn't mean that there doesn't exist an
@@ -543,18 +546,12 @@ MeshSetOperation::Node* MeshSetOperation::Graph::FindInitialOutsideNode(const Gr
 		tree.Rebuild(objectArray);
 	}
 
-	if (this->mesh->vertexArray->size() == 0)
-		return nullptr;
-
 	AxisAlignedBoundingBox aabb;
 	tree.GetBoundingBox(aabb);
 	aabb.ScaleAboutCenter(1.5);
 
-	for (Node* node : *this->nodeArray)
+	for (MeshSetOperation::Node* node : uncoloredNodesArray)
 	{
-		if (((MeshSetOperation::Node*)node)->side != MeshSetOperation::Node::Side::UNKNOWN)
-			continue;
-
 		ConvexPolygon polygon;
 		node->facet->MakePolygon(polygon, this->mesh);
 
@@ -576,14 +573,16 @@ MeshSetOperation::Node* MeshSetOperation::Graph::FindInitialOutsideNode(const Gr
 
 			ray.direction = center - ray.origin;
 			Entry* entry = (Entry*)tree.FindClosestHit(ray);
-			if (entry && entry->node == (MeshSetOperation::Node*)node)
-				return entry->node;
+			if (entry && entry->node == node)
+				return node;
 		}
 	}
 
-	// At this point, we may still have just not found an outside polygon,
-	// or indeed, one may not actually exist.
-
+	// If we got here, then we may not have done enough to find the outside polygon.
+	// It's possible that a linear ray can't see it, but that it could be found with
+	// some kind of weaving-ray.  Or it could just be completely unreachable, and
+	// so detecting it would be even more non-trivial.
+	assert(0);
 	return nullptr;
 }
 
