@@ -1,6 +1,7 @@
 #include "RenderMesh.h"
 #include "Plane.h"
 #include "ConvexPolygonMesh.h"
+#include "AxisAlignedBoundingBox.h"
 
 using namespace MeshNinja;
 
@@ -57,6 +58,32 @@ void RenderMesh::SetColor(const Vector& color)
 
 	for (Vertex& vertex : *this->vertexArray)
 		vertex.color = color;
+}
+
+void RenderMesh::MakeRainbowColors()
+{
+	AxisAlignedBoundingBox box;
+	if (this->CalcBoundingBox(box))
+	{
+		for (Vertex& vertex : *this->vertexArray)
+		{
+			box.CalcUVWs(vertex.position, vertex.color);
+		}
+	}
+}
+
+bool RenderMesh::CalcBoundingBox(AxisAlignedBoundingBox& box) const
+{
+	if (this->vertexArray->size() == 0)
+		return false;
+
+	box.min = (*this->vertexArray)[0].position;
+	box.max = box.min;
+
+	for (const Vertex& vertex : *this->vertexArray)
+		box.ExpandToIncludePoint(vertex.position);
+
+	return true;
 }
 
 void RenderMesh::ApplyTransform(const Transform& transform)

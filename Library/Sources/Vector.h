@@ -42,6 +42,8 @@ namespace MeshNinja
 		double AngleBetweenThisAnd(const Vector& vector) const;
 		void Max(const Vector& vectorA, const Vector& vectorB);
 		void Min(const Vector& vectorA, const Vector& vectorB);
+		unsigned int ToColor() const;
+		void FromColor(unsigned int color);
 
 		double x, y, z;
 	};

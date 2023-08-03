@@ -26,6 +26,7 @@ private:
 	void OnGenerateGraphDebugDraw(wxCommandEvent& event);
 	void OnNormalizeEdges(wxCommandEvent& event);
 	void OnReverseFaces(wxCommandEvent& event);
+	void OnChangeMeshColor(wxCommandEvent& event);
 	void OnUpdateUI(wxUpdateUIEvent& event);
 
 	enum
@@ -35,7 +36,8 @@ private:
 		ID_ClearFileSource,
 		ID_GenerateGraphDebugDraw,
 		ID_NormalizeEdges,
-		ID_ReverseFaces
+		ID_ReverseFaces,
+		ID_ChangeMeshColor
 	};
 
 	Mesh* GetSelectedMesh();

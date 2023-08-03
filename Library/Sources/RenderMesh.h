@@ -7,6 +7,7 @@
 namespace MeshNinja
 {
 	class ConvexPolygonMesh;
+	class AxisAlignedBoundingBox;
 
 	// When doing most operations on meshes, we don't want to carry around any of
 	// the extra baggage normally associated with a renderable mesh.  Operations that
@@ -44,6 +45,8 @@ namespace MeshNinja
 		void ApplyTransform(const Transform& transform);
 		bool IsTriangleMesh() const;
 		void SetColor(const Vector& color);
+		void MakeRainbowColors();
+		bool CalcBoundingBox(AxisAlignedBoundingBox& box) const;
 
 		struct Facet
 		{

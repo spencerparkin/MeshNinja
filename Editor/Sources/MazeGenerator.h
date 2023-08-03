@@ -17,8 +17,8 @@ public:
 private:
 
 	bool GenerateMaze();
-	int RandomInt(int min, int max);
-	void RandomPerm(int size, std::vector<int>& perm);
+	int RandomInt(int min, int max) const;
+	void RandomPerm(int size, std::vector<int>& perm) const;
 	bool GenerateTunnelMesh(MeshNinja::ConvexPolygonMesh* mesh, const MeshNinja::Vector& pointA, const MeshNinja::Vector& pointB, int sides, double radius) const;
 
 	class Node

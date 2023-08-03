@@ -172,3 +172,15 @@ void AxisAlignedBoundingBox::SplitReasonably(AxisAlignedBoundingBox& aabbA, Axis
 		aabbB.min.z = center.z;
 	}
 }
+
+bool AxisAlignedBoundingBox::CalcUVWs(const Vector& point, Vector& texCoords) const
+{
+	if (!this->ContainsPoint(point))
+		return false;
+
+	texCoords.x = (point.x - this->min.x) / (this->max.x - this->min.x);
+	texCoords.y = (point.y - this->min.y) / (this->max.y - this->min.y);
+	texCoords.z = (point.z - this->min.z) / (this->max.z - this->min.z);
+
+	return true;
+}

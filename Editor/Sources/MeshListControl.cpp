@@ -6,6 +6,7 @@
 #include "MeshGraph.h"
 #include <wx/filename.h>
 #include <wx/msgdlg.h>
+#include <wx/colordlg.h>
 
 MeshListControl::MeshListControl(wxWindow* parent) : wxListCtrl(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_VIRTUAL | wxLC_REPORT)
 {
@@ -33,6 +34,7 @@ void MeshListControl::OnListItemRightClick(wxListEvent& event)
 	contextMenu.Append(new wxMenuItem(&contextMenu, ID_GenerateGraphDebugDraw, "Generate Graph Debug Draw", "Generate points and lines to visualize a graph made as a function of the mesn."));
 	contextMenu.Append(new wxMenuItem(&contextMenu, ID_NormalizeEdges, "Normalize Edges", "Get rid of redundant edges."));
 	contextMenu.Append(new wxMenuItem(&contextMenu, ID_ReverseFaces, "Reverse Faces", "Reverse the winding on all polygons of the mesh."));
+	contextMenu.Append(new wxMenuItem(&contextMenu, ID_ChangeMeshColor, "Change Color", "Change the uniform color of the mesh."));
 
 	contextMenu.Bind(wxEVT_MENU, &MeshListControl::OnToggleVisibility, this, ID_ToggleVisibility);
 	contextMenu.Bind(wxEVT_MENU, &MeshListControl::OnMakeDual, this, ID_MakeDual);
@@ -40,6 +42,7 @@ void MeshListControl::OnListItemRightClick(wxListEvent& event)
 	contextMenu.Bind(wxEVT_MENU, &MeshListControl::OnGenerateGraphDebugDraw, this, ID_GenerateGraphDebugDraw);
 	contextMenu.Bind(wxEVT_MENU, &MeshListControl::OnNormalizeEdges, this, ID_NormalizeEdges);
 	contextMenu.Bind(wxEVT_MENU, &MeshListControl::OnReverseFaces, this, ID_ReverseFaces);
+	contextMenu.Bind(wxEVT_MENU, &MeshListControl::OnChangeMeshColor, this, ID_ChangeMeshColor);
 	contextMenu.Bind(wxEVT_UPDATE_UI, &MeshListControl::OnUpdateUI, this, ID_ClearFileSource);
 
 	this->PopupMenu(&contextMenu);
@@ -55,6 +58,25 @@ void MeshListControl::OnUpdateUI(wxUpdateUIEvent& event)
 			Mesh* mesh = this->GetSelectedMesh();
 			event.Enable(mesh && mesh->fileSource.Len() > 0);
 			break;
+		}
+	}
+}
+
+void MeshListControl::OnChangeMeshColor(wxCommandEvent& event)
+{
+	Mesh* mesh = this->GetSelectedMesh();
+	if (mesh)
+	{
+		wxColourData colorData;
+		wxColour color;
+		color.SetRGB(mesh->color.ToColor());
+		colorData.SetColour(color);
+		wxColourDialog dialog(wxGetApp().GetFrame(), &colorData);
+		if (wxID_OK == dialog.ShowModal())
+		{
+			color = dialog.GetColourData().GetColour();
+			mesh->color.FromColor(color.GetRGB());
+			wxPostEvent(wxGetApp().GetFrame(), wxCommandEvent(EVT_SCENE_CHANGED));
 		}
 	}
 }

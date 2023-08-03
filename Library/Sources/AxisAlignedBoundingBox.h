@@ -36,6 +36,8 @@ namespace MeshNinja
 
 		void SplitReasonably(AxisAlignedBoundingBox& aabbA, AxisAlignedBoundingBox& aabbB) const;
 
+		bool CalcUVWs(const Vector& point, Vector& texCoords) const;
+
 		Vector min, max;
 	};
 }

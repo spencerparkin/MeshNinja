@@ -261,6 +261,27 @@ void Vector::Min(const Vector& vectorA, const Vector& vectorB)
 	this->z = MESH_NINJA_MIN(vectorA.z, vectorB.z);
 }
 
+unsigned int Vector::ToColor() const
+{
+	unsigned int r = unsigned int(MESH_NINJA_CLAMP(this->x, 0.0, 1.0) * 255.0);
+	unsigned int g = unsigned int(MESH_NINJA_CLAMP(this->y, 0.0, 1.0) * 255.0);
+	unsigned int b = unsigned int(MESH_NINJA_CLAMP(this->z, 0.0, 1.0) * 255.0);
+
+	unsigned int color = (r << 0) | (g << 8) | (b << 16);
+	return color;
+}
+
+void Vector::FromColor(unsigned int color)
+{
+	unsigned int r = (color >> 0) & 0xFF;
+	unsigned int g = (color >> 8) & 0xFF;
+	unsigned int b = (color >> 16) & 0xFF;
+
+	this->x = double(r) / 255.0;
+	this->y = double(g) / 255.0;
+	this->z = double(b) / 255.0;
+}
+
 namespace MeshNinja
 {
 	Vector operator+(const Vector& vectorA, const Vector& vectorB)

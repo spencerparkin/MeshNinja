@@ -112,7 +112,7 @@ bool MazeGenerator::GenerateMaze()
 	return true;
 }
 
-int MazeGenerator::RandomInt(int min, int max)
+int MazeGenerator::RandomInt(int min, int max) const
 {
 	double t = double(rand()) / double(RAND_MAX);
 	int r = min + int(t * double(max - min));
@@ -120,7 +120,7 @@ int MazeGenerator::RandomInt(int min, int max)
 	return r;
 }
 
-void MazeGenerator::RandomPerm(int size, std::vector<int>& perm)
+void MazeGenerator::RandomPerm(int size, std::vector<int>& perm) const
 {
 	perm.clear();
 	for (int i = 0; i < size; i++)
@@ -150,7 +150,18 @@ bool MazeGenerator::GenerateMazeMeshes(std::list<MeshNinja::ConvexPolygonMesh*>&
 		MeshNinja::ConvexPolygonMesh* mesh = new MeshNinja::ConvexPolygonMesh();
 		meshList.push_back(mesh);
 
-		if (!mesh->GeneratePolyhedron(MeshNinja::ConvexPolygonMesh::Polyhedron::ICOSAHEDRON))
+		MeshNinja::ConvexPolygonMesh::Polyhedron polyhedron;
+
+		switch (this->RandomInt(0, 4))
+		{
+			case 0: polyhedron = MeshNinja::ConvexPolygonMesh::Polyhedron::HEXADRON; break;
+			case 1: polyhedron = MeshNinja::ConvexPolygonMesh::Polyhedron::CUBOCTAHEDRON; break;
+			case 2: polyhedron = MeshNinja::ConvexPolygonMesh::Polyhedron::DODECAHEDRON; break;
+			case 3: polyhedron = MeshNinja::ConvexPolygonMesh::Polyhedron::ICOSAHEDRON; break;
+			case 4: polyhedron = MeshNinja::ConvexPolygonMesh::Polyhedron::OCTAHEDRON; break;
+		}
+
+		if (!mesh->GeneratePolyhedron(polyhedron))
 			return false;
 
 		mesh->CenterAndScale(radius);
@@ -182,7 +193,7 @@ bool MazeGenerator::GenerateMazeMeshes(std::list<MeshNinja::ConvexPolygonMesh*>&
 				MeshNinja::Vector pointA = nodeA->location + vector * radius / 2.0;
 				MeshNinja::Vector pointB = nodeB->location - vector * radius / 2.0;
 
-				if (!this->GenerateTunnelMesh(mesh, pointA, pointB, 8, radius / 4.0))
+				if (!this->GenerateTunnelMesh(mesh, pointA, pointB, this->RandomInt(4, 8), radius / 3.0))
 					return false;
 			}
 		}
