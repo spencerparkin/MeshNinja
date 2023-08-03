@@ -9,6 +9,7 @@ Application::Application()
 	this->frame = nullptr;
 	this->meshScene = new MeshCollectionScene();
 	this->lightingMode = LightingMode::FACE_LIT;
+	this->coloringMode = ColoringMode::USE_FACE_COLORS;
 	this->renderEdges = false;
 	this->renderFaceNormals = false;
 	this->renderVertexNormals = false;

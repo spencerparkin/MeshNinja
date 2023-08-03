@@ -25,7 +25,14 @@ public:
 		VERTEX_LIT
 	};
 
+	enum ColoringMode
+	{
+		USE_FACE_COLORS,
+		USE_VERTEX_COLORS
+	};
+
 	LightingMode lightingMode;
+	ColoringMode coloringMode;
 	bool renderEdges;
 	bool renderFaceNormals;
 	bool renderVertexNormals;
