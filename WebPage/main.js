@@ -1,6 +1,6 @@
-import * as THREE from "/node_modules/.vite/deps/three.js?v=24ff2ca1";
-import WebGL from "/node_modules/.vite/deps/three_addons_capabilities_WebGL__js.js?v=244a07e3";
-import { GLTFLoader } from "/node_modules/.vite/deps/three_addons_loaders_GLTFLoader__js.js?v=11ed29e3";
+import * as THREE from 'three';
+import WebGL from 'three/addons/capabilities/WebGL.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
 
 let scene = new THREE.Scene();
 let camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
