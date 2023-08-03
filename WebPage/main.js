@@ -57,7 +57,7 @@ async function GetMazeData() {
     //console.log(mazeData);
 }
 
-await GetMazeData();
+/*await*/ GetMazeData();
 
 function Lerp(vecA, vecB, alpha) {
     let delta = new THREE.Vector3();
@@ -80,6 +80,8 @@ class Pilot {
     
     tick(deltaTime, elapsedTime) {
         if(this.state === "initialize") {
+            if(mazeData === undefined)
+                return;
             // TODO: Start in a random location.
             this.node = mazeData[0];
             this.node.visitCount = masterVisitCount++;
