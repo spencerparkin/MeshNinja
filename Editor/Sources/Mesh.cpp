@@ -275,6 +275,7 @@ void Mesh::IssueColor(const MeshNinja::Vector& givenColor) const
 	if (renderMode == GL_RENDER && this->isSelected)
 	{
 		// TODO: I think we actually need to send in a transform that takes us form object space all the way to projective space for this to really work.
+		//       In that case, the view direction would always just be the -Z-axis, I think.
 		std::set<MeshNinja::MeshGraph::VertexPair<false>> edgeSet;
 		this->meshGraph.CollectSilhouetteEdges(camera->GetViewDirection(), edgeSet, this->transform);
 
