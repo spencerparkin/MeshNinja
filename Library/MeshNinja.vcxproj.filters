@@ -91,6 +91,9 @@
     <ClInclude Include="Sources\BoundingBoxTree.h">
       <Filter>Sources</Filter>
     </ClInclude>
+    <ClInclude Include="Sources\MeshFitter.h">
+      <Filter>Sources</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sources\MeshBinaryOperation.cpp">
@@ -166,6 +169,9 @@
       <Filter>Sources</Filter>
     </ClCompile>
     <ClCompile Include="Sources\BoundingBoxTree.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\MeshFitter.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
   </ItemGroup>

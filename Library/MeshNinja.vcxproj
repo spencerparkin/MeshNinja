@@ -31,6 +31,7 @@
     <ClInclude Include="Sources\JSON\JsonValue.h" />
     <ClInclude Include="Sources\LineSegment.h" />
     <ClInclude Include="Sources\Matrix3x3.h" />
+    <ClInclude Include="Sources\MeshFitter.h" />
     <ClInclude Include="Sources\MeshGraph.h" />
     <ClInclude Include="Sources\Polyline.h" />
     <ClInclude Include="Sources\Quaternion.h" />
@@ -58,6 +59,7 @@
     <ClCompile Include="Sources\JSON\JsonValue.cpp" />
     <ClCompile Include="Sources\LineSegment.cpp" />
     <ClCompile Include="Sources\Matrix3x3.cpp" />
+    <ClCompile Include="Sources\MeshFitter.cpp" />
     <ClCompile Include="Sources\MeshGraph.cpp" />
     <ClCompile Include="Sources\Polyline.cpp" />
     <ClCompile Include="Sources\Quaternion.cpp" />
