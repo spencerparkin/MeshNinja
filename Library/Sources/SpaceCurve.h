@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Math/Vector.h"
+#include "Math/Vector3.h"
 
 namespace MeshNinja
 {
@@ -13,13 +13,13 @@ namespace MeshNinja
 		SpaceCurve();
 		virtual ~SpaceCurve();
 
-		virtual Vector Evaluate(double t) const = 0;
-		virtual Vector EvaluateDerivative(double t) const;
-		virtual Vector EvaluateSecondDerivative(double t) const;
+		virtual Vector3 Evaluate(double t) const = 0;
+		virtual Vector3 EvaluateDerivative(double t) const;
+		virtual Vector3 EvaluateSecondDerivative(double t) const;
 		virtual double AdvanceByCurveLength(double t, double length, double eps = MESH_NINJA_EPS) const;
 
 		double CalculateLength() const;
-		void CalculateFrame(double t, Vector& tangent, Vector& normal, Vector& binormal) const;
+		void CalculateFrame(double t, Vector3& tangent, Vector3& normal, Vector3& binormal) const;
 		void GenerateTubeMesh(ConvexPolygonMesh& mesh, double stepLength, int sides, std::function<double(double)> radiusFunction) const;
 	};
 
@@ -31,8 +31,8 @@ namespace MeshNinja
 
 		struct ControlPoint
 		{
-			Vector point;
-			Vector tangent;
+			Vector3 point;
+			Vector3 tangent;
 		};
 
 		const ControlPoint& operator[](int i) const
@@ -49,13 +49,13 @@ namespace MeshNinja
 		CompositeBezierCurve();
 		virtual ~CompositeBezierCurve();
 
-		virtual Vector Evaluate(double t) const override;
-		virtual Vector EvaluateDerivative(double t) const override;
-		virtual Vector EvaluateSecondDerivative(double t) const override;
+		virtual Vector3 Evaluate(double t) const override;
+		virtual Vector3 EvaluateDerivative(double t) const override;
+		virtual Vector3 EvaluateSecondDerivative(double t) const override;
 
 		struct BezierData
 		{
-			Vector pointA, pointB, pointC, pointD;
+			Vector3 pointA, pointB, pointC, pointD;
 			double t;
 		};
 

@@ -136,7 +136,7 @@ void Canvas::OnRightMouseDown(wxMouseEvent& event)
 		if (object)
 			this->camera->target = object->GetPosition();
 		else
-			this->camera->target = MeshNinja::Vector(0.0, 0.0, 0.0);
+			this->camera->target = MeshNinja::Vector3(0.0, 0.0, 0.0);
 	}
 }
 
@@ -165,7 +165,7 @@ void Canvas::OnMouseMove(wxMouseEvent& event)
 		{
 			double sensativityFactor = 0.1;
 			
-			MeshNinja::Vector xAxis, yAxis, zAxis;
+			MeshNinja::Vector3 xAxis, yAxis, zAxis;
 			this->camera->MakeFrame(xAxis, yAxis, zAxis);
 
 			MeshNinja::Transform transform;
@@ -205,24 +205,24 @@ void Canvas::OnMouseWheel(wxMouseEvent& event)
 			{
 				case ScaleMode::UNIFORM:
 				{
-					transform.matrix.SetCol(0, MeshNinja::Vector(scale, 0.0, 0.0));
-					transform.matrix.SetCol(1, MeshNinja::Vector(0.0, scale, 0.0));
-					transform.matrix.SetCol(2, MeshNinja::Vector(0.0, 0.0, scale));
+					transform.matrix.SetCol(0, MeshNinja::Vector3(scale, 0.0, 0.0));
+					transform.matrix.SetCol(1, MeshNinja::Vector3(0.0, scale, 0.0));
+					transform.matrix.SetCol(2, MeshNinja::Vector3(0.0, 0.0, scale));
 					break;
 				}
 				case ScaleMode::X_AXIS:
 				{
-					transform.matrix.SetCol(0, MeshNinja::Vector(scale, 0.0, 0.0));
+					transform.matrix.SetCol(0, MeshNinja::Vector3(scale, 0.0, 0.0));
 					break;
 				}
 				case ScaleMode::Y_AXIS:
 				{
-					transform.matrix.SetCol(1, MeshNinja::Vector(0.0, scale, 0.0));
+					transform.matrix.SetCol(1, MeshNinja::Vector3(0.0, scale, 0.0));
 					break;
 				}
 				case ScaleMode::Z_AXIS:
 				{
-					transform.matrix.SetCol(2, MeshNinja::Vector(0.0, 0.0, scale));
+					transform.matrix.SetCol(2, MeshNinja::Vector3(0.0, 0.0, scale));
 					break;
 				}
 			}
@@ -231,7 +231,7 @@ void Canvas::OnMouseWheel(wxMouseEvent& event)
 		{
 			double angle = double(-mouseWheelTicks) * (MESH_NINJA_PI / 180.0);
 
-			MeshNinja::Vector xAxis, yAxis, zAxis;
+			MeshNinja::Vector3 xAxis, yAxis, zAxis;
 			this->camera->MakeFrame(xAxis, yAxis, zAxis);
 
 			transform.matrix.SetFromAxisAngle(xAxis, angle);

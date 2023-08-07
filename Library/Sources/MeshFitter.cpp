@@ -29,12 +29,12 @@ bool MeshFitter::GenerateMesh(ConvexPolygonMesh& mesh, const AxisAlignedBounding
 	if (!object.RayCast(ray, alpha))
 		return false;
 
-	Vector surfacePointA = ray.Lerp(alpha);
+	Vector3 surfacePointA = ray.Lerp(alpha);
 	if (!aabb.ContainsPoint(surfacePointA))
 		return false;
 
-	Vector normalDirection = object.CalculateSurfaceNormalAt(surfacePointA).Normalized();
-	Vector tangentDirection;
+	Vector3 normalDirection = object.CalculateSurfaceNormalAt(surfacePointA).Normalized();
+	Vector3 tangentDirection;
 	if (!tangentDirection.MakeOrthogonalTo(normalDirection))
 		return false;
 
@@ -43,7 +43,7 @@ bool MeshFitter::GenerateMesh(ConvexPolygonMesh& mesh, const AxisAlignedBounding
 	if (!object.RayCast(ray, alpha))
 		return false;
 
-	Vector surfacePointB = ray.Lerp(alpha);
+	Vector3 surfacePointB = ray.Lerp(alpha);
 
 	mesh.vertexArray->push_back(surfacePointA);
 	mesh.vertexArray->push_back(surfacePointB);
@@ -69,9 +69,9 @@ bool MeshFitter::GenerateMesh(ConvexPolygonMesh& mesh, const AxisAlignedBounding
 		std::vector<Edge> newEdgeArray;
 		ConvexPolygonMesh::Facet newFacet;
 
-		Vector normalVector = object.CalculateSurfaceNormalAt((*mesh.vertexArray)[edge.i]);
-		Vector edgeVector = (*mesh.vertexArray)[edge.j] - (*mesh.vertexArray)[edge.i];
-		Vector tangentVector = normalVector.Cross(edgeVector);
+		Vector3 normalVector = object.CalculateSurfaceNormalAt((*mesh.vertexArray)[edge.i]);
+		Vector3 edgeVector = (*mesh.vertexArray)[edge.j] - (*mesh.vertexArray)[edge.i];
+		Vector3 tangentVector = normalVector.Cross(edgeVector);
 		Plane edgePlane((*mesh.vertexArray)[edge.i], tangentVector);
 
 		// Merge two edges together first if we can.
@@ -80,8 +80,8 @@ bool MeshFitter::GenerateMesh(ConvexPolygonMesh& mesh, const AxisAlignedBounding
 			const Edge& adjacentEdge = *iter;
 			if (adjacentEdge.j == edge.i && adjacentEdge.i != edge.j && edgePlane.WhichSide((*mesh.vertexArray)[adjacentEdge.i]) == Plane::Side::FRONT)
 			{
-				Vector vectorA = (*mesh.vertexArray)[adjacentEdge.i] - (*mesh.vertexArray)[adjacentEdge.j];
-				Vector vectorB = (*mesh.vertexArray)[edge.j] - (*mesh.vertexArray)[edge.i];
+				Vector3 vectorA = (*mesh.vertexArray)[adjacentEdge.i] - (*mesh.vertexArray)[adjacentEdge.j];
+				Vector3 vectorB = (*mesh.vertexArray)[edge.j] - (*mesh.vertexArray)[edge.i];
 				double angle = vectorA.AngleBetweenThisAnd(vectorB);
 				if (angle < MESH_NINJA_PI / 2.0)
 				{
@@ -95,8 +95,8 @@ bool MeshFitter::GenerateMesh(ConvexPolygonMesh& mesh, const AxisAlignedBounding
 			}
 			else if (edge.j == adjacentEdge.i && edge.i != adjacentEdge.j && edgePlane.WhichSide((*mesh.vertexArray)[adjacentEdge.j]) == Plane::Side::FRONT)
 			{
-				Vector vectorA = (*mesh.vertexArray)[adjacentEdge.j] - (*mesh.vertexArray)[adjacentEdge.i];
-				Vector vectorB = (*mesh.vertexArray)[edge.i] - (*mesh.vertexArray)[edge.j];
+				Vector3 vectorA = (*mesh.vertexArray)[adjacentEdge.j] - (*mesh.vertexArray)[adjacentEdge.i];
+				Vector3 vectorB = (*mesh.vertexArray)[edge.i] - (*mesh.vertexArray)[edge.j];
 				double angle = vectorA.AngleBetweenThisAnd(vectorB);
 				if (angle < MESH_NINJA_PI / 2.0)
 				{
@@ -114,12 +114,12 @@ bool MeshFitter::GenerateMesh(ConvexPolygonMesh& mesh, const AxisAlignedBounding
 		if (newFacet.vertexArray->size() == 0)
 		{
 			double length = approximateEdgeLength * ::sqrt(3.0) / 2.0;
-			Vector point = (*mesh.vertexArray)[edge.i] + (edgeVector / 2.0) + (tangentVector.Normalized() * length);
+			Vector3 point = (*mesh.vertexArray)[edge.i] + (edgeVector / 2.0) + (tangentVector.Normalized() * length);
 			ray = Ray(point, normalVector);
 			if (!object.RayCast(ray, alpha))
 				return false;
 
-			Vector surfacePointC = ray.Lerp(alpha);
+			Vector3 surfacePointC = ray.Lerp(alpha);
 			double smallestDistance = 0.0;
 			int i = mesh.FindClosestPointTo(surfacePointC, &smallestDistance);
 			if (i < 0 || smallestDistance > approximateEdgeLength / 2.0)
@@ -186,7 +186,7 @@ MeshFitter::FittableAlgebraicSurface::FittableAlgebraicSurface(const AlgebraicSu
 	return ray.CastAgainst(*this->surface, alpha, eps);
 }
 
-/*virtual*/ Vector MeshFitter::FittableAlgebraicSurface::CalculateSurfaceNormalAt(const Vector& surfacePoint) const
+/*virtual*/ Vector3 MeshFitter::FittableAlgebraicSurface::CalculateSurfaceNormalAt(const Vector3& surfacePoint) const
 {
 	return this->surface->EvaluateGradient(surfacePoint);
 }
@@ -194,7 +194,7 @@ MeshFitter::FittableAlgebraicSurface::FittableAlgebraicSurface(const AlgebraicSu
 /*virtual*/ Ray MeshFitter::FittableAlgebraicSurface::CalcInitialContactRay() const
 {
 	// TODO: This is just a guess.  Do better.
-	return Ray(Vector(0.0, 0.0, 100.0), Vector(0.0, 0.0, -1.0));
+	return Ray(Vector3(0.0, 0.0, 100.0), Vector3(0.0, 0.0, -1.0));
 }
 
 //----------------------------- MeshFitter::FittableMesh -----------------------------
@@ -214,14 +214,14 @@ MeshFitter::FittableMesh::FittableMesh(const ConvexPolygonMesh* mesh)
 	return ray.CastAgainst(*this->mesh, alpha, eps);
 }
 
-/*virtual*/ Vector MeshFitter::FittableMesh::CalculateSurfaceNormalAt(const Vector& surfacePoint) const
+/*virtual*/ Vector3 MeshFitter::FittableMesh::CalculateSurfaceNormalAt(const Vector3& surfacePoint) const
 {
 	// TODO: Write this.  Using bounding-box-tree to be more efficient.
-	return Vector(0.0, 0.0, 0.0);
+	return Vector3(0.0, 0.0, 0.0);
 }
 
 /*virtual*/ Ray MeshFitter::FittableMesh::CalcInitialContactRay() const
 {
 	// TODO: Write this.  Just shoot a ray at the biggest triangle or something like that?
-	return Ray(Vector(0.0, 0.0, 0.0), Vector(0.0, 0.0, 1.0));
+	return Ray(Vector3(0.0, 0.0, 0.0), Vector3(0.0, 0.0, 1.0));
 }

@@ -99,8 +99,8 @@ bool MeshSetOperation::CalculatePolygonLists(const ConvexPolygonMesh& meshA, con
 	{
 		for (int i = 0; i < (signed)polyline.vertexArray->size() - 1; i++)
 		{
-			const Vector& vertexA = (*polyline.vertexArray)[i];
-			const Vector& vertexB = (*polyline.vertexArray)[i + 1];
+			const Vector3& vertexA = (*polyline.vertexArray)[i];
+			const Vector3& vertexB = (*polyline.vertexArray)[i + 1];
 
 			lineSegmentArray.push_back(LineSegment(vertexA, vertexB));
 		}
@@ -123,7 +123,7 @@ bool MeshSetOperation::CalculatePolygonLists(const ConvexPolygonMesh& meshA, con
 	{
 		for (int i = 0; i < (signed)polyline.vertexArray->size(); i++)
 		{
-			const Vector& vertex = (*polyline.vertexArray)[i];
+			const Vector3& vertex = (*polyline.vertexArray)[i];
 			cutMeshA.AddRedundantVertex(vertex);
 			cutMeshB.AddRedundantVertex(vertex);
 		}
@@ -234,9 +234,9 @@ bool MeshSetOperation::ChopupPolygon(const ConvexPolygon& polygon, ConvexPolygon
 				if (rayA.CastAgainst(polygon, alpha) && 0.0 <= alpha && alpha <= 1.0 &&
 					rayB.CastAgainst(polygon, beta) && 0.0 <= beta && beta <= 1.0)
 				{
-					Vector hitPointA = rayA.Lerp(alpha);
-					Vector hitPointB = rayB.Lerp(beta);
-					Vector point = (hitPointA + hitPointB) / 2.0;
+					Vector3 hitPointA = rayA.Lerp(alpha);
+					Vector3 hitPointB = rayB.Lerp(beta);
+					Vector3 point = (hitPointA + hitPointB) / 2.0;
 					
 					if (polygon.ContainsPoint(point, &isInteriorPoint) && isInteriorPoint)
 						performSplit = true;
@@ -245,7 +245,7 @@ bool MeshSetOperation::ChopupPolygon(const ConvexPolygon& polygon, ConvexPolygon
 
 			if (performSplit)
 			{
-				Vector normal = (lineSegment.vertexB - lineSegment.vertexA).Cross(plane.normal);
+				Vector3 normal = (lineSegment.vertexB - lineSegment.vertexA).Cross(plane.normal);
 				Plane cuttingPlane(lineSegment.vertexA, normal);
 				if (polygon.SplitAgainst(cuttingPlane, polygonA, polygonB))
 				{
@@ -331,21 +331,21 @@ MeshSetOperation::Node::Node()
 {
 }
 
-/*virtual*/ Vector MeshSetOperation::Node::GetDebugColor() const
+/*virtual*/ Vector3 MeshSetOperation::Node::GetDebugColor() const
 {
 	switch (this->side)
 	{
 		case Side::INSIDE:
 		{
-			return Vector(1.0, 0.0, 0.0);
+			return Vector3(1.0, 0.0, 0.0);
 		}
 		case Side::OUTSIDE:
 		{
-			return Vector(0.0, 0.0, 1.0);
+			return Vector3(0.0, 0.0, 1.0);
 		}
 	}
 
-	return Vector(0.5, 0.5, 0.5);
+	return Vector3(0.5, 0.5, 0.5);
 }
 
 //----------------------------------- MeshSetOperation::Edge -----------------------------------
@@ -359,21 +359,21 @@ MeshSetOperation::Edge::Edge()
 {
 }
 
-/*virtual*/ Vector MeshSetOperation::Edge::GetDebugColor() const
+/*virtual*/ Vector3 MeshSetOperation::Edge::GetDebugColor() const
 {
 	switch (this->type)
 	{
 		case Type::NORMAL:
 		{
-			return Vector(0.0, 1.0, 0.0);
+			return Vector3(0.0, 1.0, 0.0);
 		}
 		case Type::CUT_BOUNDARY:
 		{
-			return Vector(1.0, 0.0, 0.0);
+			return Vector3(1.0, 0.0, 0.0);
 		}
 	}
 
-	return Vector(0.5, 0.5, 0.5);
+	return Vector3(0.5, 0.5, 0.5);
 }
 
 //----------------------------------- MeshSetOperation::Graph -----------------------------------
@@ -555,7 +555,7 @@ MeshSetOperation::Node* MeshSetOperation::Graph::FindInitialOutsideNode(const Gr
 		ConvexPolygon polygon;
 		node->facet->MakePolygon(polygon, this->mesh);
 
-		Vector center = polygon.CalcCenter();
+		Vector3 center = polygon.CalcCenter();
 
 		for (int i = 0; i < 6; i++)
 		{
@@ -563,12 +563,12 @@ MeshSetOperation::Node* MeshSetOperation::Graph::FindInitialOutsideNode(const Gr
 
 			switch (i)
 			{
-				case 0: ray.origin = Vector(center.x, center.y, aabb.max.z); break;
-				case 1: ray.origin = Vector(center.x, center.y, aabb.min.z); break;
-				case 2: ray.origin = Vector(center.x, aabb.max.y, center.z); break;
-				case 3: ray.origin = Vector(center.x, aabb.min.y, center.z); break;
-				case 4: ray.origin = Vector(aabb.max.x, center.y, center.z); break;
-				case 5: ray.origin = Vector(aabb.min.x, center.y, center.z); break;
+				case 0: ray.origin = Vector3(center.x, center.y, aabb.max.z); break;
+				case 1: ray.origin = Vector3(center.x, center.y, aabb.min.z); break;
+				case 2: ray.origin = Vector3(center.x, aabb.max.y, center.z); break;
+				case 3: ray.origin = Vector3(center.x, aabb.min.y, center.z); break;
+				case 4: ray.origin = Vector3(aabb.max.x, center.y, center.z); break;
+				case 5: ray.origin = Vector3(aabb.min.x, center.y, center.z); break;
 			}
 
 			ray.direction = center - ray.origin;

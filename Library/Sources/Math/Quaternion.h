@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../Common.h"
-#include "Vector.h"
+#include "Vector3.h"
 
 namespace MeshNinja
 {
@@ -10,7 +10,7 @@ namespace MeshNinja
 	public:
 		Quaternion();
 		Quaternion(const Quaternion& quat);
-		Quaternion(const Vector& vector);
+		Quaternion(const Vector3& vector);
 		virtual ~Quaternion();
 
 		double SquareMag() const;
@@ -21,11 +21,11 @@ namespace MeshNinja
 		bool Invert();
 		void Conjugate();
 
-		bool SetFromAxisAngle(const Vector& axis, double angle);
-		bool GetToAxisAngle(Vector& axis, double& angle) const;
+		bool SetFromAxisAngle(const Vector3& axis, double angle);
+		bool GetToAxisAngle(Vector3& axis, double& angle) const;
 
-		Vector RotateVector(const Vector& vector) const;
-		Vector RotateVectorFast(const Vector& vector) const;
+		Vector3 RotateVector(const Vector3& vector) const;
+		Vector3 RotateVectorFast(const Vector3& vector) const;
 
 		void SetSum(const Quaternion& leftQuat, const Quaternion& rightQuat);
 		void SetProduct(const Quaternion& leftQuat, const Quaternion& rightQuat);

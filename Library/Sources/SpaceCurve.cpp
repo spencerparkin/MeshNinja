@@ -15,12 +15,12 @@ SpaceCurve::SpaceCurve()
 
 /*virtual*/ double SpaceCurve::AdvanceByCurveLength(double t, double length, double eps /*= MESH_NINJA_EPS*/) const
 {
-	Vector startingPoint = this->Evaluate(t);
+	Vector3 startingPoint = this->Evaluate(t);
 	double dt = length / 2.0;
 	while (true)
 	{
 		t += dt;
-		Vector endingPoint = this->Evaluate(t);
+		Vector3 endingPoint = this->Evaluate(t);
 		double currentLength = (endingPoint - startingPoint).Length();
 		if (::fabs(currentLength - length) < eps)
 			break;
@@ -40,13 +40,13 @@ SpaceCurve::SpaceCurve()
 	return t;
 }
 
-/*virtual*/ Vector SpaceCurve::EvaluateDerivative(double t) const
+/*virtual*/ Vector3 SpaceCurve::EvaluateDerivative(double t) const
 {
 	double dt = MESH_NINJA_EPS;
 	return (this->Evaluate(t + dt) - this->Evaluate(t - dt)) / (2.0 * dt);
 }
 
-/*virtual*/ Vector SpaceCurve::EvaluateSecondDerivative(double t) const
+/*virtual*/ Vector3 SpaceCurve::EvaluateSecondDerivative(double t) const
 {
 	double dt = MESH_NINJA_EPS;
 	return (this->EvaluateDerivative(t + dt) - this->EvaluateDerivative(t - dt)) / (2.0 * dt);
@@ -57,10 +57,10 @@ double SpaceCurve::CalculateLength() const
 	// A more accurate algorithm here would have an adaptive step size.
 	double length = 0.0;
 	double dt = 0.001;
-	Vector pointA = this->Evaluate(0.0);
+	Vector3 pointA = this->Evaluate(0.0);
 	for (double t = dt; t <= 1.0; t += dt)
 	{
-		Vector pointB = this->Evaluate(t);
+		Vector3 pointB = this->Evaluate(t);
 		length += (pointB - pointA).Length();
 		pointA = pointB;
 	}
@@ -68,7 +68,7 @@ double SpaceCurve::CalculateLength() const
 	return length;
 }
 
-void SpaceCurve::CalculateFrame(double t, Vector& tangent, Vector& normal, Vector& binormal) const
+void SpaceCurve::CalculateFrame(double t, Vector3& tangent, Vector3& normal, Vector3& binormal) const
 {
 	tangent = this->EvaluateDerivative(t);
 	normal = this->EvaluateSecondDerivative(t);
@@ -82,26 +82,26 @@ void SpaceCurve::CalculateFrame(double t, Vector& tangent, Vector& normal, Vecto
 
 void SpaceCurve::GenerateTubeMesh(ConvexPolygonMesh& mesh, double stepLength, int sides, std::function<double(double)> radiusFunction) const
 {
-	std::vector<std::vector<Vector>> vertexData;
+	std::vector<std::vector<Vector3>> vertexData;
 
 	double t = 0.0;
 	while (t <= 1.0)
 	{
 		double radius = radiusFunction(t);	// Should probably have passed in 'lengthCovered', not 't'.
 
-		Vector curvePoint = this->Evaluate(t);
-		Vector xAxis, yAxis, zAxis;
+		Vector3 curvePoint = this->Evaluate(t);
+		Vector3 xAxis, yAxis, zAxis;
 		this->CalculateFrame(t, zAxis, yAxis, xAxis);
 		xAxis.Normalize();
 		yAxis.Normalize();
 
-		vertexData.push_back(std::vector<Vector>());
-		std::vector<Vector>& vertexArray = vertexData.back();
+		vertexData.push_back(std::vector<Vector3>());
+		std::vector<Vector3>& vertexArray = vertexData.back();
 
 		for (int i = 0; i < sides; i++)
 		{
 			double angle = -(double(i) / double(sides)) * MESH_NINJA_TWO_PI;
-			Vector vertex = curvePoint + xAxis * radius * ::cos(angle) + yAxis * radius * ::sin(angle);
+			Vector3 vertex = curvePoint + xAxis * radius * ::cos(angle) + yAxis * radius * ::sin(angle);
 			vertexArray.push_back(vertex);
 		}
 
@@ -115,8 +115,8 @@ void SpaceCurve::GenerateTubeMesh(ConvexPolygonMesh& mesh, double stepLength, in
 
 	for (int i = 0; i < (signed)vertexData.size() - 1; i++)
 	{
-		std::vector<Vector>& vertexArrayA = vertexData[i];
-		std::vector<Vector>& vertexArrayB = vertexData[i + 1];
+		std::vector<Vector3>& vertexArrayA = vertexData[i];
+		std::vector<Vector3>& vertexArrayB = vertexData[i + 1];
 
 		auto calculateLength = [&vertexArrayA, &vertexArrayB, &sides](int shift) -> double
 		{
@@ -210,9 +210,9 @@ bool CompositeBezierCurve::CalculateBezierData(BezierData& data, double t) const
 	return true;
 }
 
-/*virtual*/ Vector CompositeBezierCurve::Evaluate(double t) const
+/*virtual*/ Vector3 CompositeBezierCurve::Evaluate(double t) const
 {
-	Vector result(0.0, 0.0, 0.0);
+	Vector3 result(0.0, 0.0, 0.0);
 
 	BezierData data;
 	if (this->CalculateBezierData(data, t))
@@ -226,9 +226,9 @@ bool CompositeBezierCurve::CalculateBezierData(BezierData& data, double t) const
 	return result;
 }
 
-/*virtual*/ Vector CompositeBezierCurve::EvaluateDerivative(double t) const
+/*virtual*/ Vector3 CompositeBezierCurve::EvaluateDerivative(double t) const
 {
-	Vector result(0.0, 0.0, 0.0);
+	Vector3 result(0.0, 0.0, 0.0);
 
 	BezierData data;
 	if (this->CalculateBezierData(data, t))
@@ -242,9 +242,9 @@ bool CompositeBezierCurve::CalculateBezierData(BezierData& data, double t) const
 	return result;
 }
 
-/*virtual*/ Vector CompositeBezierCurve::EvaluateSecondDerivative(double t) const
+/*virtual*/ Vector3 CompositeBezierCurve::EvaluateSecondDerivative(double t) const
 {
-	Vector result(0.0, 0.0, 0.0);
+	Vector3 result(0.0, 0.0, 0.0);
 
 	BezierData data;
 	if (this->CalculateBezierData(data, t))

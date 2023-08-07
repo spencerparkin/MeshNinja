@@ -94,8 +94,8 @@ int main(int argc, char** argv)
 	QuadraticSurface surface;
 	surface.MakeEllipsoid(20.0, 25.0, 30.0);
 
-	Ray contactRay(Vector(0.0, 0.0, 0.0), Vector(1.0, 0.0, 0.0));
-	AxisAlignedBoundingBox aabb(Vector(-100.0, -100.0, -100.0), Vector(100.0, 100.0, 100.0));
+	Ray contactRay(Vector3(0.0, 0.0, 0.0), Vector3(1.0, 0.0, 0.0));
+	AxisAlignedBoundingBox aabb(Vector3(-100.0, -100.0, -100.0), Vector3(100.0, 100.0, 100.0));
 
 	ConvexPolygonMesh mesh;
 	surface.GenerateMesh(mesh, contactRay, aabb, 5.0);

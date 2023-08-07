@@ -22,7 +22,7 @@ public:
 	bool Save(bool saveRenderMesh = false);
 
 	virtual void Render(GLint renderMode, const Camera* camera) const override;
-	virtual MeshNinja::Vector GetPosition() const override;
+	virtual MeshNinja::Vector3 GetPosition() const override;
 
 	void BakeTransform();
 
@@ -38,14 +38,14 @@ public:
 
 	MeshNinja::MeshFileFormat* GetFileFormatObject();
 
-	MeshNinja::Vector color;
+	MeshNinja::Vector3 color;
 	MeshNinja::ConvexPolygonMesh mesh;
 	MeshNinja::Transform transform;
 	wxString fileSource;
 
 private:
 
-	void IssueColor(const MeshNinja::Vector& givenColor) const;
+	void IssueColor(const MeshNinja::Vector3& givenColor) const;
 
 	mutable MeshNinja::RenderMesh renderMesh;
 	mutable MeshNinja::MeshGraph meshGraph;

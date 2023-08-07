@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Common.h"
-#include "Math/Vector.h"
+#include "Math/Vector3.h"
 #include "Math/Transform.h"
 
 namespace MeshNinja
@@ -31,11 +31,11 @@ namespace MeshNinja
 			Options()
 			{
 				this->normalType = NormalType::FACET_BASED;
-				this->color = Vector(1.0, 0.0, 0.0);
+				this->color = Vector3(1.0, 0.0, 0.0);
 			}
 
 			NormalType normalType;
-			Vector color;
+			Vector3 color;
 		};
 
 		void Clear();
@@ -44,7 +44,7 @@ namespace MeshNinja
 		void ToConvexPolygonMesh(ConvexPolygonMesh& mesh) const;
 		void ApplyTransform(const Transform& transform);
 		bool IsTriangleMesh() const;
-		void SetColor(const Vector& color);
+		void SetColor(const Vector3& color);
 		void MakeRainbowColors();
 		bool CalcBoundingBox(AxisAlignedBoundingBox& box) const;
 
@@ -60,9 +60,9 @@ namespace MeshNinja
 			}
 
 			std::vector<int>* vertexArray;
-			Vector color;
-			Vector normal;
-			Vector center;
+			Vector3 color;
+			Vector3 normal;
+			Vector3 center;
 		};
 
 		struct Vertex
@@ -71,10 +71,10 @@ namespace MeshNinja
 			Vertex(const Vertex& vertex);
 			virtual ~Vertex();
 
-			Vector position;
-			Vector color;
-			Vector normal;
-			Vector texCoords;
+			Vector3 position;
+			Vector3 color;
+			Vector3 normal;
+			Vector3 texCoords;
 		};
 
 		std::vector<Facet>* facetArray;

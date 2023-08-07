@@ -21,13 +21,13 @@ void PointCloud::Clear()
 	this->rootSpace = nullptr;
 }
 
-void PointCloud::ToPointArray(std::vector<Vector>& pointArray) const
+void PointCloud::ToPointArray(std::vector<Vector3>& pointArray) const
 {
 	if (this->rootSpace)
 		this->rootSpace->ToPointArray(pointArray);
 }
 
-void PointCloud::FromPointArray(const std::vector<Vector>& pointArray, int maxPointsPerLeaf /*= 10*/)
+void PointCloud::FromPointArray(const std::vector<Vector3>& pointArray, int maxPointsPerLeaf /*= 10*/)
 {
 	this->Clear();
 
@@ -39,7 +39,7 @@ void PointCloud::FromPointArray(const std::vector<Vector>& pointArray, int maxPo
 	this->rootSpace->FromPointArray(pointArray, maxPointsPerLeaf);
 }
 
-const Vector* PointCloud::FindNearestPoint(const Vector& givenPoint, double& distance) const
+const Vector3* PointCloud::FindNearestPoint(const Vector3& givenPoint, double& distance) const
 {
 	if (!this->rootSpace)
 		return nullptr;
@@ -71,7 +71,7 @@ PointCloud::InternalNode::InternalNode()
 	delete this->frontSpace;
 }
 
-/*virtual*/ void PointCloud::InternalNode::ToPointArray(std::vector<Vector>& givenPointArray) const
+/*virtual*/ void PointCloud::InternalNode::ToPointArray(std::vector<Vector3>& givenPointArray) const
 {
 	if (this->backSpace)
 		this->backSpace->ToPointArray(givenPointArray);
@@ -80,11 +80,11 @@ PointCloud::InternalNode::InternalNode()
 		this->frontSpace->ToPointArray(givenPointArray);
 }
 
-void PointCloud::InternalNode::FromPointArray(const std::vector<Vector>& givenPointArray, int maxPointsPerLeaf)
+void PointCloud::InternalNode::FromPointArray(const std::vector<Vector3>& givenPointArray, int maxPointsPerLeaf)
 {
 	AxisAlignedBoundingBox box(givenPointArray[0]);
-	Vector averagePoint(0.0, 0.0, 0.0);
-	for (const Vector& point : givenPointArray)
+	Vector3 averagePoint(0.0, 0.0, 0.0);
+	for (const Vector3& point : givenPointArray)
 	{
 		box.ExpandToIncludePoint(point);
 		averagePoint += point;
@@ -99,15 +99,15 @@ void PointCloud::InternalNode::FromPointArray(const std::vector<Vector>& givenPo
 	double largestDimension = MESH_NINJA_MAX(width, MESH_NINJA_MAX(height, depth));
 
 	if (largestDimension == width)
-		this->partitioningPlane = Plane(averagePoint, Vector(1.0, 0.0, 0.0));
+		this->partitioningPlane = Plane(averagePoint, Vector3(1.0, 0.0, 0.0));
 	else if (largestDimension == height)
-		this->partitioningPlane = Plane(averagePoint, Vector(0.0, 1.0, 0.0));
+		this->partitioningPlane = Plane(averagePoint, Vector3(0.0, 1.0, 0.0));
 	else if (largestDimension == depth)
-		this->partitioningPlane = Plane(averagePoint, Vector(0.0, 0.0, 1.0));
+		this->partitioningPlane = Plane(averagePoint, Vector3(0.0, 0.0, 1.0));
 
-	std::vector<Vector> backPointArray, frontPointArray;
+	std::vector<Vector3> backPointArray, frontPointArray;
 
-	for (const Vector& point : givenPointArray)
+	for (const Vector3& point : givenPointArray)
 	{
 		Plane::Side side = this->partitioningPlane.WhichSide(point, 0.0);
 		switch (side)
@@ -139,7 +139,7 @@ void PointCloud::InternalNode::FromPointArray(const std::vector<Vector>& givenPo
 	}
 }
 
-const Vector* PointCloud::InternalNode::FindNearestPoint(const Vector& givenPoint, double& distance) const
+const Vector3* PointCloud::InternalNode::FindNearestPoint(const Vector3& givenPoint, double& distance) const
 {
 	Plane::Side side = this->partitioningPlane.WhichSide(givenPoint);
 
@@ -164,7 +164,7 @@ const Vector* PointCloud::InternalNode::FindNearestPoint(const Vector& givenPoin
 	}
 
 	double firstDistance = 0.0;
-	const Vector* firstNearestPoint = firstNode->FindNearestPoint(givenPoint, firstDistance);
+	const Vector3* firstNearestPoint = firstNode->FindNearestPoint(givenPoint, firstDistance);
 	if (firstNearestPoint)
 	{
 		double distanceToPlane = ::abs(this->partitioningPlane.SignedDistanceToPoint(givenPoint));
@@ -176,7 +176,7 @@ const Vector* PointCloud::InternalNode::FindNearestPoint(const Vector& givenPoin
 	}
 
 	double secondDistance = 0.0;
-	const Vector* secondNearestPoint = secondNode->FindNearestPoint(givenPoint, secondDistance);
+	const Vector3* secondNearestPoint = secondNode->FindNearestPoint(givenPoint, secondDistance);
 	if (!secondNearestPoint || firstDistance < secondDistance)
 	{
 		distance = firstDistance;
@@ -197,23 +197,23 @@ PointCloud::LeafNode::LeafNode()
 {
 }
 
-/*virtual*/ void PointCloud::LeafNode::ToPointArray(std::vector<Vector>& givenPointArray) const
+/*virtual*/ void PointCloud::LeafNode::ToPointArray(std::vector<Vector3>& givenPointArray) const
 {
-	for (const Vector& point : this->pointArray)
+	for (const Vector3& point : this->pointArray)
 		givenPointArray.push_back(point);
 }
 
-/*virtual*/ void PointCloud::LeafNode::FromPointArray(const std::vector<Vector>& givenPointArray, int maxPointsPerLeaf)
+/*virtual*/ void PointCloud::LeafNode::FromPointArray(const std::vector<Vector3>& givenPointArray, int maxPointsPerLeaf)
 {
 	this->pointArray = givenPointArray;
 }
 
-/*virtual*/ const Vector* PointCloud::LeafNode::FindNearestPoint(const Vector& givenPoint, double& distance) const
+/*virtual*/ const Vector3* PointCloud::LeafNode::FindNearestPoint(const Vector3& givenPoint, double& distance) const
 {
 	distance = DBL_MAX;
-	const Vector* closestPoint = nullptr;
+	const Vector3* closestPoint = nullptr;
 
-	for (const Vector& point : this->pointArray)
+	for (const Vector3& point : this->pointArray)
 	{
 		double otherDistance = (point - givenPoint).Length();
 		if (otherDistance < distance)

@@ -56,7 +56,7 @@ void MeshCollectionScene::Clear()
 {
 	this->ForAllMeshes([&transform](Mesh* mesh)
 		{
-			if (transform.translation != MeshNinja::Vector(0.0, 0.0, 0.0))
+			if (transform.translation != MeshNinja::Vector3(0.0, 0.0, 0.0))
 				mesh->transform = transform * mesh->transform;
 			else
 			{

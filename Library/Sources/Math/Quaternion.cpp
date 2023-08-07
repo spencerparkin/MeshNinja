@@ -15,7 +15,7 @@ Quaternion::Quaternion(const Quaternion& quat)
 	this->z = quat.z;
 }
 
-Quaternion::Quaternion(const Vector& vector)
+Quaternion::Quaternion(const Vector3& vector)
 {
 	this->w = 0.0;
 	this->x = vector.x;
@@ -91,9 +91,9 @@ void Quaternion::Conjugate()
 	this->z = -this->z;
 }
 
-bool Quaternion::SetFromAxisAngle(const Vector& axis, double angle)
+bool Quaternion::SetFromAxisAngle(const Vector3& axis, double angle)
 {
-	Vector unitAxis(axis);
+	Vector3 unitAxis(axis);
 	if (!unitAxis.Normalize())
 		return false;
 
@@ -110,7 +110,7 @@ bool Quaternion::SetFromAxisAngle(const Vector& axis, double angle)
 }
 
 // Here we assume that this quaternion is normalized.
-bool Quaternion::GetToAxisAngle(Vector& axis, double& angle) const
+bool Quaternion::GetToAxisAngle(Vector3& axis, double& angle) const
 {
 	double cosHalfAngle = this->w;
 	double halfAngle = ::acos(cosHalfAngle);
@@ -136,7 +136,7 @@ bool Quaternion::GetToAxisAngle(Vector& axis, double& angle) const
 	return true;
 }
 
-Vector Quaternion::RotateVector(const Vector& vector) const
+Vector3 Quaternion::RotateVector(const Vector3& vector) const
 {
 	Quaternion quatVector(vector);
 	Quaternion quatInv(*this);
@@ -144,10 +144,10 @@ Vector Quaternion::RotateVector(const Vector& vector) const
 	quatInv.Invert();
 
 	Quaternion quatVectorRotated = *this * quatVector * quatInv;
-	return Vector(quatVectorRotated);
+	return Vector3(quatVectorRotated);
 }
 
-Vector Quaternion::RotateVectorFast(const Vector& vector) const
+Vector3 Quaternion::RotateVectorFast(const Vector3& vector) const
 {
 	Quaternion quatVector(vector);
 	Quaternion quatInv(*this);
@@ -155,7 +155,7 @@ Vector Quaternion::RotateVectorFast(const Vector& vector) const
 	quatInv.Conjugate();	// Assume that this quaternion is already normalized.
 
 	Quaternion quatVectorRotated = *this * quatVector * quatInv;
-	return Vector(quatVectorRotated);
+	return Vector3(quatVectorRotated);
 }
 
 void Quaternion::SetSum(const Quaternion& leftQuat, const Quaternion& rightQuat)

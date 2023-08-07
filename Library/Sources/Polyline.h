@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Common.h"
-#include "Math/Vector.h"
+#include "Math/Vector3.h"
 
 namespace MeshNinja
 {
@@ -12,11 +12,11 @@ namespace MeshNinja
 	public:
 		Polyline();
 		Polyline(const Polyline& polyline);
-		Polyline(const Vector& vertexA, const Vector& vertexB);
+		Polyline(const Vector3& vertexA, const Vector3& vertexB);
 		virtual ~Polyline();
 
-		const Vector& GetFirstVertex() const;
-		const Vector& GetLastVertex() const;
+		const Vector3& GetFirstVertex() const;
+		const Vector3& GetLastVertex() const;
 
 		bool IsLineLoop(double eps = MESH_NINJA_EPS) const;
 		void ReverseOrder();
@@ -24,6 +24,6 @@ namespace MeshNinja
 		void Concatinate(const Polyline& polylineA, const Polyline& polylineB);
 		bool GenerateTubeMesh(ConvexPolygonMesh& tubeMesh, double radius, int numSides) const;
 
-		std::vector<Vector>* vertexArray;
+		std::vector<Vector3>* vertexArray;
 	};
 }

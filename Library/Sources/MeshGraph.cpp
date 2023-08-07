@@ -94,7 +94,7 @@ bool MeshGraph::Generate(const ConvexPolygonMesh& givenMesh)
 	return new Edge();
 }
 
-void MeshGraph::CollectSilhouetteEdges(const Vector& viewDirection, std::set<VertexPair<false>>& edgeSet, const Transform& transform) const
+void MeshGraph::CollectSilhouetteEdges(const Vector3& viewDirection, std::set<VertexPair<false>>& edgeSet, const Transform& transform) const
 {
 	edgeSet.clear();
 
@@ -173,11 +173,11 @@ bool MeshGraph::GenerateDual(ConvexPolygonMesh& dualMesh) const
 				VertexPair<true> pairB = *iter;
 				if (pairA.j == pairB.i && pairA.i != pairB.j)
 				{
-					const Vector& pointA = (*dualMesh.vertexArray)[pairA.i];
-					const Vector& pointB = (*dualMesh.vertexArray)[pairA.j];
-					const Vector& pointC = (*dualMesh.vertexArray)[pairB.j];
+					const Vector3& pointA = (*dualMesh.vertexArray)[pairA.i];
+					const Vector3& pointB = (*dualMesh.vertexArray)[pairA.j];
+					const Vector3& pointC = (*dualMesh.vertexArray)[pairB.j];
 
-					Vector vectorAB, vectorBC;
+					Vector3 vectorAB, vectorBC;
 
 					vectorAB = pointB - pointA;
 					vectorBC = pointC - pointB;
@@ -227,8 +227,8 @@ bool MeshGraph::GenerateDual(ConvexPolygonMesh& dualMesh) const
 
 		for (const Edge* edge : node->edgeArray)
 		{
-			const Vector& pointA = (*this->mesh->vertexArray)[edge->pair.i];
-			const Vector& pointB = (*this->mesh->vertexArray)[edge->pair.j];
+			const Vector3& pointA = (*this->mesh->vertexArray)[edge->pair.i];
+			const Vector3& pointB = (*this->mesh->vertexArray)[edge->pair.j];
 
 			DebugDraw::Line* line = debugDraw.New<DebugDraw::Line>();
 			line->vertex[0] = point->vertex;
@@ -250,9 +250,9 @@ MeshGraph::Node::Node()
 {
 }
 
-/*virtual*/ Vector MeshGraph::Node::GetDebugColor() const
+/*virtual*/ Vector3 MeshGraph::Node::GetDebugColor() const
 {
-	return Vector(1.0, 1.0, 1.0);
+	return Vector3(1.0, 1.0, 1.0);
 }
 
 //----------------------------------- MeshGraph::Edge -----------------------------------
@@ -273,7 +273,7 @@ MeshGraph::Node* MeshGraph::Edge::Fallow(Node* origin)
 	return (origin == this->node[0]) ? this->node[1] : this->node[0];
 }
 
-/*virtual*/ Vector MeshGraph::Edge::GetDebugColor() const
+/*virtual*/ Vector3 MeshGraph::Edge::GetDebugColor() const
 {
-	return Vector(0.5, 0.5, 0.5);
+	return Vector3(0.5, 0.5, 0.5);
 }

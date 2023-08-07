@@ -73,12 +73,12 @@ void Mesh::DirtyRenderFlag() const
 	this->renderMeshDirty = true;
 }
 
-/*virtual*/ MeshNinja::Vector Mesh::GetPosition() const
+/*virtual*/ MeshNinja::Vector3 Mesh::GetPosition() const
 {
 	return this->transform.TransformPosition(this->mesh.CalcCenter());
 }
 
-void Mesh::IssueColor(const MeshNinja::Vector& givenColor) const
+void Mesh::IssueColor(const MeshNinja::Vector3& givenColor) const
 {
 	if (wxGetApp().lightingMode == Application::LightingMode::UNLIT)
 		glColor3d(givenColor.x, givenColor.y, givenColor.z);
@@ -150,7 +150,7 @@ void Mesh::IssueColor(const MeshNinja::Vector& givenColor) const
 
 			if (wxGetApp().lightingMode == Application::LightingMode::FACE_LIT)
 			{
-				MeshNinja::Vector faceNormal;
+				MeshNinja::Vector3 faceNormal;
 				matrixInvT.MultiplyRight(facet.normal, faceNormal);
 				faceNormal.Normalize();
 				glNormal3d(faceNormal.x, faceNormal.y, faceNormal.z);
@@ -159,14 +159,14 @@ void Mesh::IssueColor(const MeshNinja::Vector& givenColor) const
 			for (int j : *facet.vertexArray)
 			{
 				const MeshNinja::RenderMesh::Vertex& vertex = (*this->renderMesh.vertexArray)[j];
-				MeshNinja::Vector vertexPosition = this->transform.TransformPosition(vertex.position);
+				MeshNinja::Vector3 vertexPosition = this->transform.TransformPosition(vertex.position);
 
 				if (wxGetApp().coloringMode == Application::ColoringMode::USE_VERTEX_COLORS)
 					this->IssueColor(vertex.color);
 
 				if (wxGetApp().lightingMode == Application::LightingMode::VERTEX_LIT)
 				{
-					MeshNinja::Vector vertexNormal;
+					MeshNinja::Vector3 vertexNormal;
 					matrixInvT.MultiplyRight(vertex.normal, vertexNormal);
 					vertexNormal.Normalize();
 					glNormal3d(vertexNormal.x, vertexNormal.y, vertexNormal.z);
@@ -197,11 +197,11 @@ void Mesh::IssueColor(const MeshNinja::Vector& givenColor) const
 
 		for (const MeshNinja::RenderMesh::Facet& facet : *this->renderMesh.facetArray)
 		{
-			MeshNinja::Vector faceNormal;
+			MeshNinja::Vector3 faceNormal;
 			matrixInvT.MultiplyRight(facet.normal, faceNormal);
 
-			const MeshNinja::Vector pointA = this->transform.TransformPosition(facet.center);
-			const MeshNinja::Vector pointB = pointA + faceNormal;
+			const MeshNinja::Vector3 pointA = this->transform.TransformPosition(facet.center);
+			const MeshNinja::Vector3 pointB = pointA + faceNormal;
 
 			glVertex3dv(&pointA.x);
 			glVertex3dv(&pointB.x);
@@ -219,11 +219,11 @@ void Mesh::IssueColor(const MeshNinja::Vector& givenColor) const
 		{
 			const MeshNinja::RenderMesh::Vertex& vertex = (*this->renderMesh.vertexArray)[i];
 
-			MeshNinja::Vector vertexNormal;
+			MeshNinja::Vector3 vertexNormal;
 			matrixInvT.MultiplyRight(vertex.normal, vertexNormal);
 
-			const MeshNinja::Vector pointA = this->transform.TransformPosition(vertex.position);
-			const MeshNinja::Vector pointB = pointA + vertexNormal;
+			const MeshNinja::Vector3 pointA = this->transform.TransformPosition(vertex.position);
+			const MeshNinja::Vector3 pointB = pointA + vertexNormal;
 
 			glVertex3dv(&pointA.x);
 			glVertex3dv(&pointB.x);
@@ -250,14 +250,14 @@ void Mesh::IssueColor(const MeshNinja::Vector& givenColor) const
 				{
 					vertexPairSet.insert(pair);
 
-					MeshNinja::Vector vertexA = (*this->mesh.vertexArray)[(*facet.vertexArray)[i]];
-					MeshNinja::Vector vertexB = (*this->mesh.vertexArray)[(*facet.vertexArray)[j]];
+					MeshNinja::Vector3 vertexA = (*this->mesh.vertexArray)[(*facet.vertexArray)[i]];
+					MeshNinja::Vector3 vertexB = (*this->mesh.vertexArray)[(*facet.vertexArray)[j]];
 
 					vertexA = this->transform.TransformPosition(vertexA);
 					vertexB = this->transform.TransformPosition(vertexB);
 
-					MeshNinja::Vector lineOfSightDirection = (vertexA + vertexB) / 2.0 - camera->position;
-					MeshNinja::Vector offset = lineOfSightDirection.Normalized() * -0.01;
+					MeshNinja::Vector3 lineOfSightDirection = (vertexA + vertexB) / 2.0 - camera->position;
+					MeshNinja::Vector3 offset = lineOfSightDirection.Normalized() * -0.01;
 
 					// This is to prevent Z-fighting.
 					vertexA += offset;
@@ -285,8 +285,8 @@ void Mesh::IssueColor(const MeshNinja::Vector& givenColor) const
 
 		for (MeshNinja::MeshGraph::VertexPair<false> pair : edgeSet)
 		{
-			MeshNinja::Vector vertexA = this->transform.TransformPosition((*this->mesh.vertexArray)[pair.i]);
-			MeshNinja::Vector vertexB = this->transform.TransformPosition((*this->mesh.vertexArray)[pair.j]);
+			MeshNinja::Vector3 vertexA = this->transform.TransformPosition((*this->mesh.vertexArray)[pair.i]);
+			MeshNinja::Vector3 vertexB = this->transform.TransformPosition((*this->mesh.vertexArray)[pair.j]);
 
 			glVertex3dv(&vertexA.x);
 			glVertex3dv(&vertexB.x);

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Math/Vector.h"
+#include "Math/Vector3.h"
 #include "Scene.h"
 #include <wx/glcanvas.h>
 
@@ -21,13 +21,13 @@ public:
 	void LookUpDown(double angleDelta, bool pivotAboutTarget);
 	void Zoom(double zoomFactor);
 
-	void MakeFrame(MeshNinja::Vector& xAxis, MeshNinja::Vector& yAxis, MeshNinja::Vector& zAxis) const;
-	void RotateLookDirection(const MeshNinja::Vector& axis, double angleDelta, bool pivotAboutTarget);
+	void MakeFrame(MeshNinja::Vector3& xAxis, MeshNinja::Vector3& yAxis, MeshNinja::Vector3& zAxis) const;
+	void RotateLookDirection(const MeshNinja::Vector3& axis, double angleDelta, bool pivotAboutTarget);
 
-	MeshNinja::Vector GetViewDirection() const;
+	MeshNinja::Vector3 GetViewDirection() const;
 
-	MeshNinja::Vector position;
-	MeshNinja::Vector target;
+	MeshNinja::Vector3 position;
+	MeshNinja::Vector3 target;
 	double foviAngle;
 	double aspectRatio;
 	GLuint* hitBuffer;

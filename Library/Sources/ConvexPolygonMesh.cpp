@@ -10,13 +10,13 @@ using namespace MeshNinja;
 ConvexPolygonMesh::ConvexPolygonMesh()
 {
 	this->facetArray = new std::vector<Facet>();
-	this->vertexArray = new std::vector<Vector>();
+	this->vertexArray = new std::vector<Vector3>();
 }
 
 ConvexPolygonMesh::ConvexPolygonMesh(const ConvexPolygonMesh& mesh)
 {
 	this->facetArray = new std::vector<Facet>();
-	this->vertexArray = new std::vector<Vector>();
+	this->vertexArray = new std::vector<Vector3>();
 
 	this->Copy(mesh);
 }
@@ -24,7 +24,7 @@ ConvexPolygonMesh::ConvexPolygonMesh(const ConvexPolygonMesh& mesh)
 ConvexPolygonMesh::ConvexPolygonMesh(const std::vector<ConvexPolygon>& polygonArray)
 {
 	this->facetArray = new std::vector<Facet>();
-	this->vertexArray = new std::vector<Vector>();
+	this->vertexArray = new std::vector<Vector3>();
 
 	this->FromConvexPolygonArray(polygonArray);
 }
@@ -45,7 +45,7 @@ void ConvexPolygonMesh::Copy(const ConvexPolygonMesh& mesh)
 {
 	this->Clear();
 
-	for (const Vector& vertex : *mesh.vertexArray)
+	for (const Vector3& vertex : *mesh.vertexArray)
 		this->vertexArray->push_back(vertex);
 
 	for (const Facet& facet : *mesh.facetArray)
@@ -79,7 +79,7 @@ bool ConvexPolygonMesh::IsConvex(double eps /*= MESH_NINJA_EPS*/) const
 		Plane plane;
 		polygon.CalcPlane(plane, eps);
 
-		for (const Vector& vertex : *this->vertexArray)
+		for (const Vector3& vertex : *this->vertexArray)
 			if (plane.WhichSide(vertex, eps) == Plane::Side::FRONT)
 				return false;
 	}
@@ -94,7 +94,7 @@ bool ConvexPolygonMesh::IsConcave(double eps /*= MESH_NINJA_EPS*/) const
 
 void ConvexPolygonMesh::ApplyTransform(const Transform& transform)
 {
-	for (Vector& vertex : *this->vertexArray)
+	for (Vector3& vertex : *this->vertexArray)
 		vertex = transform.TransformPosition(vertex);
 }
 
@@ -181,7 +181,7 @@ void ConvexPolygonMesh::NormalizeEdges(double eps /*= MESH_NINJA_EPS*/)
 			bool foundInteriorPoint = false;
 			for (int k = 0; k < (signed)this->vertexArray->size(); k++)
 			{
-				const Vector& vertex = (*this->vertexArray)[k];
+				const Vector3& vertex = (*this->vertexArray)[k];
 				if (edge.IsInteriorPoint(vertex, eps))
 				{
 					foundInteriorPoint = true;
@@ -216,19 +216,19 @@ void ConvexPolygonMesh::FromConvexPolygonArray(const std::vector<ConvexPolygon>&
 {
 	this->Clear();
 
-	std::map<Vector, int> pointMap;
+	std::map<Vector3, int> pointMap;
 	int i = 0;
 
 	for (const ConvexPolygon& polygon : convexPolygonArray)
 	{
 		Facet facet;
 
-		for (const Vector& vertex : *polygon.vertexArray)
+		for (const Vector3& vertex : *polygon.vertexArray)
 		{
-			std::map<Vector, int>::iterator iter = pointMap.find(vertex);
+			std::map<Vector3, int>::iterator iter = pointMap.find(vertex);
 			if (iter == pointMap.end())
 			{
-				pointMap.insert(std::pair<Vector, int>(vertex, i++));
+				pointMap.insert(std::pair<Vector3, int>(vertex, i++));
 				this->vertexArray->push_back(vertex);
 				iter = pointMap.find(vertex);
 			}
@@ -242,7 +242,7 @@ void ConvexPolygonMesh::FromConvexPolygonArray(const std::vector<ConvexPolygon>&
 
 bool ConvexPolygonMesh::GeneratePolyhedron(Polyhedron polyhedron, double eps /*= MESH_NINJA_EPS*/)
 {
-	std::vector<Vector> pointArray;
+	std::vector<Vector3> pointArray;
 
 	auto singleCombo = [](std::function<void(double a)> callback)
 	{
@@ -288,85 +288,85 @@ bool ConvexPolygonMesh::GeneratePolyhedron(Polyhedron polyhedron, double eps /*=
 		case Polyhedron::TETRAHEDRON:
 		{
 			singleCombo([&pointArray](double a) {
-				pointArray.push_back(Vector(a, 0, -1.0 / ::sqrt(2.0)));
-				pointArray.push_back(Vector(0, a, 1.0 / ::sqrt(2.0)));
+				pointArray.push_back(Vector3(a, 0, -1.0 / ::sqrt(2.0)));
+				pointArray.push_back(Vector3(0, a, 1.0 / ::sqrt(2.0)));
 			});
 			break;
 		}
 		case Polyhedron::OCTAHEDRON:
 		{
 			singleCombo([&pointArray](double a) {
-				pointArray.push_back(Vector(a, 0.0, 0.0));
-				pointArray.push_back(Vector(0.0, a, 0.0));
-				pointArray.push_back(Vector(0.0, 0.0, a));
+				pointArray.push_back(Vector3(a, 0.0, 0.0));
+				pointArray.push_back(Vector3(0.0, a, 0.0));
+				pointArray.push_back(Vector3(0.0, 0.0, a));
 			});
 			break;
 		}
 		case Polyhedron::HEXADRON:
 		{
 			tripleCombo([&pointArray](double a, double b, double c) {
-				pointArray.push_back(Vector(a, b, c));
+				pointArray.push_back(Vector3(a, b, c));
 			});
 			break;
 		}
 		case Polyhedron::ICOSAHEDRON:
 		{
 			doubleCombo([&pointArray](double a, double b) {
-				pointArray.push_back(Vector(0.0, a, b * MESH_NINJA_PHI));
-				pointArray.push_back(Vector(a, b * MESH_NINJA_PHI, 0.0));
-				pointArray.push_back(Vector(a * MESH_NINJA_PHI, 0.0, b));
+				pointArray.push_back(Vector3(0.0, a, b * MESH_NINJA_PHI));
+				pointArray.push_back(Vector3(a, b * MESH_NINJA_PHI, 0.0));
+				pointArray.push_back(Vector3(a * MESH_NINJA_PHI, 0.0, b));
 			});
 			break;
 		}
 		case Polyhedron::DODECAHEDRON:
 		{
 			tripleCombo([&pointArray](double a, double b, double c) {
-				pointArray.push_back(Vector(a, b, c));
+				pointArray.push_back(Vector3(a, b, c));
 			});
 			doubleCombo([&pointArray](double a, double b) {
-				pointArray.push_back(Vector(0.0, a * MESH_NINJA_PHI, b / MESH_NINJA_PHI));
-				pointArray.push_back(Vector(a / MESH_NINJA_PHI, 0.0, b * MESH_NINJA_PHI));
-				pointArray.push_back(Vector(a * MESH_NINJA_PHI, b / MESH_NINJA_PHI, 0.0));
+				pointArray.push_back(Vector3(0.0, a * MESH_NINJA_PHI, b / MESH_NINJA_PHI));
+				pointArray.push_back(Vector3(a / MESH_NINJA_PHI, 0.0, b * MESH_NINJA_PHI));
+				pointArray.push_back(Vector3(a * MESH_NINJA_PHI, b / MESH_NINJA_PHI, 0.0));
 			});
 			break;
 		}
 		case Polyhedron::ICOSIDODECAHEDRON:
 		{
 			singleCombo([&pointArray](double a) {
-				pointArray.push_back(Vector(a * MESH_NINJA_PHI, 0.0, 0.0));
-				pointArray.push_back(Vector(0.0, a * MESH_NINJA_PHI, 0.0));
-				pointArray.push_back(Vector(0.0, 0.0, a * MESH_NINJA_PHI));
+				pointArray.push_back(Vector3(a * MESH_NINJA_PHI, 0.0, 0.0));
+				pointArray.push_back(Vector3(0.0, a * MESH_NINJA_PHI, 0.0));
+				pointArray.push_back(Vector3(0.0, 0.0, a * MESH_NINJA_PHI));
 			});
 			tripleCombo([&pointArray](double a, double b, double c) {
-				pointArray.push_back(Vector(a / 2.0, b * MESH_NINJA_PHI / 2.0, c * MESH_NINJA_PHI * MESH_NINJA_PHI / 2.0));
-				pointArray.push_back(Vector(a * MESH_NINJA_PHI / 2.0, b * MESH_NINJA_PHI * MESH_NINJA_PHI / 2.0, c / 2.0));
-				pointArray.push_back(Vector(a * MESH_NINJA_PHI * MESH_NINJA_PHI / 2.0, b / 2.0, c * MESH_NINJA_PHI / 2.0));
+				pointArray.push_back(Vector3(a / 2.0, b * MESH_NINJA_PHI / 2.0, c * MESH_NINJA_PHI * MESH_NINJA_PHI / 2.0));
+				pointArray.push_back(Vector3(a * MESH_NINJA_PHI / 2.0, b * MESH_NINJA_PHI * MESH_NINJA_PHI / 2.0, c / 2.0));
+				pointArray.push_back(Vector3(a * MESH_NINJA_PHI * MESH_NINJA_PHI / 2.0, b / 2.0, c * MESH_NINJA_PHI / 2.0));
 			});
 			break;
 		}
 		case Polyhedron::CUBOCTAHEDRON:
 		{
 			doubleCombo([&pointArray](double a, double b) {
-				pointArray.push_back(Vector(a, b, 0.0));
-				pointArray.push_back(Vector(a, 0.0, b));
-				pointArray.push_back(Vector(0.0, a, b));
+				pointArray.push_back(Vector3(a, b, 0.0));
+				pointArray.push_back(Vector3(a, 0.0, b));
+				pointArray.push_back(Vector3(0.0, a, b));
 			});
 			break;
 		}
 		case Polyhedron::RHOMBICOSIDODECAHEDRON:
 		{
 			tripleCombo([&pointArray](double a, double b, double c) {
-				pointArray.push_back(Vector(a, b, c * MESH_NINJA_PHI * MESH_NINJA_PHI * MESH_NINJA_PHI));
-				pointArray.push_back(Vector(a, b * MESH_NINJA_PHI * MESH_NINJA_PHI * MESH_NINJA_PHI, c));
-				pointArray.push_back(Vector(a * MESH_NINJA_PHI * MESH_NINJA_PHI * MESH_NINJA_PHI, b, c));
-				pointArray.push_back(Vector(a * MESH_NINJA_PHI * MESH_NINJA_PHI, b * MESH_NINJA_PHI, 2.0 * c * MESH_NINJA_PHI));
-				pointArray.push_back(Vector(a * MESH_NINJA_PHI, 2.0 * b * MESH_NINJA_PHI, c * MESH_NINJA_PHI * MESH_NINJA_PHI));
-				pointArray.push_back(Vector(2.0 * a * MESH_NINJA_PHI, b * MESH_NINJA_PHI * MESH_NINJA_PHI, c * MESH_NINJA_PHI));
+				pointArray.push_back(Vector3(a, b, c * MESH_NINJA_PHI * MESH_NINJA_PHI * MESH_NINJA_PHI));
+				pointArray.push_back(Vector3(a, b * MESH_NINJA_PHI * MESH_NINJA_PHI * MESH_NINJA_PHI, c));
+				pointArray.push_back(Vector3(a * MESH_NINJA_PHI * MESH_NINJA_PHI * MESH_NINJA_PHI, b, c));
+				pointArray.push_back(Vector3(a * MESH_NINJA_PHI * MESH_NINJA_PHI, b * MESH_NINJA_PHI, 2.0 * c * MESH_NINJA_PHI));
+				pointArray.push_back(Vector3(a * MESH_NINJA_PHI, 2.0 * b * MESH_NINJA_PHI, c * MESH_NINJA_PHI * MESH_NINJA_PHI));
+				pointArray.push_back(Vector3(2.0 * a * MESH_NINJA_PHI, b * MESH_NINJA_PHI * MESH_NINJA_PHI, c * MESH_NINJA_PHI));
 			});
 			doubleCombo([&pointArray](double a, double b) {
-				pointArray.push_back(Vector(a * (2.0 + MESH_NINJA_PHI), 0.0, b * MESH_NINJA_PHI * MESH_NINJA_PHI));
-				pointArray.push_back(Vector(0.0, a * MESH_NINJA_PHI * MESH_NINJA_PHI, b * (2.0 + MESH_NINJA_PHI)));
-				pointArray.push_back(Vector(a * MESH_NINJA_PHI * MESH_NINJA_PHI, b * (2.0 + MESH_NINJA_PHI), 0.0));
+				pointArray.push_back(Vector3(a * (2.0 + MESH_NINJA_PHI), 0.0, b * MESH_NINJA_PHI * MESH_NINJA_PHI));
+				pointArray.push_back(Vector3(0.0, a * MESH_NINJA_PHI * MESH_NINJA_PHI, b * (2.0 + MESH_NINJA_PHI)));
+				pointArray.push_back(Vector3(a * MESH_NINJA_PHI * MESH_NINJA_PHI, b * (2.0 + MESH_NINJA_PHI), 0.0));
 			});
 			break;
 		}
@@ -376,7 +376,7 @@ bool ConvexPolygonMesh::GeneratePolyhedron(Polyhedron polyhedron, double eps /*=
 }
 
 // Interestingly, this algorithm is also a proof that any polyhedron is the sum of tetrahedrons.
-bool ConvexPolygonMesh::GenerateConvexHull(const std::vector<Vector>& pointArray, double eps /*= MESH_NINJA_EPS*/)
+bool ConvexPolygonMesh::GenerateConvexHull(const std::vector<Vector3>& pointArray, double eps /*= MESH_NINJA_EPS*/)
 {
 	this->Clear();
 
@@ -387,20 +387,20 @@ bool ConvexPolygonMesh::GenerateConvexHull(const std::vector<Vector>& pointArray
 	{
 		for (int i = 0; i < (signed)pointArray.size(); i++)
 		{
-			const Vector& vertexA = pointArray[i];
+			const Vector3& vertexA = pointArray[i];
 			for (int j = i + 1; j < (signed)pointArray.size(); j++)
 			{
-				const Vector& vertexB = pointArray[j];
+				const Vector3& vertexB = pointArray[j];
 				for (int k = j + 1; k < (signed)pointArray.size(); k++)
 				{
-					const Vector& vertexC = pointArray[k];
+					const Vector3& vertexC = pointArray[k];
 					for (int l = k + 1; l < (signed)pointArray.size(); l++)
 					{
-						const Vector& vertexD = pointArray[l];
+						const Vector3& vertexD = pointArray[l];
 
-						Vector xAxis = vertexB - vertexA;
-						Vector yAxis = vertexC - vertexA;
-						Vector zAxis = vertexD - vertexA;
+						Vector3 xAxis = vertexB - vertexA;
+						Vector3 yAxis = vertexC - vertexA;
+						Vector3 zAxis = vertexD - vertexA;
 
 						double determinant = xAxis.Cross(yAxis).Dot(zAxis);
 						if (determinant > MESH_NINJA_EPS)
@@ -422,7 +422,7 @@ bool ConvexPolygonMesh::GenerateConvexHull(const std::vector<Vector>& pointArray
 	if (!findInitialTetrahedron())
 		return false;
 
-	auto convexHullContainsPoint = [&pointArray, &triangleList, eps](const Vector& point) -> bool
+	auto convexHullContainsPoint = [&pointArray, &triangleList, eps](const Vector3& point) -> bool
 	{
 		for (const Triangle& triangle : triangleList)
 		{
@@ -462,7 +462,7 @@ bool ConvexPolygonMesh::GenerateConvexHull(const std::vector<Vector>& pointArray
 			std::list<int>::iterator iterNext = iter;
 			iterNext++;
 
-			const Vector& point = pointArray[*iter];
+			const Vector3& point = pointArray[*iter];
 			if (convexHullContainsPoint(point))
 				pointList.erase(iter);
 
@@ -475,7 +475,7 @@ bool ConvexPolygonMesh::GenerateConvexHull(const std::vector<Vector>& pointArray
 
 		// The first point in the list, like all others, should be one we can use to expand the convex hull further.
 		int i = *pointList.begin();
-		const Vector& newPoint = pointArray[i];
+		const Vector3& newPoint = pointArray[i];
 		std::vector<Triangle> newTriangleArray;
 		for (const Triangle& existingTriangle : triangleList)
 		{
@@ -515,7 +515,7 @@ bool ConvexPolygonMesh::GenerateConvexHull(const std::vector<Vector>& pointArray
 
 // Note that we can do better than O(N) here if we used a point-cloud.
 // In that case, we would get O(log N), I believe.
-int ConvexPolygonMesh::FindClosestPointTo(const Vector& point, double* smallestDistance /*= nullptr*/) const
+int ConvexPolygonMesh::FindClosestPointTo(const Vector3& point, double* smallestDistance /*= nullptr*/) const
 {
 	double smallestDistanceStorage = 0.0;
 	if (!smallestDistance)
@@ -547,7 +547,7 @@ void ConvexPolygonMesh::ReverseAllPolygons()
 // If it is one of our vertices, nothing changes, and we return true.
 // If it is on one of our edges, then the edge is split for all polygons using it, and the vertex is added, and we return true.
 // If it is on a face, then for now, we just return false, but it would make sense to tessellate in this case.
-bool ConvexPolygonMesh::AddRedundantVertex(const Vector& vertex, double eps /*= MESH_NINJA_EPS*/)
+bool ConvexPolygonMesh::AddRedundantVertex(const Vector3& vertex, double eps /*= MESH_NINJA_EPS*/)
 {
 	double smallestDistance = DBL_MAX;
 	int i = this->FindClosestPointTo(vertex, &smallestDistance);
@@ -586,9 +586,9 @@ bool ConvexPolygonMesh::GenerateSphere(double radius, int segments, int slices)
 
 	std::vector<ConvexPolygon> polygonArray;
 
-	Vector** pointMatrix = new Vector*[segments + 1];
+	Vector3** pointMatrix = new Vector3*[segments + 1];
 	for (int i = 0; i <= segments; i++)
-		pointMatrix[i] = new Vector[slices];
+		pointMatrix[i] = new Vector3[slices];
 
 	for (int i = 0; i <= segments; i++)
 	{
@@ -604,7 +604,7 @@ bool ConvexPolygonMesh::GenerateSphere(double radius, int segments, int slices)
 			double cosTheta = ::cos(theta);
 			double sinTheta = ::sin(theta);
 
-			Vector vertex;
+			Vector3 vertex;
 
 			double segmentRadius = radius * sinPhi;
 
@@ -665,9 +665,9 @@ bool ConvexPolygonMesh::GenerateCylinder(double length, double radius, int segme
 
 	std::vector<ConvexPolygon> polygonArray;
 
-	Vector** pointMatrix = new Vector*[segments + 1];
+	Vector3** pointMatrix = new Vector3*[segments + 1];
 	for (int i = 0; i <= segments; i++)
-		pointMatrix[i] = new Vector[slices];
+		pointMatrix[i] = new Vector3[slices];
 
 	for (int i = 0; i <= segments; i++)
 	{
@@ -678,7 +678,7 @@ bool ConvexPolygonMesh::GenerateCylinder(double length, double radius, int segme
 			double cosTheta = ::cos(theta);
 			double sinTheta = ::sin(theta);
 
-			Vector vertex;
+			Vector3 vertex;
 
 			vertex.x = radius * cosTheta;
 			vertex.y = radius * sinTheta;
@@ -731,15 +731,15 @@ bool ConvexPolygonMesh::GenerateTorus(double innerRadius, double outerRadius, in
 	double majorRadius = (outerRadius + innerRadius) / 2.0;
 	double minorRadius = (outerRadius - innerRadius) / 2.0;
 
-	Vector** pointMatrix = new Vector*[slices];
+	Vector3** pointMatrix = new Vector3*[slices];
 	for (int i = 0; i < slices; i++)
-		pointMatrix[i] = new Vector[segments];
+		pointMatrix[i] = new Vector3[segments];
 
 	for (int i = 0; i < slices; i++)
 	{
 		double phi = 2.0 * MESH_NINJA_PI * double(i) / double(slices);
 
-		Vector majorVector;
+		Vector3 majorVector;
 
 		majorVector.x = majorRadius * ::cos(phi);
 		majorVector.y = majorRadius * ::sin(phi);
@@ -749,10 +749,10 @@ bool ConvexPolygonMesh::GenerateTorus(double innerRadius, double outerRadius, in
 		{
 			double theta = 2.0 * MESH_NINJA_PI * double(j) / double(segments);
 
-			Vector xAxis = majorVector.Normalized();
-			Vector yAxis(0.0, 0.0, 1.0);
+			Vector3 xAxis = majorVector.Normalized();
+			Vector3 yAxis(0.0, 0.0, 1.0);
 
-			Vector minorVector = xAxis * minorRadius * ::cos(theta) + yAxis * minorRadius * ::sin(theta);
+			Vector3 minorVector = xAxis * minorRadius * ::cos(theta) + yAxis * minorRadius * ::sin(theta);
 
 			pointMatrix[i][j] = majorVector + minorVector;
 		}
@@ -788,15 +788,15 @@ bool ConvexPolygonMesh::GenerateMobiusStrip(double width, double radius, int seg
 
 	std::vector<ConvexPolygon> polygonArray;
 
-	Vector** pointMatrix = new Vector*[segments];
+	Vector3** pointMatrix = new Vector3*[segments];
 	for (int i = 0; i < segments; i++)
-		pointMatrix[i] = new Vector[2];
+		pointMatrix[i] = new Vector3[2];
 
 	for (int i = 0; i < segments; i++)
 	{
 		double theta = 2.0 * MESH_NINJA_PI * double(i) / double(segments);
 
-		Vector majorVector;
+		Vector3 majorVector;
 
 		majorVector.x = radius * ::cos(theta);
 		majorVector.y = radius * ::sin(theta);
@@ -804,10 +804,10 @@ bool ConvexPolygonMesh::GenerateMobiusStrip(double width, double radius, int seg
 
 		double phi = MESH_NINJA_PI * double(i) / double(segments);
 
-		Vector xAxis = majorVector.Normalized();
-		Vector yAxis(0.0, 0.0, 1.0);
+		Vector3 xAxis = majorVector.Normalized();
+		Vector3 yAxis(0.0, 0.0, 1.0);
 
-		Vector minorVector = xAxis * width * ::cos(phi) + yAxis * width * ::sin(phi);
+		Vector3 minorVector = xAxis * width * ::cos(phi) + yAxis * width * ::sin(phi);
 
 		pointMatrix[i][0] = majorVector + minorVector;
 		pointMatrix[i][1] = majorVector - minorVector;
@@ -847,11 +847,11 @@ bool ConvexPolygonMesh::GenerateKleinBottle(int segments)
 {
 	CompositeBezierCurve curve;
 
-	curve.controlPointArray->push_back(CompositeBezierCurve::ControlPoint{ Vector(0.0, 16.0, 0.0), Vector(0.0, -2.0, 0.0) });
-	curve.controlPointArray->push_back(CompositeBezierCurve::ControlPoint{ Vector(-1.0, 0.0, 0.0), Vector(0.0, -2.0, 0.0) });
-	curve.controlPointArray->push_back(CompositeBezierCurve::ControlPoint{ Vector(3.0, -4.0, 0.0), Vector(2.0, 0.0, 0.0) });
-	curve.controlPointArray->push_back(CompositeBezierCurve::ControlPoint{ Vector(7.0, 0.0, 0.0), Vector(0.0, 3.0, 0.0) });
-	curve.controlPointArray->push_back(CompositeBezierCurve::ControlPoint{ Vector(0.0, 16.0, 0.0), Vector(0.0, 8.0, 0.0) });
+	curve.controlPointArray->push_back(CompositeBezierCurve::ControlPoint{ Vector3(0.0, 16.0, 0.0), Vector3(0.0, -2.0, 0.0) });
+	curve.controlPointArray->push_back(CompositeBezierCurve::ControlPoint{ Vector3(-1.0, 0.0, 0.0), Vector3(0.0, -2.0, 0.0) });
+	curve.controlPointArray->push_back(CompositeBezierCurve::ControlPoint{ Vector3(3.0, -4.0, 0.0), Vector3(2.0, 0.0, 0.0) });
+	curve.controlPointArray->push_back(CompositeBezierCurve::ControlPoint{ Vector3(7.0, 0.0, 0.0), Vector3(0.0, 3.0, 0.0) });
+	curve.controlPointArray->push_back(CompositeBezierCurve::ControlPoint{ Vector3(0.0, 16.0, 0.0), Vector3(0.0, 8.0, 0.0) });
 
 	curve.GenerateTubeMesh(*this, 1.0, 16, [](double t) -> double
 		{
@@ -871,13 +871,13 @@ bool ConvexPolygonMesh::GenerateKleinBottle(int segments)
 	return true;
 }
 
-Vector ConvexPolygonMesh::CalcCenter() const
+Vector3 ConvexPolygonMesh::CalcCenter() const
 {
-	Vector center(0.0, 0.0, 0.0);
+	Vector3 center(0.0, 0.0, 0.0);
 
 	if (this->vertexArray->size() > 0)
 	{
-		for (const Vector& vertex : *this->vertexArray)
+		for (const Vector3& vertex : *this->vertexArray)
 			center += vertex;
 
 		center /= double(this->vertexArray->size());
@@ -906,14 +906,14 @@ bool ConvexPolygonMesh::Triangle::IsCanceledBy(const Triangle& triangle) const
 	return false;
 }
 
-void ConvexPolygonMesh::Triangle::MakePolygon(ConvexPolygon& polygon, const std::vector<Vector>& pointArray) const
+void ConvexPolygonMesh::Triangle::MakePolygon(ConvexPolygon& polygon, const std::vector<Vector3>& pointArray) const
 {
 	polygon.Clear();
 	for (int i = 0; i < 3; i++)
 		polygon.vertexArray->push_back(pointArray[this->vertex[i]]);
 }
 
-void ConvexPolygonMesh::Triangle::MakePlane(Plane& plane, const std::vector<Vector>& pointArray) const
+void ConvexPolygonMesh::Triangle::MakePlane(Plane& plane, const std::vector<Vector3>& pointArray) const
 {
 	ConvexPolygon polygon;
 	this->MakePolygon(polygon, pointArray);
@@ -1122,8 +1122,8 @@ bool ConvexPolygonMesh::Facet::CalcInteriorAngleStats(AngleStats& angleStats, co
 		int j = (i + 1) % this->vertexArray->size();
 		int k = (i + 2) % this->vertexArray->size();
 
-		const Vector& edgeA = (*mesh->vertexArray)[i] - (*mesh->vertexArray)[j];
-		const Vector& edgeB = (*mesh->vertexArray)[k] - (*mesh->vertexArray)[j];
+		const Vector3& edgeA = (*mesh->vertexArray)[i] - (*mesh->vertexArray)[j];
+		const Vector3& edgeB = (*mesh->vertexArray)[k] - (*mesh->vertexArray)[j];
 
 		double angle = edgeA.AngleBetweenThisAnd(edgeB);
 
@@ -1156,12 +1156,12 @@ void ConvexPolygonMesh::Facet::Reverse()
 
 void ConvexPolygonMesh::CenterAndScale(double radius)
 {
-	Vector center = this->CalcCenter();
-	for (Vector& vertex : *this->vertexArray)
+	Vector3 center = this->CalcCenter();
+	for (Vector3& vertex : *this->vertexArray)
 		vertex -= center;
 
 	double maxLength = DBL_MIN;
-	for (Vector& vertex : *this->vertexArray)
+	for (Vector3& vertex : *this->vertexArray)
 	{
 		double length = vertex.Length();
 		if (length > maxLength)
@@ -1171,7 +1171,7 @@ void ConvexPolygonMesh::CenterAndScale(double radius)
 	if (maxLength > 0.0)
 	{
 		double scale = radius / maxLength;
-		for (Vector& vertex : *this->vertexArray)
+		for (Vector3& vertex : *this->vertexArray)
 			vertex *= scale;
 	}
 }

@@ -149,10 +149,10 @@ void DebugDraw::AddObject(Object* object)
 
 DebugDraw::Object::Object()
 {
-	this->color = Vector(1.0, 1.0, 1.0);
+	this->color = Vector3(1.0, 1.0, 1.0);
 }
 
-DebugDraw::Object::Object(const Vector& color)
+DebugDraw::Object::Object(const Vector3& color)
 {
 	this->color = color;
 }
@@ -185,7 +185,7 @@ DebugDraw::Object::Object(const Vector& color)
 	return true;
 }
 
-/*static*/ bool DebugDraw::Object::SaveVector(JsonObject* jsonObject, const std::string& key, const Vector& vector)
+/*static*/ bool DebugDraw::Object::SaveVector(JsonObject* jsonObject, const std::string& key, const Vector3& vector)
 {
 	if (jsonObject->GetValue(key))
 		return false;
@@ -198,7 +198,7 @@ DebugDraw::Object::Object(const Vector& color)
 	return jsonObject->SetValue(key, jsonVector);
 }
 
-/*static*/ bool DebugDraw::Object::LoadVector(const JsonObject* jsonObject, const std::string& key, Vector& vector)
+/*static*/ bool DebugDraw::Object::LoadVector(const JsonObject* jsonObject, const std::string& key, Vector3& vector)
 {
 	const JsonObject* jsonVector = dynamic_cast<const JsonObject*>(jsonObject->GetValue(key));
 	if (!jsonVector)
@@ -222,10 +222,10 @@ DebugDraw::Object::Object(const Vector& color)
 
 DebugDraw::Point::Point()
 {
-	this->vertex = Vector(0.0, 0.0, 0.0);
+	this->vertex = Vector3(0.0, 0.0, 0.0);
 }
 
-DebugDraw::Point::Point(const Vector& vertex, const Vector& color) : Object(color)
+DebugDraw::Point::Point(const Vector3& vertex, const Vector3& color) : Object(color)
 {
 	this->vertex = vertex;
 }
@@ -270,11 +270,11 @@ DebugDraw::Point::Point(const Vector& vertex, const Vector& color) : Object(colo
 
 DebugDraw::Line::Line()
 {
-	this->vertex[0] = Vector(0.0, 0.0, 0.0);
-	this->vertex[1] = Vector(1.0, 0.0, 0.0);
+	this->vertex[0] = Vector3(0.0, 0.0, 0.0);
+	this->vertex[1] = Vector3(1.0, 0.0, 0.0);
 }
 
-DebugDraw::Line::Line(const Vector& pointA, const Vector& pointB, const Vector& color) : Object(color)
+DebugDraw::Line::Line(const Vector3& pointA, const Vector3& pointB, const Vector3& color) : Object(color)
 {
 	this->vertex[0] = pointA;
 	this->vertex[1] = pointB;

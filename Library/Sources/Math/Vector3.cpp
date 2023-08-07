@@ -1,116 +1,116 @@
-#include "Vector.h"
+#include "Vector3.h"
 #include "Quaternion.h"
 
 using namespace MeshNinja;
 
-Vector::Vector()
+Vector3::Vector3()
 {
 	this->x = 0.0;
 	this->y = 0.0;
 	this->z = 0.0;
 }
 
-Vector::Vector(double x, double y, double z)
+Vector3::Vector3(double x, double y, double z)
 {
 	this->x = x;
 	this->y = y;
 	this->z = z;
 }
 
-Vector::Vector(const Vector& vector)
+Vector3::Vector3(const Vector3& vector)
 {
 	this->x = vector.x;
 	this->y = vector.y;
 	this->z = vector.z;
 }
 
-Vector::Vector(const Quaternion& quat)
+Vector3::Vector3(const Quaternion& quat)
 {
 	this->x = quat.x;
 	this->y = quat.y;
 	this->z = quat.z;
 }
 
-/*virtual*/ Vector::~Vector()
+/*virtual*/ Vector3::~Vector3()
 {
 }
 
-bool Vector::operator==(const Vector& vector)
+bool Vector3::operator==(const Vector3& vector)
 {
 	return this->x == vector.x && this->y == vector.y && this->z == vector.z;
 }
 
-void Vector::operator=(const Vector& vector)
+void Vector3::operator=(const Vector3& vector)
 {
 	this->x = vector.x;
 	this->y = vector.y;
 	this->z = vector.z;
 }
 
-void Vector::operator+=(const Vector& vector)
+void Vector3::operator+=(const Vector3& vector)
 {
 	this->x += vector.x;
 	this->y += vector.y;
 	this->z += vector.z;
 }
 
-void Vector::operator-=(const Vector& vector)
+void Vector3::operator-=(const Vector3& vector)
 {
 	this->x -= vector.x;
 	this->y -= vector.y;
 	this->z -= vector.z;
 }
 
-void Vector::operator*=(double scale)
+void Vector3::operator*=(double scale)
 {
 	this->x *= scale;
 	this->y *= scale;
 	this->z *= scale;
 }
 
-void Vector::operator/=(double scale)
+void Vector3::operator/=(double scale)
 {
 	this->x /= scale;
 	this->y /= scale;
 	this->z /= scale;
 }
 
-Vector Vector::operator*(double scale)
+Vector3 Vector3::operator*(double scale)
 {
-	return Vector(
+	return Vector3(
 		this->x * scale,
 		this->y * scale,
 		this->z * scale);
 }
 
-Vector Vector::operator-() const
+Vector3 Vector3::operator-() const
 {
-	return Vector(
+	return Vector3(
 		-this->x,
 		-this->y,
 		-this->z);
 }
 
-void Vector::SetComponents(double x, double y, double z)
+void Vector3::SetComponents(double x, double y, double z)
 {
 	this->x = x;
 	this->y = y;
 	this->z = z;
 }
 
-void Vector::GetComponents(double& x, double& y, double& z) const
+void Vector3::GetComponents(double& x, double& y, double& z) const
 {
 	x = this->x;
 	y = this->y;
 	z = this->z;
 }
 
-double Vector::Length() const
+double Vector3::Length() const
 {
 	return ::sqrt(this->Dot(*this));
 }
 
-bool Vector::Normalize(double* returnedLength /*= nullptr*/)
+bool Vector3::Normalize(double* returnedLength /*= nullptr*/)
 {
 	double length = this->Length();
 	if (length == 0.0)
@@ -127,14 +127,14 @@ bool Vector::Normalize(double* returnedLength /*= nullptr*/)
 	return true;
 }
 
-Vector Vector::Normalized() const
+Vector3 Vector3::Normalized() const
 {
-	Vector unitVector(*this);
+	Vector3 unitVector(*this);
 	unitVector.Normalize();
 	return unitVector;
 }
 
-double Vector::Dot(const Vector& vector) const
+double Vector3::Dot(const Vector3& vector) const
 {
 	double dot =
 		this->x * vector.x +
@@ -144,28 +144,28 @@ double Vector::Dot(const Vector& vector) const
 	return dot;
 }
 
-Vector Vector::Cross(const Vector& vector) const
+Vector3 Vector3::Cross(const Vector3& vector) const
 {
-	return Vector(
+	return Vector3(
 		this->y * vector.z - this->z * vector.y,
 		this->z * vector.x - this->x * vector.z,
 		this->x * vector.y - this->y * vector.x);
 }
 
-/*static*/ double Vector::Dot(const Vector& vectorA, const Vector& vectorB)
+/*static*/ double Vector3::Dot(const Vector3& vectorA, const Vector3& vectorB)
 {
 	return vectorA.Dot(vectorB);
 }
 
-Vector& Vector::Cross(const Vector& vectorA, const Vector& vectorB)
+Vector3& Vector3::Cross(const Vector3& vectorA, const Vector3& vectorB)
 {
 	*this = vectorA.Cross(vectorB);
 	return *this;
 }
 
-bool Vector::ProjectOnto(const Vector& vector)
+bool Vector3::ProjectOnto(const Vector3& vector)
 {
-	Vector normal(vector);
+	Vector3 normal(vector);
 	if (!normal.Normalize())
 		return false;
 
@@ -173,9 +173,9 @@ bool Vector::ProjectOnto(const Vector& vector)
 	return true;
 }
 
-bool Vector::RejectFrom(const Vector& vector)
+bool Vector3::RejectFrom(const Vector3& vector)
 {
-	Vector projection(*this);
+	Vector3 projection(*this);
 	if (!projection.ProjectOnto(vector))
 		return false;
 
@@ -183,20 +183,20 @@ bool Vector::RejectFrom(const Vector& vector)
 	return true;
 }
 
-bool Vector::RotateAbout(const Vector& vector, double angle)
+bool Vector3::RotateAbout(const Vector3& vector, double angle)
 {
-	Vector axis(vector);
+	Vector3 axis(vector);
 	if (!axis.Normalize())
 		return false;
 
-	Vector projection = axis * this->Dot(axis);
-	Vector rejection = *this - projection;
+	Vector3 projection = axis * this->Dot(axis);
+	Vector3 rejection = *this - projection;
 
-	Vector xAxis(rejection);
+	Vector3 xAxis(rejection);
 	double length = 0.0;
 	if (xAxis.Normalize(&length))
 	{
-		Vector yAxis = axis.Cross(xAxis);
+		Vector3 yAxis = axis.Cross(xAxis);
 		rejection = (xAxis * ::cos(angle) + yAxis * ::sin(angle)) * length;
 		*this = rejection + projection;
 	}
@@ -204,12 +204,12 @@ bool Vector::RotateAbout(const Vector& vector, double angle)
 	return true;
 }
 
-bool Vector::Intersect(const Line& line, const Plane& plane)
+bool Vector3::Intersect(const Line& line, const Plane& plane)
 {
 	return false;
 }
 
-bool Vector::ToString(std::string& str) const
+bool Vector3::ToString(std::string& str) const
 {
 	std::stringstream stringStream;
 	stringStream << this->x << ", " << this->y << ", " << this->z;
@@ -217,13 +217,13 @@ bool Vector::ToString(std::string& str) const
 	return true;
 }
 
-bool Vector::FromString(const std::string& str)
+bool Vector3::FromString(const std::string& str)
 {
 	// TODO: Write this.
 	return false;
 }
 
-bool Vector::MakeOrthogonalTo(const Vector& vector)
+bool Vector3::MakeOrthogonalTo(const Vector3& vector)
 {
 	double ax = fabs(vector.x);
 	double ay = fabs(vector.y);
@@ -254,15 +254,15 @@ bool Vector::MakeOrthogonalTo(const Vector& vector)
 	return false;
 }
 
-bool Vector::IsEqualTo(const Vector& vector, double eps /*= MESH_NINJA_EPS*/) const
+bool Vector3::IsEqualTo(const Vector3& vector, double eps /*= MESH_NINJA_EPS*/) const
 {
 	return (*this - vector).Length() < eps;
 }
 
-double Vector::AngleBetweenThisAnd(const Vector& vector) const
+double Vector3::AngleBetweenThisAnd(const Vector3& vector) const
 {
-	Vector unitNormalA(*this);
-	Vector unitNormalB(vector);
+	Vector3 unitNormalA(*this);
+	Vector3 unitNormalB(vector);
 
 	if (!unitNormalA.Normalize() || !unitNormalB.Normalize())
 		return 0.0;
@@ -272,21 +272,21 @@ double Vector::AngleBetweenThisAnd(const Vector& vector) const
 	return ::acos(dot);
 }
 
-void Vector::Max(const Vector& vectorA, const Vector& vectorB)
+void Vector3::Max(const Vector3& vectorA, const Vector3& vectorB)
 {
 	this->x = MESH_NINJA_MAX(vectorA.x, vectorB.x);
 	this->y = MESH_NINJA_MAX(vectorA.y, vectorB.y);
 	this->z = MESH_NINJA_MAX(vectorA.z, vectorB.z);
 }
 
-void Vector::Min(const Vector& vectorA, const Vector& vectorB)
+void Vector3::Min(const Vector3& vectorA, const Vector3& vectorB)
 {
 	this->x = MESH_NINJA_MIN(vectorA.x, vectorB.x);
 	this->y = MESH_NINJA_MIN(vectorA.y, vectorB.y);
 	this->z = MESH_NINJA_MIN(vectorA.z, vectorB.z);
 }
 
-unsigned int Vector::ToColor() const
+unsigned int Vector3::ToColor() const
 {
 	unsigned int r = unsigned int(MESH_NINJA_CLAMP(this->x, 0.0, 1.0) * 255.0);
 	unsigned int g = unsigned int(MESH_NINJA_CLAMP(this->y, 0.0, 1.0) * 255.0);
@@ -296,7 +296,7 @@ unsigned int Vector::ToColor() const
 	return color;
 }
 
-void Vector::FromColor(unsigned int color)
+void Vector3::FromColor(unsigned int color)
 {
 	unsigned int r = (color >> 0) & 0xFF;
 	unsigned int g = (color >> 8) & 0xFF;
@@ -309,47 +309,47 @@ void Vector::FromColor(unsigned int color)
 
 namespace MeshNinja
 {
-	Vector operator+(const Vector& vectorA, const Vector& vectorB)
+	Vector3 operator+(const Vector3& vectorA, const Vector3& vectorB)
 	{
-		return Vector(
+		return Vector3(
 			vectorA.x + vectorB.x,
 			vectorA.y + vectorB.y,
 			vectorA.z + vectorB.z);
 	}
 
-	Vector operator-(const Vector& vectorA, const Vector& vectorB)
+	Vector3 operator-(const Vector3& vectorA, const Vector3& vectorB)
 	{
-		return Vector(
+		return Vector3(
 			vectorA.x - vectorB.x,
 			vectorA.y - vectorB.y,
 			vectorA.z - vectorB.z);
 	}
 
-	Vector operator*(const Vector& vector, double scale)
+	Vector3 operator*(const Vector3& vector, double scale)
 	{
-		return Vector(
+		return Vector3(
 			vector.x * scale,
 			vector.y * scale,
 			vector.z * scale);
 	}
 
-	Vector operator*(double scale, const Vector& vector)
+	Vector3 operator*(double scale, const Vector3& vector)
 	{
-		return Vector(
+		return Vector3(
 			vector.x * scale,
 			vector.y * scale,
 			vector.z * scale);
 	}
 
-	Vector operator/(const Vector& vector, double scale)
+	Vector3 operator/(const Vector3& vector, double scale)
 	{
-		return Vector(
+		return Vector3(
 			vector.x / scale,
 			vector.y / scale,
 			vector.z / scale);
 	}
 
-	bool operator<(const Vector& vectorA, const Vector& vectorB)
+	bool operator<(const Vector3& vectorA, const Vector3& vectorB)
 	{
 		std::string strA, strB;
 		vectorA.ToString(strA);

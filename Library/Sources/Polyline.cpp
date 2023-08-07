@@ -7,18 +7,18 @@ using namespace MeshNinja;
 
 Polyline::Polyline()
 {
-	this->vertexArray = new std::vector<Vector>();
+	this->vertexArray = new std::vector<Vector3>();
 }
 
 Polyline::Polyline(const Polyline& polyline)
 {
-	this->vertexArray = new std::vector<Vector>();
+	this->vertexArray = new std::vector<Vector3>();
 	*this->vertexArray = *polyline.vertexArray;
 }
 
-Polyline::Polyline(const Vector& vertexA, const Vector& vertexB)
+Polyline::Polyline(const Vector3& vertexA, const Vector3& vertexB)
 {
-	this->vertexArray = new std::vector<Vector>();
+	this->vertexArray = new std::vector<Vector3>();
 	this->vertexArray->push_back(vertexA);
 	this->vertexArray->push_back(vertexB);
 }
@@ -28,12 +28,12 @@ Polyline::Polyline(const Vector& vertexA, const Vector& vertexB)
 	delete this->vertexArray;
 }
 
-const Vector& Polyline::GetFirstVertex() const
+const Vector3& Polyline::GetFirstVertex() const
 {
 	return (*this->vertexArray)[0];
 }
 
-const Vector& Polyline::GetLastVertex() const
+const Vector3& Polyline::GetLastVertex() const
 {
 	return (*this->vertexArray)[this->vertexArray->size() - 1];
 }
@@ -51,7 +51,7 @@ bool Polyline::IsLineLoop(double eps /*= MESH_NINJA_EPS*/) const
 
 void Polyline::ReverseOrder()
 {
-	std::vector<Vector> reversedVertexArray;
+	std::vector<Vector3> reversedVertexArray;
 	for (int i = this->vertexArray->size() - 1; i >= 0; i--)
 		reversedVertexArray.push_back((*this->vertexArray)[i]);
 
@@ -117,10 +117,10 @@ void Polyline::Concatinate(const Polyline& polylineA, const Polyline& polylineB)
 {
 	this->vertexArray->clear();
 
-	for (const Vector& vertex : *polylineA.vertexArray)
+	for (const Vector3& vertex : *polylineA.vertexArray)
 		this->vertexArray->push_back(vertex);
 
-	for (const Vector& vertex : *polylineB.vertexArray)
+	for (const Vector3& vertex : *polylineB.vertexArray)
 		this->vertexArray->push_back(vertex);
 }
 
@@ -133,10 +133,10 @@ bool Polyline::GenerateTubeMesh(ConvexPolygonMesh& tubeMesh, double radius, int 
 	int numVertices = this->vertexArray->size();
 	for (int i = 0; i < numVertices - 1; i++)
 	{
-		const Vector& vertexA = (*this->vertexArray)[i];
-		const Vector& vertexB = (*this->vertexArray)[i + 1];
+		const Vector3& vertexA = (*this->vertexArray)[i];
+		const Vector3& vertexB = (*this->vertexArray)[i + 1];
 
-		Vector vectorA, vectorB;
+		Vector3 vectorA, vectorB;
 
 		if (i > 0)
 			vectorA = (*this->vertexArray)[i - 1] - (*this->vertexArray)[i];
@@ -155,14 +155,14 @@ bool Polyline::GenerateTubeMesh(ConvexPolygonMesh& tubeMesh, double radius, int 
 		vectorA.Normalize();
 		vectorB.Normalize();
 
-		Vector axisVectorA(vertexA - vertexB);
-		Vector axisVectorB(vertexB - vertexA);
+		Vector3 axisVectorA(vertexA - vertexB);
+		Vector3 axisVectorB(vertexB - vertexA);
 
 		axisVectorA.Normalize();
 		axisVectorB.Normalize();
 
-		Vector capNormalA(axisVectorA + vectorA);
-		Vector capNormalB(axisVectorB + vectorB);
+		Vector3 capNormalA(axisVectorA + vectorA);
+		Vector3 capNormalB(axisVectorB + vectorB);
 
 		capNormalA.Normalize();
 		capNormalB.Normalize();
@@ -170,20 +170,20 @@ bool Polyline::GenerateTubeMesh(ConvexPolygonMesh& tubeMesh, double radius, int 
 		Plane capPlaneA(vertexA, capNormalA);
 		Plane capPlaneB(vertexB, capNormalB);
 
-		Vector origin = (vertexA + vertexB) / 2.0;
+		Vector3 origin = (vertexA + vertexB) / 2.0;
 
-		Vector zAxis = vertexB - vertexA;
+		Vector3 zAxis = vertexB - vertexA;
 		zAxis.Normalize();
-		Vector yAxis;
+		Vector3 yAxis;
 		yAxis.MakeOrthogonalTo(zAxis);
 		yAxis.Normalize();
-		Vector xAxis = yAxis.Cross(zAxis);
+		Vector3 xAxis = yAxis.Cross(zAxis);
 
-		std::vector<Vector> pointArrayA, pointArrayB;
+		std::vector<Vector3> pointArrayA, pointArrayB;
 		for (int j = 0; j < numSides; j++)
 		{
 			double angle = (double(j) / double(numSides)) * 2.0 * M_PI;
-			Vector circlePoint;
+			Vector3 circlePoint;
 			circlePoint = origin + (xAxis * cos(angle) + yAxis * sin(angle)) * radius;
 
 			double alpha = 0.0;

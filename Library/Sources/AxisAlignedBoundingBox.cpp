@@ -6,13 +6,13 @@ AxisAlignedBoundingBox::AxisAlignedBoundingBox()
 {
 }
 
-AxisAlignedBoundingBox::AxisAlignedBoundingBox(const Vector& point)
+AxisAlignedBoundingBox::AxisAlignedBoundingBox(const Vector3& point)
 {
 	this->min = point;
 	this->max = point;
 }
 
-AxisAlignedBoundingBox::AxisAlignedBoundingBox(const Vector& min, const Vector& max)
+AxisAlignedBoundingBox::AxisAlignedBoundingBox(const Vector3& min, const Vector3& max)
 {
 	this->min = min;
 	this->max = max;
@@ -62,17 +62,17 @@ double AxisAlignedBoundingBox::Volume() const
 	return this->Width() * this->Height() * this->Depth();
 }
 
-Vector AxisAlignedBoundingBox::Center() const
+Vector3 AxisAlignedBoundingBox::Center() const
 {
 	return (this->min + this->max) / 2.0;
 }
 
 void AxisAlignedBoundingBox::ScaleAboutCenter(double scale)
 {
-	Vector center = this->Center();
+	Vector3 center = this->Center();
 	
-	Vector minDelta = this->min - center;
-	Vector maxDelta = this->max - center;
+	Vector3 minDelta = this->min - center;
+	Vector3 maxDelta = this->max - center;
 	
 	minDelta *= scale;
 	maxDelta *= scale;
@@ -86,7 +86,7 @@ bool AxisAlignedBoundingBox::ContainsBox(const AxisAlignedBoundingBox& aabb) con
 	return this->ContainsPoint(aabb.min) && this->ContainsPoint(aabb.max);
 }
 
-bool AxisAlignedBoundingBox::ContainsPoint(const Vector& point, double eps /*= MESH_NINJA_EPS*/) const
+bool AxisAlignedBoundingBox::ContainsPoint(const Vector3& point, double eps /*= MESH_NINJA_EPS*/) const
 {
 	return (
 		this->min.x - eps <= point.x && point.x <= this->max.x + eps &&
@@ -94,7 +94,7 @@ bool AxisAlignedBoundingBox::ContainsPoint(const Vector& point, double eps /*= M
 		this->min.z - eps <= point.z && point.z <= this->max.z + eps);
 }
 
-bool AxisAlignedBoundingBox::ContainsInteriorPoint(const Vector& point, double eps /*= MESH_NINJA_EPS*/) const
+bool AxisAlignedBoundingBox::ContainsInteriorPoint(const Vector3& point, double eps /*= MESH_NINJA_EPS*/) const
 {
 	return (
 		this->min.x + eps <= point.x && point.x <= this->max.x - eps &&
@@ -102,12 +102,12 @@ bool AxisAlignedBoundingBox::ContainsInteriorPoint(const Vector& point, double e
 		this->min.z + eps <= point.z && point.z <= this->max.z - eps);
 }
 
-bool AxisAlignedBoundingBox::ContainsPointOnBoundary(const Vector& point, double eps /*= MESH_NINJA_EPS*/) const
+bool AxisAlignedBoundingBox::ContainsPointOnBoundary(const Vector3& point, double eps /*= MESH_NINJA_EPS*/) const
 {
 	return this->ContainsPoint(point) && !this->ContainsInteriorPoint(point, eps);
 }
 
-void AxisAlignedBoundingBox::ExpandToIncludePoint(const Vector& point)
+void AxisAlignedBoundingBox::ExpandToIncludePoint(const Vector3& point)
 {
 	this->min.x = MESH_NINJA_MIN(this->min.x, point.x);
 	this->min.y = MESH_NINJA_MIN(this->min.y, point.y);
@@ -149,7 +149,7 @@ void AxisAlignedBoundingBox::SplitReasonably(AxisAlignedBoundingBox& aabbA, Axis
 
 	double maxDimension = MESH_NINJA_MAX(width, MESH_NINJA_MAX(height, depth));
 
-	Vector center = this->Center();
+	Vector3 center = this->Center();
 
 	aabbA.min = this->min;
 	aabbA.max = this->max;
@@ -173,7 +173,7 @@ void AxisAlignedBoundingBox::SplitReasonably(AxisAlignedBoundingBox& aabbA, Axis
 	}
 }
 
-bool AxisAlignedBoundingBox::CalcUVWs(const Vector& point, Vector& texCoords) const
+bool AxisAlignedBoundingBox::CalcUVWs(const Vector3& point, Vector3& texCoords) const
 {
 	if (!this->ContainsPoint(point))
 		return false;

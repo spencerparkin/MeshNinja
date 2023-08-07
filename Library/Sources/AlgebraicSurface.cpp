@@ -13,17 +13,17 @@ AlgebraicSurface::AlgebraicSurface()
 {
 }
 
-/*virtual*/ Vector AlgebraicSurface::EvaluateGradient(const Vector& point) const
+/*virtual*/ Vector3 AlgebraicSurface::EvaluateGradient(const Vector3& point) const
 {
-	return Vector(0.0, 0.0, 0.0);	// TODO: Approximate gradient here using central differencing?
+	return Vector3(0.0, 0.0, 0.0);	// TODO: Approximate gradient here using central differencing?
 }
 
-/*virtual*/ double AlgebraicSurface::EvaluateDirectionalDerivative(const Vector& point, const Vector& unitDirection) const
+/*virtual*/ double AlgebraicSurface::EvaluateDirectionalDerivative(const Vector3& point, const Vector3& unitDirection) const
 {
 	return this->EvaluateGradient(point).Dot(unitDirection);
 }
 
-/*virtual*/ double AlgebraicSurface::ApproximateDirectionalDerivative(const Vector& point, const Vector& unitDirection, double delta) const
+/*virtual*/ double AlgebraicSurface::ApproximateDirectionalDerivative(const Vector3& point, const Vector3& unitDirection, double delta) const
 {
 	return (this->Evaluate(point + unitDirection * delta) - this->Evaluate(point)) / delta;
 }
@@ -48,7 +48,7 @@ QuadraticSurface::QuadraticSurface()
 {
 }
 
-/*virtual*/ double QuadraticSurface::Evaluate(const Vector& point) const
+/*virtual*/ double QuadraticSurface::Evaluate(const Vector3& point) const
 {
 	double x = point.x;
 	double y = point.y;
@@ -69,13 +69,13 @@ QuadraticSurface::QuadraticSurface()
 	return result;
 }
 
-/*virtual*/ Vector QuadraticSurface::EvaluateGradient(const Vector& point) const
+/*virtual*/ Vector3 QuadraticSurface::EvaluateGradient(const Vector3& point) const
 {
 	double x = point.x;
 	double y = point.y;
 	double z = point.z;
 
-	return Vector(
+	return Vector3(
 		2.0 * this->a * x + this->d * y + this->f * z + this->g,
 		2.0 * this->b * y + this->d * x + this->e * z + this->h,
 		2.0 * this->c * z + this->e * y + this->f * x + this->i);

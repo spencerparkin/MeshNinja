@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Common.h"
-#include "Math/Vector.h"
+#include "Math/Vector3.h"
 #include "Math/Transform.h"
 #include "ConvexPolygon.h"
 
@@ -39,28 +39,28 @@ namespace MeshNinja
 		void TessellateFaces(double eps = MESH_NINJA_EPS);
 		void ToConvexPolygonArray(std::vector<ConvexPolygon>& convexPolygonArray, bool concatinate = true) const;
 		void FromConvexPolygonArray(const std::vector<ConvexPolygon>& convexPolygonArray);
-		bool GenerateConvexHull(const std::vector<Vector>& pointArray, double eps = MESH_NINJA_EPS);
+		bool GenerateConvexHull(const std::vector<Vector3>& pointArray, double eps = MESH_NINJA_EPS);
 		bool GeneratePolyhedron(Polyhedron polyhedron, double eps = MESH_NINJA_EPS);
 		bool GenerateSphere(double radius, int segments, int slices);
 		bool GenerateCylinder(double length, double radius, int segments, int slices);
 		bool GenerateTorus(double innerRadius, double outerRadius, int segments, int slices);
 		bool GenerateMobiusStrip(double width, double radius, int segments);
 		bool GenerateKleinBottle(int segments);
-		int FindClosestPointTo(const Vector& point, double* smallestDistance = nullptr) const;
+		int FindClosestPointTo(const Vector3& point, double* smallestDistance = nullptr) const;
 		void Copy(const ConvexPolygonMesh& mesh);
-		Vector CalcCenter() const;
+		Vector3 CalcCenter() const;
 		void ApplyTransform(const Transform& transform);
 		void ReverseAllPolygons();
 		void CenterAndScale(double radius);
-		bool AddRedundantVertex(const Vector& vertex, double eps = MESH_NINJA_EPS);
+		bool AddRedundantVertex(const Vector3& vertex, double eps = MESH_NINJA_EPS);
 
 		struct MESH_NINJA_API Triangle
 		{
 			int vertex[3];
 
 			bool IsCanceledBy(const Triangle& triangle) const;
-			void MakePolygon(ConvexPolygon& polygon, const std::vector<Vector>& pointArray) const;
-			void MakePlane(Plane& plane, const std::vector<Vector>& pointArray) const;
+			void MakePolygon(ConvexPolygon& polygon, const std::vector<Vector3>& pointArray) const;
+			void MakePlane(Plane& plane, const std::vector<Vector3>& pointArray) const;
 		};
 
 		class MESH_NINJA_API Facet
@@ -92,6 +92,6 @@ namespace MeshNinja
 		};
 
 		std::vector<Facet>* facetArray;
-		std::vector<Vector>* vertexArray;
+		std::vector<Vector3>* vertexArray;
 	};
 }

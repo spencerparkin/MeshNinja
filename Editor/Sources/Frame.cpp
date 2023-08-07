@@ -420,10 +420,10 @@ void Frame::OnAddMesh(wxCommandEvent& event)
 		else if (meshName == "Plane")
 		{
 			MeshNinja::ConvexPolygon polygon;
-			polygon.vertexArray->push_back(MeshNinja::Vector(-10.0, -10.0, 0.0));
-			polygon.vertexArray->push_back(MeshNinja::Vector(10.0, -10.0, 0.0));
-			polygon.vertexArray->push_back(MeshNinja::Vector(10.0, 10.0, 0.0));
-			polygon.vertexArray->push_back(MeshNinja::Vector(-10.0, 10.0, 0.0));
+			polygon.vertexArray->push_back(MeshNinja::Vector3(-10.0, -10.0, 0.0));
+			polygon.vertexArray->push_back(MeshNinja::Vector3(10.0, -10.0, 0.0));
+			polygon.vertexArray->push_back(MeshNinja::Vector3(10.0, 10.0, 0.0));
+			polygon.vertexArray->push_back(MeshNinja::Vector3(-10.0, 10.0, 0.0));
 
 			std::vector<MeshNinja::ConvexPolygon> polygonArray;
 			polygonArray.push_back(polygon);

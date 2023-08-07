@@ -50,7 +50,7 @@ namespace MeshNinja
 			Node();
 			virtual ~Node();
 
-			virtual Vector GetDebugColor() const override;
+			virtual Vector3 GetDebugColor() const override;
 
 			enum class Side
 			{
@@ -68,7 +68,7 @@ namespace MeshNinja
 			Edge();
 			virtual ~Edge();
 
-			virtual Vector GetDebugColor() const override;
+			virtual Vector3 GetDebugColor() const override;
 
 			enum class Type
 			{

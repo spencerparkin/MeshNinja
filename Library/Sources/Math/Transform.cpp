@@ -15,19 +15,19 @@ Transform::Transform()
 void Transform::SetIdentity()
 {
 	this->matrix.SetIdentity();
-	this->translation = Vector(0.0, 0.0, 0.0);
+	this->translation = Vector3(0.0, 0.0, 0.0);
 }
 
-Vector Transform::TransformVector(const Vector& vector) const
+Vector3 Transform::TransformVector(const Vector3& vector) const
 {
-	Vector result;
+	Vector3 result;
 	this->matrix.MultiplyRight(vector, result);
 	return result;
 }
 
-Vector Transform::TransformPosition(const Vector& position) const
+Vector3 Transform::TransformPosition(const Vector3& position) const
 {
-	Vector result;
+	Vector3 result;
 	this->matrix.MultiplyRight(position, result);
 	result += this->translation;
 	return result;
@@ -35,7 +35,7 @@ Vector Transform::TransformPosition(const Vector& position) const
 
 void Transform::TransformPolygon(ConvexPolygon& polygon) const
 {
-	for (Vector& vertex : *polygon.vertexArray)
+	for (Vector3& vertex : *polygon.vertexArray)
 		vertex = this->TransformPosition(vertex);
 }
 
@@ -62,7 +62,7 @@ Transform& Transform::Multiply(const Transform& transformA, const Transform& tra
 	return *this;
 }
 
-Vector Transform::operator*(const Vector& vector)
+Vector3 Transform::operator*(const Vector3& vector)
 {
 	return this->TransformVector(vector);
 }

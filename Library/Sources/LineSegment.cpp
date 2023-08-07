@@ -12,7 +12,7 @@ LineSegment::LineSegment(const LineSegment& lineSegment)
 	this->vertexB = lineSegment.vertexB;
 }
 
-LineSegment::LineSegment(const Vector& vertexA, const Vector& vertexB)
+LineSegment::LineSegment(const Vector3& vertexA, const Vector3& vertexB)
 {
 	this->vertexA = vertexA;
 	this->vertexB = vertexB;
@@ -22,9 +22,9 @@ LineSegment::LineSegment(const Vector& vertexA, const Vector& vertexB)
 {
 }
 
-double LineSegment::DistanceToPoint(const Vector& point) const
+double LineSegment::DistanceToPoint(const Vector3& point) const
 {
-	Vector axis = this->vertexB - this->vertexA;
+	Vector3 axis = this->vertexB - this->vertexA;
 	double length = axis.Length();
 	if (length == 0.0)
 		return (point - this->vertexA).Length();
@@ -42,17 +42,17 @@ double LineSegment::DistanceToPoint(const Vector& point) const
 	return distance;
 }
 
-bool LineSegment::ContainsPoint(const Vector& point, double eps /*= MESH_NINJA_EPS*/) const
+bool LineSegment::ContainsPoint(const Vector3& point, double eps /*= MESH_NINJA_EPS*/) const
 {
 	return this->DistanceToPoint(point) < eps;
 }
 
-bool LineSegment::IsEndPoint(const Vector& point, double eps /*= MESH_NINJA_EPS*/) const
+bool LineSegment::IsEndPoint(const Vector3& point, double eps /*= MESH_NINJA_EPS*/) const
 {
 	return point.IsEqualTo(this->vertexA, eps) || point.IsEqualTo(this->vertexB, eps);
 }
 
-bool LineSegment::IsInteriorPoint(const Vector& point, double eps /*= MESH_NINJA_EPS*/) const
+bool LineSegment::IsInteriorPoint(const Vector3& point, double eps /*= MESH_NINJA_EPS*/) const
 {
 	return !this->IsEndPoint(point, eps) && this->ContainsPoint(point, eps);
 }
@@ -68,7 +68,7 @@ bool LineSegment::IsEqualTo(const LineSegment& lineSegment, double eps /*= MESH_
 	return false;
 }
 
-Vector LineSegment::CalcMidpoint() const
+Vector3 LineSegment::CalcMidpoint() const
 {
 	return (this->vertexA + this->vertexB) / 2.0;
 }

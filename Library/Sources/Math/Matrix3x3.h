@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../Common.h"
-#include "Vector.h"
+#include "Vector3.h"
 #include "Quaternion.h"
 
 namespace MeshNinja
@@ -15,18 +15,18 @@ namespace MeshNinja
 
 		void SetIdentity(void);
 
-		void SetRow(int i, const Vector& vector);
-		void SetCol(int j, const Vector& vector);
-		Vector GetRow(int i) const;
-		Vector GetCol(int j) const;
+		void SetRow(int i, const Vector3& vector);
+		void SetCol(int j, const Vector3& vector);
+		Vector3 GetRow(int i) const;
+		Vector3 GetCol(int j) const;
 
 		void Orthonormalize(void);
 
 		void SetCopy(const Matrix3x3& matrix);
 		void GetCopy(Matrix3x3& matrix) const;
 
-		void SetFromAxisAngle(const Vector& axis, double angle);
-		bool GetToAxisAngle(Vector& axis, double& angle) const;
+		void SetFromAxisAngle(const Vector3& axis, double angle);
+		bool GetToAxisAngle(Vector3& axis, double& angle) const;
 
 		void SetFromQuat(const Quaternion& quat);
 		bool GetToQuat(Quaternion& quat) const; // Must be orthonormal with determinant +1 for this to work.
@@ -41,13 +41,13 @@ namespace MeshNinja
 
 		void SetProduct(const Matrix3x3& matrixA, const Matrix3x3& matrixB);
 
-		void MultiplyLeft(const Vector& inVector, Vector& outVector) const;
-		void MultiplyRight(const Vector& inVector, Vector& outVector) const;
+		void MultiplyLeft(const Vector3& inVector, Vector3& outVector) const;
+		void MultiplyRight(const Vector3& inVector, Vector3& outVector) const;
 
 		void operator=(const Matrix3x3& matrix);
 		void operator*=(const Matrix3x3& matrix);
 		void operator/=(const Matrix3x3& matrix);
-		Vector operator*(const Vector& vector) const;
+		Vector3 operator*(const Vector3& vector) const;
 
 		double Determinant(void) const;
 		double Trace(void) const;

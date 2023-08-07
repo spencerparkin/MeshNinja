@@ -187,8 +187,8 @@ bool glTF_FileFormat::WriteVertexBuffer(const RenderMesh& mesh, std::ofstream& b
 
 	long offset = (long)binFileStream.tellp();
 
-	MeshNinja::Vector minPosition(DBL_MAX, DBL_MAX, DBL_MAX);
-	MeshNinja::Vector maxPosition(DBL_MIN, DBL_MIN, DBL_MIN);
+	MeshNinja::Vector3 minPosition(DBL_MAX, DBL_MAX, DBL_MAX);
+	MeshNinja::Vector3 maxPosition(DBL_MIN, DBL_MIN, DBL_MIN);
 
 	for (const RenderMesh::Vertex& vertex : *mesh.vertexArray)
 	{

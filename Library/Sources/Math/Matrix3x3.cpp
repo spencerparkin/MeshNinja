@@ -31,7 +31,7 @@ void Matrix3x3::SetIdentity(void)
 			this->ele[i][j] = (i == j) ? 1.0 : 0.0;
 }
 
-void Matrix3x3::SetRow(int i, const Vector& vector)
+void Matrix3x3::SetRow(int i, const Vector3& vector)
 {
 	MESH_NINJA_ASSERT(0 <= i && i < 3);
 	this->ele[i][0] = vector.x;
@@ -39,7 +39,7 @@ void Matrix3x3::SetRow(int i, const Vector& vector)
 	this->ele[i][2] = vector.z;
 }
 
-void Matrix3x3::SetCol(int j, const Vector& vector)
+void Matrix3x3::SetCol(int j, const Vector3& vector)
 {
 	MESH_NINJA_ASSERT(0 <= j && j < 3);
 	this->ele[0][j] = vector.x;
@@ -47,16 +47,16 @@ void Matrix3x3::SetCol(int j, const Vector& vector)
 	this->ele[2][j] = vector.z;
 }
 
-Vector Matrix3x3::GetRow(int i) const
+Vector3 Matrix3x3::GetRow(int i) const
 {
 	MESH_NINJA_ASSERT(0 <= i && i < 3);
-	return Vector(this->ele[i][0], this->ele[i][1], this->ele[i][2]);
+	return Vector3(this->ele[i][0], this->ele[i][1], this->ele[i][2]);
 }
 
-Vector Matrix3x3::GetCol(int j) const
+Vector3 Matrix3x3::GetCol(int j) const
 {
 	MESH_NINJA_ASSERT(0 <= j && j < 3);
-	return Vector(this->ele[0][j], this->ele[1][j], this->ele[2][j]);
+	return Vector3(this->ele[0][j], this->ele[1][j], this->ele[2][j]);
 }
 
 // TODO: The SVD would give us a best-fit rotation matrix.
@@ -66,9 +66,9 @@ Vector Matrix3x3::GetCol(int j) const
 //       in some cases.
 void Matrix3x3::Orthonormalize(void)
 {
-	Vector xAxis = this->GetCol(0);
-	Vector yAxis = this->GetCol(1);
-	Vector zAxis = this->GetCol(2);
+	Vector3 xAxis = this->GetCol(0);
+	Vector3 yAxis = this->GetCol(1);
+	Vector3 zAxis = this->GetCol(2);
 
 	xAxis.Normalize();
 	yAxis.RejectFrom(xAxis);
@@ -79,11 +79,11 @@ void Matrix3x3::Orthonormalize(void)
 	this->SetCol(2, zAxis);
 }
 
-void Matrix3x3::SetFromAxisAngle(const Vector& axis, double angle)
+void Matrix3x3::SetFromAxisAngle(const Vector3& axis, double angle)
 {
-	Vector xAxis(1.0, 0.0, 0.0);
-	Vector yAxis(0.0, 1.0, 0.0);
-	Vector zAxis(0.0, 0.0, 1.0);
+	Vector3 xAxis(1.0, 0.0, 0.0);
+	Vector3 yAxis(0.0, 1.0, 0.0);
+	Vector3 zAxis(0.0, 0.0, 1.0);
 
 	xAxis.RotateAbout(axis, angle);
 	yAxis.RotateAbout(axis, angle);
@@ -94,7 +94,7 @@ void Matrix3x3::SetFromAxisAngle(const Vector& axis, double angle)
 	this->SetCol(2, zAxis);
 }
 
-bool Matrix3x3::GetToAxisAngle(Vector& axis, double& angle) const
+bool Matrix3x3::GetToAxisAngle(Vector3& axis, double& angle) const
 {
 	Quaternion quat;
 	if (!this->GetToQuat(quat))
@@ -105,9 +105,9 @@ bool Matrix3x3::GetToAxisAngle(Vector& axis, double& angle) const
 
 void Matrix3x3::SetFromQuat(const Quaternion& quat)
 {
-	Vector xAxis(1.0, 0.0, 0.0);
-	Vector yAxis(0.0, 1.0, 0.0);
-	Vector zAxis(0.0, 0.0, 1.0);
+	Vector3 xAxis(1.0, 0.0, 0.0);
+	Vector3 yAxis(0.0, 1.0, 0.0);
+	Vector3 zAxis(0.0, 0.0, 1.0);
 
 	xAxis = quat.RotateVector(xAxis);
 	yAxis = quat.RotateVector(yAxis);
@@ -196,7 +196,7 @@ bool Matrix3x3::SetInverseTranspose(const Matrix3x3& matrix)
 
 void Matrix3x3::SetProduct(const Matrix3x3& matrixA, const Matrix3x3& matrixB)
 {
-	Vector row[3], col[3];
+	Vector3 row[3], col[3];
 	for (int i = 0; i < 3; i++)
 	{
 		row[i] = matrixA.GetRow(i);
@@ -208,11 +208,11 @@ void Matrix3x3::SetProduct(const Matrix3x3& matrixA, const Matrix3x3& matrixB)
 			this->ele[i][j] = row[i].Dot(col[j]);
 }
 
-void Matrix3x3::MultiplyLeft(const Vector& inVector, Vector& outVector) const
+void Matrix3x3::MultiplyLeft(const Vector3& inVector, Vector3& outVector) const
 {
 	MESH_NINJA_ASSERT(&inVector != &outVector);
 
-	Vector col[3];
+	Vector3 col[3];
 	for (int j = 0; j < 3; j++)
 		col[j] = this->GetCol(j);
 
@@ -221,11 +221,11 @@ void Matrix3x3::MultiplyLeft(const Vector& inVector, Vector& outVector) const
 	outVector.z = inVector.Dot(col[2]);
 }
 
-void Matrix3x3::MultiplyRight(const Vector& inVector, Vector& outVector) const
+void Matrix3x3::MultiplyRight(const Vector3& inVector, Vector3& outVector) const
 {
 	MESH_NINJA_ASSERT(&inVector != &outVector);
 
-	Vector row[3];
+	Vector3 row[3];
 	for (int i = 0; i < 3; i++)
 		row[i] = this->GetRow(i);
 
@@ -251,9 +251,9 @@ void Matrix3x3::operator/=(const Matrix3x3& matrix)
 		this->SetProduct(*this, matrixInv);
 }
 
-Vector Matrix3x3::operator*(const Vector& vector) const
+Vector3 Matrix3x3::operator*(const Vector3& vector) const
 {
-	Vector result;
+	Vector3 result;
 	this->MultiplyRight(vector, result);
 	return result;
 }

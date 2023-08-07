@@ -94,7 +94,7 @@
     <ClInclude Include="Sources\Math\Quaternion.h">
       <Filter>Sources\Math</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\Math\Vector.h">
+    <ClInclude Include="Sources\Math\Vector3.h">
       <Filter>Sources\Math</Filter>
     </ClInclude>
     <ClInclude Include="Sources\Math\Transform.h">
@@ -177,7 +177,7 @@
     <ClCompile Include="Sources\Math\Quaternion.cpp">
       <Filter>Sources\Math</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\Math\Vector.cpp">
+    <ClCompile Include="Sources\Math\Vector3.cpp">
       <Filter>Sources\Math</Filter>
     </ClCompile>
     <ClCompile Include="Sources\Math\Transform.cpp">

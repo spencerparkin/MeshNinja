@@ -33,7 +33,7 @@ namespace MeshNinja
 			Node();
 			virtual ~Node();
 
-			virtual Vector GetDebugColor() const;
+			virtual Vector3 GetDebugColor() const;
 
 			const ConvexPolygonMesh::Facet* facet;
 			std::vector<Edge*> edgeArray;
@@ -62,7 +62,7 @@ namespace MeshNinja
 			Edge();
 			virtual ~Edge();
 
-			virtual Vector GetDebugColor() const;
+			virtual Vector3 GetDebugColor() const;
 
 			Node* Fallow(Node* origin);
 
@@ -70,7 +70,7 @@ namespace MeshNinja
 			Node* node[2];
 		};
 
-		void CollectSilhouetteEdges(const Vector& viewPoint, std::set<VertexPair<false>>& edgeSet, const Transform& transform) const;
+		void CollectSilhouetteEdges(const Vector3& viewPoint, std::set<VertexPair<false>>& edgeSet, const Transform& transform) const;
 
 		std::vector<Node*>* nodeArray;
 		std::vector<Edge*>* edgeArray;

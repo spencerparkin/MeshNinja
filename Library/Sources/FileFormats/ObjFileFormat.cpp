@@ -64,7 +64,7 @@ void ObjFileFormat::ProcessLine(const std::vector<std::string>& tokenArray, Conv
 
 	if (tokenArray[0] == "v")
 	{
-		Vector vertex;
+		Vector3 vertex;
 
 		vertex.x = (tokenArray.size() > 1) ? ::atof(tokenArray[1].c_str()) : 0.0;
 		vertex.y = (tokenArray.size() > 2) ? ::atof(tokenArray[2].c_str()) : 0.0;
@@ -114,7 +114,7 @@ void ObjFileFormat::ProcessLine(const std::vector<std::string>& tokenArray, Conv
 	fileStream << "# Vertices: " << mesh.vertexArray->size() << "\n";
 	fileStream << "# Faces: " << mesh.facetArray->size() << "\n\n";
 
-	for (const Vector& vertex : *mesh.vertexArray)
+	for (const Vector3& vertex : *mesh.vertexArray)
 		fileStream << "v " << vertex.x << " " << vertex.y << " " << vertex.z << "\n";
 
 	fileStream << "\n";

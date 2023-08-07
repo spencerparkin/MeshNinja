@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Common.h"
-#include "Math/Vector.h"
+#include "Math/Vector3.h"
 
 namespace MeshNinja
 {
@@ -25,16 +25,16 @@ namespace MeshNinja
 		bool IsConvex(double eps = MESH_NINJA_EPS) const;
 		bool IsConcave(double eps = MESH_NINJA_EPS) const;
 		bool CalcPlane(Plane& plane, double eps = MESH_NINJA_EPS) const;
-		Vector CalcCenter() const;
+		Vector3 CalcCenter() const;
 		bool CalcBox(AxisAlignedBoundingBox& box) const;
 		double CalcArea() const;
 		bool Intersect(const ConvexPolygon& polygonA, const ConvexPolygon& polygonB, double eps = MESH_NINJA_EPS);
-		bool IntersectWithLineSegment(const Vector& pointA, const Vector& pointB, Vector& intersectionPoint, double eps = MESH_NINJA_EPS) const;
-		bool ContainsPoint(const Vector& point, bool* isInteriorPoint = nullptr, double eps = MESH_NINJA_EPS) const;
-		bool ContainsPointOnBoundary(const Vector& point, double eps = MESH_NINJA_EPS) const;
+		bool IntersectWithLineSegment(const Vector3& pointA, const Vector3& pointB, Vector3& intersectionPoint, double eps = MESH_NINJA_EPS) const;
+		bool ContainsPoint(const Vector3& point, bool* isInteriorPoint = nullptr, double eps = MESH_NINJA_EPS) const;
+		bool ContainsPointOnBoundary(const Vector3& point, double eps = MESH_NINJA_EPS) const;
 		bool SplitAgainst(const Plane& cuttingPlane, ConvexPolygon& polygonA, ConvexPolygon& polygonB, double eps = MESH_NINJA_EPS) const;
 		void MakeReverseOf(const ConvexPolygon& polygon);
 
-		std::vector<Vector>* vertexArray;
+		std::vector<Vector3>* vertexArray;
 	};
 }

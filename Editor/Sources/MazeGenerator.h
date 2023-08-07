@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Math/Vector.h"
+#include "Math/Vector3.h"
 #include "ConvexPolygonMesh.h"
 
 class MazeGenerator
@@ -19,7 +19,7 @@ private:
 	bool GenerateMaze();
 	int RandomInt(int min, int max) const;
 	void RandomPerm(int size, std::vector<int>& perm) const;
-	bool GenerateTunnelMesh(MeshNinja::ConvexPolygonMesh* mesh, const MeshNinja::Vector& pointA, const MeshNinja::Vector& pointB, int sides, double radius) const;
+	bool GenerateTunnelMesh(MeshNinja::ConvexPolygonMesh* mesh, const MeshNinja::Vector3& pointA, const MeshNinja::Vector3& pointB, int sides, double radius) const;
 
 	class Node
 	{
@@ -34,7 +34,7 @@ private:
 		std::vector<Node*> adjacencyArray;
 		std::vector<Node*> connectionArray;
 		mutable Node* parentNode;
-		MeshNinja::Vector location;
+		MeshNinja::Vector3 location;
 		mutable int i;
 	};
 

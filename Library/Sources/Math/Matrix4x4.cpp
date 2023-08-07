@@ -1,6 +1,6 @@
 #include "Matrix4x4.h"
 #include "Matrix3x3.h"
-#include "Vector.h"
+#include "Vector3.h"
 #include "Quaternion.h"
 #include <math.h>
 
@@ -32,7 +32,7 @@ Matrix4x4::Matrix4x4(const Matrix3x3& matrix)
 	}
 }
 
-Matrix4x4::Matrix4x4(const Matrix3x3& matrix, const Vector& translation)
+Matrix4x4::Matrix4x4(const Matrix3x3& matrix, const Vector3& translation)
 {
 	this->ele[0][0] = matrix.ele[0][0];
 	this->ele[1][0] = matrix.ele[1][0];
@@ -82,7 +82,7 @@ void Matrix4x4::Identity()
 			this->ele[i][j] = (i == j) ? 1.0 : 0.0;
 }
 
-bool Matrix4x4::SetCol(int col, const Vector& vector)
+bool Matrix4x4::SetCol(int col, const Vector3& vector)
 {
 	if (col < 0 || col > 3)
 		return false;
@@ -93,7 +93,7 @@ bool Matrix4x4::SetCol(int col, const Vector& vector)
 	return true;
 }
 
-bool Matrix4x4::GetCol(int col, Vector& vector) const
+bool Matrix4x4::GetCol(int col, Vector3& vector) const
 {
 	if (col < 0 || col > 3)
 		return false;
@@ -104,21 +104,21 @@ bool Matrix4x4::GetCol(int col, Vector& vector) const
 	return true;
 }
 
-void Matrix4x4::GetAxes(Vector& xAxis, Vector& yAxis, Vector& zAxis) const
+void Matrix4x4::GetAxes(Vector3& xAxis, Vector3& yAxis, Vector3& zAxis) const
 {
 	this->GetCol(0, xAxis);
 	this->GetCol(1, yAxis);
 	this->GetCol(2, zAxis);
 }
 
-void Matrix4x4::SetAxes(const Vector& xAxis, const Vector& yAxis, const Vector& zAxis)
+void Matrix4x4::SetAxes(const Vector3& xAxis, const Vector3& yAxis, const Vector3& zAxis)
 {
 	this->SetCol(0, xAxis);
 	this->SetCol(1, yAxis);
 	this->SetCol(2, zAxis);
 }
 
-void Matrix4x4::TransformVector(const Vector& vector, Vector& vectorTransformed) const
+void Matrix4x4::TransformVector(const Vector3& vector, Vector3& vectorTransformed) const
 {
 	vectorTransformed.SetComponents(
 		vector.x * this->ele[0][0] +
@@ -132,7 +132,7 @@ void Matrix4x4::TransformVector(const Vector& vector, Vector& vectorTransformed)
 		vector.z * this->ele[2][2]);
 }
 
-void Matrix4x4::TransformPoint(const Vector& point, Vector& pointTransformed) const
+void Matrix4x4::TransformPoint(const Vector3& point, Vector3& pointTransformed) const
 {
 	pointTransformed.SetComponents(
 		point.x * this->ele[0][0] +
@@ -283,32 +283,32 @@ double Matrix4x4::Determinant() const
 	return det;
 }
 
-void Matrix4x4::SetTranslation(const Vector& translation)
+void Matrix4x4::SetTranslation(const Vector3& translation)
 {
 	this->ele[0][3] = translation.x;
 	this->ele[1][3] = translation.y;
 	this->ele[2][3] = translation.z;
 }
 
-void Matrix4x4::SetScale(const Vector& scale)
+void Matrix4x4::SetScale(const Vector3& scale)
 {
-	this->SetCol(0, Vector(scale.x, 0.0, 0.0));
-	this->SetCol(1, Vector(0.0, scale.y, 0.0));
-	this->SetCol(2, Vector(0.0, 0.0, scale.z));
+	this->SetCol(0, Vector3(scale.x, 0.0, 0.0));
+	this->SetCol(1, Vector3(0.0, scale.y, 0.0));
+	this->SetCol(2, Vector3(0.0, 0.0, scale.z));
 }
 
 void Matrix4x4::SetUniformScale(double scale)
 {
-	this->SetCol(0, Vector(scale, 0.0, 0.0));
-	this->SetCol(1, Vector(0.0, scale, 0.0));
-	this->SetCol(2, Vector(0.0, 0.0, scale));
+	this->SetCol(0, Vector3(scale, 0.0, 0.0));
+	this->SetCol(1, Vector3(0.0, scale, 0.0));
+	this->SetCol(2, Vector3(0.0, 0.0, scale));
 }
 
-void Matrix4x4::SetRotation(const Vector& axis, double angle)
+void Matrix4x4::SetRotation(const Vector3& axis, double angle)
 {
-	Vector xAxis(1.0, 0.0, 0.0);
-	Vector yAxis(0.0, 1.0, 0.0);
-	Vector zAxis(0.0, 0.0, 1.0);
+	Vector3 xAxis(1.0, 0.0, 0.0);
+	Vector3 yAxis(0.0, 1.0, 0.0);
+	Vector3 zAxis(0.0, 0.0, 1.0);
 
 	xAxis.RotateAbout(axis, angle);
 	yAxis.RotateAbout(axis, angle);
@@ -319,16 +319,16 @@ void Matrix4x4::SetRotation(const Vector& axis, double angle)
 	this->SetCol(2, zAxis);
 }
 
-void Matrix4x4::RigidBodyMotion(const Vector& axis, double angle, const Vector& delta)
+void Matrix4x4::RigidBodyMotion(const Vector3& axis, double angle, const Vector3& delta)
 {
 	this->Identity();
 	this->SetRotation(axis, angle);
 	this->SetTranslation(delta);
 }
 
-void Matrix4x4::RigidBodyMotion(const Quaternion& quat, const Vector& delta)
+void Matrix4x4::RigidBodyMotion(const Quaternion& quat, const Vector3& delta)
 {
-	Vector axis;
+	Vector3 axis;
 	double angle;
 	quat.GetToAxisAngle(axis, angle);
 	this->RigidBodyMotion(axis, angle, delta);
@@ -347,7 +347,7 @@ void Matrix4x4::Projection(double hfovi, double vfovi, double near, double far)
 
 bool Matrix4x4::OrthonormalizeOrientation()
 {
-	Vector xAxis, yAxis, zAxis;
+	Vector3 xAxis, yAxis, zAxis;
 	this->GetAxes(xAxis, yAxis, zAxis);
 
 	if (!xAxis.Normalize())

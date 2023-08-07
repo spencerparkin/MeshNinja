@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Math/Vector.h"
+#include "Math/Vector3.h"
 
 namespace MeshNinja
 {
@@ -23,7 +23,7 @@ namespace MeshNinja
 			virtual ~FittableObject();
 
 			virtual Ray CalcInitialContactRay() const = 0;
-			virtual Vector CalculateSurfaceNormalAt(const Vector& surfacePoint) const = 0;
+			virtual Vector3 CalculateSurfaceNormalAt(const Vector3& surfacePoint) const = 0;
 			virtual bool RayCast(const Ray& ray, double& alpha, double eps = MESH_NINJA_EPS) const = 0;
 		};
 
@@ -35,7 +35,7 @@ namespace MeshNinja
 			virtual ~FittableAlgebraicSurface();
 
 			virtual bool RayCast(const Ray& ray, double& alpha, double eps = MESH_NINJA_EPS) const override;
-			virtual Vector CalculateSurfaceNormalAt(const Vector& surfacePoint) const override;
+			virtual Vector3 CalculateSurfaceNormalAt(const Vector3& surfacePoint) const override;
 			virtual Ray CalcInitialContactRay() const override;
 
 			const AlgebraicSurface* surface;
@@ -50,7 +50,7 @@ namespace MeshNinja
 			virtual ~FittableMesh();
 
 			virtual bool RayCast(const Ray& ray, double& alpha, double eps = MESH_NINJA_EPS) const override;
-			virtual Vector CalculateSurfaceNormalAt(const Vector& surfacePoint) const override;
+			virtual Vector3 CalculateSurfaceNormalAt(const Vector3& surfacePoint) const override;
 			virtual Ray CalcInitialContactRay() const override;
 
 			const ConvexPolygonMesh* mesh;

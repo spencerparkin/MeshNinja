@@ -34,7 +34,7 @@ bool MazeGenerator::GenerateGridMaze(int width, int height, int depth, double sc
 			for (int k = 0; k < depth; k++)
 			{
 				Node* node = new Node();
-				node->location = MeshNinja::Vector(double(i) - double(width - 1) / 2.0, double(j) - double(height - 1) / 2.0, double(k) - double(depth - 1) / 2.0) * scale;
+				node->location = MeshNinja::Vector3(double(i) - double(width - 1) / 2.0, double(j) - double(height - 1) / 2.0, double(k) - double(depth - 1) / 2.0) * scale;
 				matrix[i][j][k] = node;
 				this->nodeArray.push_back(node);
 			}
@@ -187,11 +187,11 @@ bool MazeGenerator::GenerateMazeMeshes(std::list<MeshNinja::ConvexPolygonMesh*>&
 				MeshNinja::ConvexPolygonMesh* mesh = new MeshNinja::ConvexPolygonMesh();
 				meshList.push_back(mesh);
 
-				MeshNinja::Vector vector = nodeB->location - nodeA->location;
+				MeshNinja::Vector3 vector = nodeB->location - nodeA->location;
 				vector.Normalize();
 
-				MeshNinja::Vector pointA = nodeA->location + vector * radius / 2.0;
-				MeshNinja::Vector pointB = nodeB->location - vector * radius / 2.0;
+				MeshNinja::Vector3 pointA = nodeA->location + vector * radius / 2.0;
+				MeshNinja::Vector3 pointB = nodeB->location - vector * radius / 2.0;
 
 				if (!this->GenerateTunnelMesh(mesh, pointA, pointB, this->RandomInt(4, 8), radius / 3.0))
 					return false;
@@ -235,21 +235,21 @@ bool MazeGenerator::GenerateMazeMeshes(std::list<MeshNinja::ConvexPolygonMesh*>&
 	return true;
 }
 
-bool MazeGenerator::GenerateTunnelMesh(MeshNinja::ConvexPolygonMesh* mesh, const MeshNinja::Vector& pointA, const MeshNinja::Vector& pointB, int sides, double radius) const
+bool MazeGenerator::GenerateTunnelMesh(MeshNinja::ConvexPolygonMesh* mesh, const MeshNinja::Vector3& pointA, const MeshNinja::Vector3& pointB, int sides, double radius) const
 {
-	MeshNinja::Vector zAxis = pointB - pointA;
+	MeshNinja::Vector3 zAxis = pointB - pointA;
 	zAxis.Normalize();
-	MeshNinja::Vector yAxis;
+	MeshNinja::Vector3 yAxis;
 	yAxis.MakeOrthogonalTo(zAxis);
 	yAxis.Normalize();
-	MeshNinja::Vector xAxis = yAxis.Cross(zAxis);
+	MeshNinja::Vector3 xAxis = yAxis.Cross(zAxis);
 
-	std::vector<MeshNinja::Vector> vertexArray[2];
+	std::vector<MeshNinja::Vector3> vertexArray[2];
 
 	for (int i = 0; i < sides; i++)
 	{
 		double angle = -2.0 * MESH_NINJA_PI * (double(i) / double(sides));
-		MeshNinja::Vector vector = (xAxis * ::cos(angle) + yAxis * ::sin(angle)) * radius;
+		MeshNinja::Vector3 vector = (xAxis * ::cos(angle) + yAxis * ::sin(angle)) * radius;
 		vertexArray[0].push_back(pointA + vector);
 		vertexArray[1].push_back(pointB + vector);
 	}

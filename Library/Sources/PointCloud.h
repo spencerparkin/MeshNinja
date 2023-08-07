@@ -12,10 +12,10 @@ namespace MeshNinja
 		virtual ~PointCloud();
 
 		void Clear();
-		void ToPointArray(std::vector<Vector>& pointArray) const;
-		void FromPointArray(const std::vector<Vector>& pointArray, int maxPointsPerLeaf = 10);
+		void ToPointArray(std::vector<Vector3>& pointArray) const;
+		void FromPointArray(const std::vector<Vector3>& pointArray, int maxPointsPerLeaf = 10);
 
-		const Vector* FindNearestPoint(const Vector& givenPoint, double& distance) const;
+		const Vector3* FindNearestPoint(const Vector3& givenPoint, double& distance) const;
 
 		class Node
 		{
@@ -23,9 +23,9 @@ namespace MeshNinja
 			Node();
 			virtual ~Node();
 
-			virtual void ToPointArray(std::vector<Vector>& givenPointArray) const = 0;
-			virtual void FromPointArray(const std::vector<Vector>& givenPointArray, int maxPointsPerLeaf) = 0;
-			virtual const Vector* FindNearestPoint(const Vector& givenPoint, double& distance) const = 0;
+			virtual void ToPointArray(std::vector<Vector3>& givenPointArray) const = 0;
+			virtual void FromPointArray(const std::vector<Vector3>& givenPointArray, int maxPointsPerLeaf) = 0;
+			virtual const Vector3* FindNearestPoint(const Vector3& givenPoint, double& distance) const = 0;
 		};
 
 		class InternalNode : public Node
@@ -34,9 +34,9 @@ namespace MeshNinja
 			InternalNode();
 			virtual ~InternalNode();
 
-			virtual void ToPointArray(std::vector<Vector>& givenPointArray) const override;
-			virtual void FromPointArray(const std::vector<Vector>& givenPointArray, int maxPointsPerLeaf) override;
-			virtual const Vector* FindNearestPoint(const Vector& givenPoint, double& distance) const override;
+			virtual void ToPointArray(std::vector<Vector3>& givenPointArray) const override;
+			virtual void FromPointArray(const std::vector<Vector3>& givenPointArray, int maxPointsPerLeaf) override;
+			virtual const Vector3* FindNearestPoint(const Vector3& givenPoint, double& distance) const override;
 
 			Plane partitioningPlane;
 			Node* backSpace;
@@ -49,11 +49,11 @@ namespace MeshNinja
 			LeafNode();
 			virtual ~LeafNode();
 
-			virtual void ToPointArray(std::vector<Vector>& givenPointArray) const override;
-			virtual void FromPointArray(const std::vector<Vector>& givenPointArray, int maxPointsPerLeaf) override;
-			virtual const Vector* FindNearestPoint(const Vector& givenPoint, double& distance) const override;
+			virtual void ToPointArray(std::vector<Vector3>& givenPointArray) const override;
+			virtual void FromPointArray(const std::vector<Vector3>& givenPointArray, int maxPointsPerLeaf) override;
+			virtual const Vector3* FindNearestPoint(const Vector3& givenPoint, double& distance) const override;
 
-			std::vector<Vector> pointArray;
+			std::vector<Vector3> pointArray;
 		};
 
 	protected:

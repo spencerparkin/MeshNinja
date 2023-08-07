@@ -4,7 +4,7 @@ using namespace MeshNinja;
 
 Plane::Plane()
 {
-	this->normal = Vector(0.0, 0.0, 0.0);
+	this->normal = Vector3(0.0, 0.0, 0.0);
 	this->D = 0.0;
 }
 
@@ -14,7 +14,7 @@ Plane::Plane(const Plane& plane)
 	this->D = plane.D;
 }
 
-Plane::Plane(const Vector& point, const Vector& normal)
+Plane::Plane(const Vector3& point, const Vector3& normal)
 {
 	this->normal = normal;
 	this->normal.Normalize();
@@ -25,7 +25,7 @@ Plane::Plane(const Vector& point, const Vector& normal)
 {
 }
 
-double Plane::SignedDistanceToPoint(const Vector& point) const
+double Plane::SignedDistanceToPoint(const Vector3& point) const
 {
 	return point.Dot(this->normal) - this->D;
 }
@@ -35,12 +35,12 @@ bool Plane::IsEqualTo(const Plane& plane, double eps /*= MESH_NINJA_EPS*/) const
 	return (this->D - plane.D) < eps && this->normal.IsEqualTo(plane.normal, eps);
 }
 
-Vector Plane::CalcCenter() const
+Vector3 Plane::CalcCenter() const
 {
 	return this->normal * this->D;
 }
 
-Plane::Side Plane::WhichSide(const Vector& point, double eps /*= MESH_NINJA_EPS*/) const
+Plane::Side Plane::WhichSide(const Vector3& point, double eps /*= MESH_NINJA_EPS*/) const
 {
 	double signedDistance = this->SignedDistanceToPoint(point);
 	
@@ -53,18 +53,18 @@ Plane::Side Plane::WhichSide(const Vector& point, double eps /*= MESH_NINJA_EPS*
 	return Side::NEITHER;
 }
 
-bool Plane::AllPointsOnSide(const std::vector<Vector>& pointArray, Side side) const
+bool Plane::AllPointsOnSide(const std::vector<Vector3>& pointArray, Side side) const
 {
-	for (const Vector& point : pointArray)
+	for (const Vector3& point : pointArray)
 		if (this->WhichSide(point) != side)
 			return false;
 
 	return true;
 }
 
-bool Plane::AllPointsNotOnSide(const std::vector<Vector>& pointArray, Side side) const
+bool Plane::AllPointsNotOnSide(const std::vector<Vector3>& pointArray, Side side) const
 {
-	for (const Vector& point : pointArray)
+	for (const Vector3& point : pointArray)
 		if (this->WhichSide(point) == side)
 			return false;
 

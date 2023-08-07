@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Common.h"
-#include "Math/Vector.h"
+#include "Math/Vector3.h"
 
 namespace MeshNinja
 {
@@ -11,10 +11,10 @@ namespace MeshNinja
 		AlgebraicSurface();
 		virtual ~AlgebraicSurface();
 
-		virtual double Evaluate(const Vector& point) const = 0;
-		virtual Vector EvaluateGradient(const Vector& point) const;
-		virtual double EvaluateDirectionalDerivative(const Vector& point, const Vector& unitDirection) const;
-		virtual double ApproximateDirectionalDerivative(const Vector& point, const Vector& unitDirection, double delta) const;
+		virtual double Evaluate(const Vector3& point) const = 0;
+		virtual Vector3 EvaluateGradient(const Vector3& point) const;
+		virtual double EvaluateDirectionalDerivative(const Vector3& point, const Vector3& unitDirection) const;
+		virtual double ApproximateDirectionalDerivative(const Vector3& point, const Vector3& unitDirection, double delta) const;
 	};
 
 	class MESH_NINJA_API QuadraticSurface : public AlgebraicSurface
@@ -23,8 +23,8 @@ namespace MeshNinja
 		QuadraticSurface();
 		virtual ~QuadraticSurface();
 
-		virtual double Evaluate(const Vector& point) const override;
-		virtual Vector EvaluateGradient(const Vector& point) const override;
+		virtual double Evaluate(const Vector3& point) const override;
+		virtual Vector3 EvaluateGradient(const Vector3& point) const override;
 
 		void MakeEllipsoid(double A, double B, double C);
 		void MakeEllipticCone(double A, double B, double C);

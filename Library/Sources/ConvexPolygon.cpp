@@ -8,12 +8,12 @@ using namespace MeshNinja;
 
 ConvexPolygon::ConvexPolygon()
 {
-	this->vertexArray = new std::vector<Vector>();
+	this->vertexArray = new std::vector<Vector3>();
 }
 
 ConvexPolygon::ConvexPolygon(const ConvexPolygon& polygon)
 {
-	this->vertexArray = new std::vector<Vector>();
+	this->vertexArray = new std::vector<Vector3>();
 	*this->vertexArray = *polygon.vertexArray;
 }
 
@@ -35,7 +35,7 @@ bool ConvexPolygon::CalcBox(AxisAlignedBoundingBox& box) const
 	box.min = (*this->vertexArray)[0];
 	box.max = (*this->vertexArray)[0];
 
-	for (const Vector& vertex : *this->vertexArray)
+	for (const Vector3& vertex : *this->vertexArray)
 		box.ExpandToIncludePoint(vertex);
 
 	return true;
@@ -47,7 +47,7 @@ bool ConvexPolygon::VerticesAreCoplanar(double eps /*= MESH_NINJA_EPS*/) const
 	if (!this->CalcPlane(plane, eps))
 		return false;
 
-	for (const Vector& vertex : *this->vertexArray)
+	for (const Vector3& vertex : *this->vertexArray)
 		if (plane.WhichSide(vertex, eps) != Plane::Side::NEITHER)
 			return false;
 
@@ -63,13 +63,13 @@ bool ConvexPolygon::IsConvex(double eps /*= MESH_NINJA_EPS*/) const
 	for (int i = 0; i < (signed)this->vertexArray->size(); i++)
 	{
 		int j = (i + 1) % this->vertexArray->size();
-		Vector edgeVector = (*this->vertexArray)[j] - (*this->vertexArray)[i];
-		Vector edgeNormal = edgeVector.Cross(plane.normal);
+		Vector3 edgeVector = (*this->vertexArray)[j] - (*this->vertexArray)[i];
+		Vector3 edgeNormal = edgeVector.Cross(plane.normal);
 		Plane edgePlane((*this->vertexArray)[i], edgeNormal);
 
 		for (j = 0; j < (signed)this->vertexArray->size(); j++)
 		{
-			const Vector& vertex = (*this->vertexArray)[j];
+			const Vector3& vertex = (*this->vertexArray)[j];
 			if (edgePlane.WhichSide(vertex, eps) == Plane::Side::FRONT)
 				return false;
 		}
@@ -92,8 +92,8 @@ void ConvexPolygon::Compress(double eps /*= MESH_NINJA_EPS*/)
 
 		for (int i = 0; i < (signed)this->vertexArray->size(); i++)
 		{
-			const Vector& vertexA = (*this->vertexArray)[i];
-			const Vector& vertexB = (*this->vertexArray)[(i + 1) % this->vertexArray->size()];
+			const Vector3& vertexA = (*this->vertexArray)[i];
+			const Vector3& vertexB = (*this->vertexArray)[(i + 1) % this->vertexArray->size()];
 
 			if (vertexA.IsEqualTo(vertexB, eps))
 			{
@@ -111,9 +111,9 @@ void ConvexPolygon::Compress(double eps /*= MESH_NINJA_EPS*/)
 
 		for (int i = 0; i < (signed)this->vertexArray->size(); i++)
 		{
-			const Vector& vertexA = (*this->vertexArray)[i];
-			const Vector& vertexB = (*this->vertexArray)[(i + 1) % this->vertexArray->size()];
-			const Vector& vertexC = (*this->vertexArray)[(i + 2) % this->vertexArray->size()];
+			const Vector3& vertexA = (*this->vertexArray)[i];
+			const Vector3& vertexB = (*this->vertexArray)[(i + 1) % this->vertexArray->size()];
+			const Vector3& vertexC = (*this->vertexArray)[(i + 2) % this->vertexArray->size()];
 
 			double triangleArea = (vertexB - vertexA).Cross(vertexC - vertexA).Length() / 2.0;
 
@@ -133,15 +133,15 @@ bool ConvexPolygon::CalcPlane(Plane& plane, double eps /*= MESH_NINJA_EPS*/) con
 		return false;
 	
 	double largestLength = DBL_MIN;
-	Vector bestNormal;
+	Vector3 bestNormal;
 
 	for(int i = 0; i < (signed)vertexArray->size(); i++)
 	{
-		const Vector& vertexA = (*this->vertexArray)[i];
-		const Vector& vertexB = (*this->vertexArray)[(i + 1) % vertexArray->size()];
-		const Vector& vertexC = (*this->vertexArray)[(i + 2) % vertexArray->size()];
+		const Vector3& vertexA = (*this->vertexArray)[i];
+		const Vector3& vertexB = (*this->vertexArray)[(i + 1) % vertexArray->size()];
+		const Vector3& vertexC = (*this->vertexArray)[(i + 2) % vertexArray->size()];
 
-		Vector normal = (vertexC - vertexB).Cross(vertexA - vertexB);
+		Vector3 normal = (vertexC - vertexB).Cross(vertexA - vertexB);
 		double length = normal.Length();
 		if (length > largestLength)
 		{
@@ -157,11 +157,11 @@ bool ConvexPolygon::CalcPlane(Plane& plane, double eps /*= MESH_NINJA_EPS*/) con
 	return true;
 }
 
-Vector ConvexPolygon::CalcCenter() const
+Vector3 ConvexPolygon::CalcCenter() const
 {
-	Vector center(0.0, 0.0, 0.0);
+	Vector3 center(0.0, 0.0, 0.0);
 
-	for (const Vector& vertex : *this->vertexArray)
+	for (const Vector3& vertex : *this->vertexArray)
 		center += vertex;
 
 	if (this->vertexArray->size() > 0)
@@ -172,15 +172,15 @@ Vector ConvexPolygon::CalcCenter() const
 
 double ConvexPolygon::CalcArea() const
 {
-	Vector center = this->CalcCenter();
+	Vector3 center = this->CalcCenter();
 	double area = 0.0;
 
 	for (int i = 0; i < (signed)this->vertexArray->size(); i++)
 	{
 		int j = (i + 1) % this->vertexArray->size();
 
-		const Vector& vertexA = (*this->vertexArray)[i];
-		const Vector& vertexB = (*this->vertexArray)[j];
+		const Vector3& vertexA = (*this->vertexArray)[i];
+		const Vector3& vertexB = (*this->vertexArray)[j];
 
 		area += (vertexA - center).Cross(vertexB - center).Length() / 2.0;
 	}
@@ -188,7 +188,7 @@ double ConvexPolygon::CalcArea() const
 	return area;
 }
 
-bool ConvexPolygon::IntersectWithLineSegment(const Vector& pointA, const Vector& pointB, Vector& intersectionPoint, double eps /*= MESH_NINJA_EPS*/) const
+bool ConvexPolygon::IntersectWithLineSegment(const Vector3& pointA, const Vector3& pointB, Vector3& intersectionPoint, double eps /*= MESH_NINJA_EPS*/) const
 {
 	Plane plane;
 	if (!this->CalcPlane(plane, eps))
@@ -208,7 +208,7 @@ bool ConvexPolygon::IntersectWithLineSegment(const Vector& pointA, const Vector&
 	return false;
 }
 
-bool ConvexPolygon::ContainsPoint(const Vector& point, bool* isInteriorPoint /*= nullptr*/, double eps /*= MESH_NINJA_EPS*/) const
+bool ConvexPolygon::ContainsPoint(const Vector3& point, bool* isInteriorPoint /*= nullptr*/, double eps /*= MESH_NINJA_EPS*/) const
 {
 	if (isInteriorPoint)
 		*isInteriorPoint = false;
@@ -227,8 +227,8 @@ bool ConvexPolygon::ContainsPoint(const Vector& point, bool* isInteriorPoint /*=
 	for (int i = 0; i < (signed)this->vertexArray->size(); i++)
 	{
 		int j = (i + 1) % this->vertexArray->size();
-		const Vector& vertexA = (*this->vertexArray)[i];
-		const Vector& vertexB = (*this->vertexArray)[j];
+		const Vector3& vertexA = (*this->vertexArray)[i];
+		const Vector3& vertexB = (*this->vertexArray)[j];
 		double dot = (vertexA - point).Cross(vertexB - point).Dot(plane.normal);
 		if (dot < 0.0)
 			return false;
@@ -240,13 +240,13 @@ bool ConvexPolygon::ContainsPoint(const Vector& point, bool* isInteriorPoint /*=
 	return true;
 }
 
-bool ConvexPolygon::ContainsPointOnBoundary(const Vector& point, double eps /*= MESH_NINJA_EPS*/) const
+bool ConvexPolygon::ContainsPointOnBoundary(const Vector3& point, double eps /*= MESH_NINJA_EPS*/) const
 {
 	for (int i = 0; i < (signed)this->vertexArray->size(); i++)
 	{
 		int j = (i + 1) % this->vertexArray->size();
-		const Vector& vertexA = (*this->vertexArray)[i];
-		const Vector& vertexB = (*this->vertexArray)[j];
+		const Vector3& vertexA = (*this->vertexArray)[i];
+		const Vector3& vertexB = (*this->vertexArray)[j];
 		LineSegment line(vertexA, vertexB);
 		if (line.ContainsPoint(point, eps))
 			return true;
@@ -269,7 +269,7 @@ bool ConvexPolygon::Intersect(const ConvexPolygon& polygonA, const ConvexPolygon
 
 		for (int j = 0; j < (signed)polygon->vertexArray->size(); j++)
 		{
-			const Vector& vertex = (*polygon->vertexArray)[j];
+			const Vector3& vertex = (*polygon->vertexArray)[j];
 			if (!otherPolygon->ContainsPoint(vertex))
 			{
 				samePolygon = false;
@@ -285,7 +285,7 @@ bool ConvexPolygon::Intersect(const ConvexPolygon& polygonA, const ConvexPolygon
 		return true;
 	}
 
-	std::vector<Vector> hitPointArray[2];
+	std::vector<Vector3> hitPointArray[2];
 
 	for (int i = 0; i < 2; i++)
 	{
@@ -296,14 +296,14 @@ bool ConvexPolygon::Intersect(const ConvexPolygon& polygonA, const ConvexPolygon
 		{
 			int k = (j + 1) % polygon->vertexArray->size();
 
-			const Vector& vertexA = (*polygon->vertexArray)[j];
-			const Vector& vertexB = (*polygon->vertexArray)[k];
+			const Vector3& vertexA = (*polygon->vertexArray)[j];
+			const Vector3& vertexB = (*polygon->vertexArray)[k];
 
 			Ray ray(vertexA, vertexB - vertexA);
 			double alpha = 0.0;
 			if (ray.CastAgainst(*otherPolygon, alpha) && alpha <= 1.0)
 			{
-				Vector hitPoint = ray.Lerp(alpha);
+				Vector3 hitPoint = ray.Lerp(alpha);
 				if (!hitPoint.IsEqualTo(vertexB))
 					hitPointArray[i].push_back(hitPoint);
 			}
@@ -312,15 +312,15 @@ bool ConvexPolygon::Intersect(const ConvexPolygon& polygonA, const ConvexPolygon
 
 	if (hitPointArray[0].size() <= 2 && hitPointArray[1].size() <= 2)
 	{
-		std::vector<Vector> combinedHitPointArray;
+		std::vector<Vector3> combinedHitPointArray;
 		for (int i = 0; i < 2; i++)
-			for (Vector& hitPoint : hitPointArray[i])
+			for (Vector3& hitPoint : hitPointArray[i])
 				combinedHitPointArray.push_back(hitPoint);
 
-		for (Vector& hitPoint : combinedHitPointArray)
+		for (Vector3& hitPoint : combinedHitPointArray)
 		{
 			bool pointFound = false;
-			for (Vector& vertex : *this->vertexArray)
+			for (Vector3& vertex : *this->vertexArray)
 			{
 				if ((vertex - hitPoint).Length() < eps)
 				{
@@ -354,8 +354,8 @@ bool ConvexPolygon::SplitAgainst(const Plane& cuttingPlane, ConvexPolygon& polyg
 	{
 		int j = (i + 1) % this->vertexArray->size();
 
-		const Vector& vertexA = (*this->vertexArray)[i];
-		const Vector& vertexB = (*this->vertexArray)[j];
+		const Vector3& vertexA = (*this->vertexArray)[i];
+		const Vector3& vertexB = (*this->vertexArray)[j];
 
 		Plane::Side vertexASide = cuttingPlane.WhichSide(vertexA, eps);
 		Plane::Side vertexBSide = cuttingPlane.WhichSide(vertexB, eps);
@@ -369,7 +369,7 @@ bool ConvexPolygon::SplitAgainst(const Plane& cuttingPlane, ConvexPolygon& polyg
 				Ray ray(vertexA, vertexB - vertexA);
 				double alpha = 0.0;
 				ray.CastAgainst(cuttingPlane, alpha, eps);
-				Vector hitPoint = ray.Lerp(alpha);
+				Vector3 hitPoint = ray.Lerp(alpha);
 				polygonA.vertexArray->push_back(hitPoint);
 				polygonB.vertexArray->push_back(hitPoint);
 			}
@@ -383,7 +383,7 @@ bool ConvexPolygon::SplitAgainst(const Plane& cuttingPlane, ConvexPolygon& polyg
 				Ray ray(vertexA, vertexB - vertexA);
 				double alpha = 0.0;
 				ray.CastAgainst(cuttingPlane, alpha, eps);
-				Vector hitPoint = ray.Lerp(alpha);
+				Vector3 hitPoint = ray.Lerp(alpha);
 				polygonA.vertexArray->push_back(hitPoint);
 				polygonB.vertexArray->push_back(hitPoint);
 			}

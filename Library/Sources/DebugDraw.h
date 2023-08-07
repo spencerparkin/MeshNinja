@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Math/Vector.h"
+#include "Math/Vector3.h"
 
 namespace MeshNinja
 {
@@ -47,7 +47,7 @@ namespace MeshNinja
 		{
 		public:
 			Object();
-			Object(const Vector& color);
+			Object(const Vector3& color);
 			virtual ~Object();
 
 			virtual std::string GetType() const = 0;
@@ -55,17 +55,17 @@ namespace MeshNinja
 			virtual bool Save(JsonObject* jsonObject) const;
 			virtual bool Load(const JsonObject* jsonObject);
 
-			static bool SaveVector(JsonObject* jsonObject, const std::string& key, const Vector& vector);
-			static bool LoadVector(const JsonObject* jsonObject, const std::string& key, Vector& vector);
+			static bool SaveVector(JsonObject* jsonObject, const std::string& key, const Vector3& vector);
+			static bool LoadVector(const JsonObject* jsonObject, const std::string& key, Vector3& vector);
 
-			Vector color;
+			Vector3 color;
 		};
 
 		class MESH_NINJA_API Point : public Object
 		{
 		public:
 			Point();
-			Point(const Vector& vertex, const Vector& color);
+			Point(const Vector3& vertex, const Vector3& color);
 			virtual ~Point();
 
 			static std::string GetStaticType();
@@ -73,14 +73,14 @@ namespace MeshNinja
 			virtual bool Save(JsonObject* jsonObject) const override;
 			virtual bool Load(const JsonObject* jsonObject) override;
 
-			Vector vertex;
+			Vector3 vertex;
 		};
 
 		class MESH_NINJA_API Line : public Object
 		{
 		public:
 			Line();
-			Line(const Vector& pointA, const Vector& pointB, const Vector& color);
+			Line(const Vector3& pointA, const Vector3& pointB, const Vector3& color);
 			virtual ~Line();
 
 			static std::string GetStaticType();
@@ -88,7 +88,7 @@ namespace MeshNinja
 			virtual bool Save(JsonObject* jsonObject) const override;
 			virtual bool Load(const JsonObject* jsonObject) override;
 
-			Vector vertex[2];
+			Vector3 vertex[2];
 		};
 
 	protected:

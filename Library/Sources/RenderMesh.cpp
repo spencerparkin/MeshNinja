@@ -51,7 +51,7 @@ bool RenderMesh::IsTriangleMesh() const
 	return true;
 }
 
-void RenderMesh::SetColor(const Vector& color)
+void RenderMesh::SetColor(const Vector3& color)
 {
 	for (Facet& facet : *this->facetArray)
 		facet.color = color;
@@ -114,7 +114,7 @@ void RenderMesh::FromConvexPolygonMesh(const ConvexPolygonMesh& mesh, const Opti
 	for (const ConvexPolygonMesh::Facet& facet : *mesh.facetArray)
 	{
 		Facet renderFacet;
-		renderFacet.center = Vector(0.0, 0.0, 0.0);
+		renderFacet.center = Vector3(0.0, 0.0, 0.0);
 
 		for (int i = 0; i < (signed)facet.vertexArray->size(); i++)
 		{
@@ -136,21 +136,21 @@ void RenderMesh::FromConvexPolygonMesh(const ConvexPolygonMesh& mesh, const Opti
 		polygon.CalcPlane(plane);
 
 		renderFacet.normal = plane.normal;
-		renderFacet.color = Vector(1.0, 1.0, 1.0);
+		renderFacet.color = Vector3(1.0, 1.0, 1.0);
 
 		this->facetArray->push_back(renderFacet);
 	}
 
 	if (options.normalType == Options::NormalType::VERTEX_BASED)
 	{
-		for (const Vector& vertex : *mesh.vertexArray)
+		for (const Vector3& vertex : *mesh.vertexArray)
 		{
 			Vertex renderVertex;
 
 			renderVertex.position = vertex;
-			renderVertex.normal = Vector(0.0, 0.0, 0.0);
+			renderVertex.normal = Vector3(0.0, 0.0, 0.0);
 			renderVertex.color = options.color;
-			renderVertex.texCoords = Vector(0.0, 0.0, 0.0);
+			renderVertex.texCoords = Vector3(0.0, 0.0, 0.0);
 
 			this->vertexArray->push_back(renderVertex);
 		}
@@ -176,14 +176,14 @@ void RenderMesh::FromConvexPolygonMesh(const ConvexPolygonMesh& mesh, const Opti
 
 			for (int j = 0; j < (signed)facet.vertexArray->size(); j++)
 			{
-				const Vector& vertex = (*mesh.vertexArray)[facet[j]];
+				const Vector3& vertex = (*mesh.vertexArray)[facet[j]];
 
 				Vertex renderVertex;
 
 				renderVertex.position = vertex;
 				renderVertex.normal = renderFacet.normal;
 				renderVertex.color = options.color;
-				renderVertex.texCoords = Vector(0.0, 0.0, 0.0);
+				renderVertex.texCoords = Vector3(0.0, 0.0, 0.0);
 
 				this->vertexArray->push_back(renderVertex);
 			}

@@ -72,7 +72,7 @@ Scene::Object::Object()
 {
 }
 
-/*virtual*/ MeshNinja::Vector Scene::Object::GetPosition() const
+/*virtual*/ MeshNinja::Vector3 Scene::Object::GetPosition() const
 {
-	return MeshNinja::Vector(0.0, 0.0, 0.0);
+	return MeshNinja::Vector3(0.0, 0.0, 0.0);
 }

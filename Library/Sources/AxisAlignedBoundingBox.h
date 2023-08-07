@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Math/Vector.h"
+#include "Math/Vector3.h"
 
 namespace MeshNinja
 {
@@ -8,8 +8,8 @@ namespace MeshNinja
 	{
 	public:
 		AxisAlignedBoundingBox();
-		AxisAlignedBoundingBox(const Vector& point);
-		AxisAlignedBoundingBox(const Vector& min, const Vector& max);
+		AxisAlignedBoundingBox(const Vector3& point);
+		AxisAlignedBoundingBox(const Vector3& min, const Vector3& max);
 		AxisAlignedBoundingBox(const AxisAlignedBoundingBox& aabb);
 		virtual ~AxisAlignedBoundingBox();
 
@@ -19,16 +19,16 @@ namespace MeshNinja
 		double Height() const;
 		double Depth() const;
 		double Volume() const;
-		Vector Center() const;
+		Vector3 Center() const;
 
 		void ScaleAboutCenter(double scale);
 
 		bool ContainsBox(const AxisAlignedBoundingBox& aabb) const;
-		bool ContainsPoint(const Vector& point, double eps = MESH_NINJA_EPS) const;
-		bool ContainsInteriorPoint(const Vector& point, double eps = MESH_NINJA_EPS) const;
-		bool ContainsPointOnBoundary(const Vector& point, double eps = MESH_NINJA_EPS) const;
+		bool ContainsPoint(const Vector3& point, double eps = MESH_NINJA_EPS) const;
+		bool ContainsInteriorPoint(const Vector3& point, double eps = MESH_NINJA_EPS) const;
+		bool ContainsPointOnBoundary(const Vector3& point, double eps = MESH_NINJA_EPS) const;
 
-		void ExpandToIncludePoint(const Vector& point);
+		void ExpandToIncludePoint(const Vector3& point);
 
 		bool Intersect(const AxisAlignedBoundingBox& aabbA, const AxisAlignedBoundingBox& aabbB);
 		bool Merge(const AxisAlignedBoundingBox& aabbA, const AxisAlignedBoundingBox& aabbB);
@@ -36,8 +36,8 @@ namespace MeshNinja
 
 		void SplitReasonably(AxisAlignedBoundingBox& aabbA, AxisAlignedBoundingBox& aabbB) const;
 
-		bool CalcUVWs(const Vector& point, Vector& texCoords) const;
+		bool CalcUVWs(const Vector3& point, Vector3& texCoords) const;
 
-		Vector min, max;
+		Vector3 min, max;
 	};
 }

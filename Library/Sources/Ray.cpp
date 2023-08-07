@@ -18,7 +18,7 @@ Ray::Ray(const Ray& ray)
 	this->direction = ray.direction;
 }
 
-Ray::Ray(const Vector& origin, const Vector& direction)
+Ray::Ray(const Vector3& origin, const Vector3& direction)
 {
 	this->origin = origin;
 	this->direction = direction;
@@ -56,7 +56,7 @@ bool Ray::CastAgainst(const LineSegment& lineSegment, double& alpha, double eps 
 	if (!Ray::Intersect(*this, ray, alpha, beta, eps))
 		return false;
 
-	Vector point = this->Lerp(alpha);
+	Vector3 point = this->Lerp(alpha);
 	return lineSegment.ContainsPoint(point, eps);
 }
 
@@ -76,8 +76,8 @@ bool Ray::CastAgainst(const ConvexPolygon& polygon, double& alpha, double eps /*
 		for (int i = 0; i < (signed)polygon.vertexArray->size(); i++)
 		{
 			int j = (i + 1) % polygon.vertexArray->size();
-			const Vector& vertexA = (*polygon.vertexArray)[i];
-			const Vector& vertexB = (*polygon.vertexArray)[j];
+			const Vector3& vertexA = (*polygon.vertexArray)[i];
+			const Vector3& vertexB = (*polygon.vertexArray)[j];
 			LineSegment line(vertexA, vertexB);
 			if (this->CastAgainst(line, alpha, eps) && alpha < smallestAlpha)
 				smallestAlpha = alpha;
@@ -93,7 +93,7 @@ bool Ray::CastAgainst(const ConvexPolygon& polygon, double& alpha, double eps /*
 	if (!this->CastAgainst(plane, alpha))
 		return false;
 
-	Vector hitPoint = this->Lerp(alpha);
+	Vector3 hitPoint = this->Lerp(alpha);
 	return polygon.ContainsPoint(hitPoint, nullptr, eps);
 }
 
@@ -103,10 +103,10 @@ bool Ray::CastAgainst(const AlgebraicSurface& algebraicSurface, double& alpha,
 								double initialStepSize /*= 1.0*/,
 								bool forwardOrBackward /*= false*/) const
 {
-	Vector unitDirection = this->direction.Normalized();
+	Vector3 unitDirection = this->direction.Normalized();
 	double signedStepSize = initialStepSize;
 	int iterationCount = 0;
-	Vector currentPoint(this->origin);
+	Vector3 currentPoint(this->origin);
 
 	while (iterationCount++ < maxIterations)
 	{
@@ -158,12 +158,12 @@ bool Ray::CastAgainst(const AxisAlignedBoundingBox& aabb, double& alpha, double 
 	{
 		switch (i)
 		{
-			case 0: plane = Plane(aabb.min, Vector(-1.0, 0.0, 0.0)); break;
-			case 1: plane = Plane(aabb.min, Vector(0.0, -1.0, 0.0)); break;
-			case 2: plane = Plane(aabb.min, Vector(0.0, 0.0, -1.0)); break;
-			case 3: plane = Plane(aabb.max, Vector(+1.0, 0.0, 0.0)); break;
-			case 4: plane = Plane(aabb.max, Vector(0.0, +1.0, 0.0)); break;
-			case 5: plane = Plane(aabb.max, Vector(0.0, 0.0, +1.0)); break;
+			case 0: plane = Plane(aabb.min, Vector3(-1.0, 0.0, 0.0)); break;
+			case 1: plane = Plane(aabb.min, Vector3(0.0, -1.0, 0.0)); break;
+			case 2: plane = Plane(aabb.min, Vector3(0.0, 0.0, -1.0)); break;
+			case 3: plane = Plane(aabb.max, Vector3(+1.0, 0.0, 0.0)); break;
+			case 4: plane = Plane(aabb.max, Vector3(0.0, +1.0, 0.0)); break;
+			case 5: plane = Plane(aabb.max, Vector3(0.0, 0.0, +1.0)); break;
 		}
 
 		if (this->CastAgainst(plane, alpha, eps))
@@ -176,19 +176,19 @@ bool Ray::CastAgainst(const AxisAlignedBoundingBox& aabb, double& alpha, double 
 	return false;
 }
 
-Vector Ray::Lerp(double alpha) const
+Vector3 Ray::Lerp(double alpha) const
 {
 	return this->origin + this->direction * alpha;
 }
 
-double Ray::LerpInverse(const Vector& point) const
+double Ray::LerpInverse(const Vector3& point) const
 {
 	return (point - this->origin).Dot(this->direction) / this->direction.Dot(this->direction);
 }
 
 /*static*/ bool Ray::Intersect(const Ray& rayA, const Ray& rayB, double& alpha, double& beta, double eps /*= MESH_NINJA_EPS*/)
 {
-	Vector normal = rayA.direction.Normalized().Cross(rayB.direction.Normalized());
+	Vector3 normal = rayA.direction.Normalized().Cross(rayB.direction.Normalized());
 	double length = normal.Length();
 	if (length < eps || !normal.Normalize())
 	{

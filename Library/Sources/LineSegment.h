@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Math/Vector.h"
+#include "Math/Vector3.h"
 
 namespace MeshNinja
 {
@@ -9,16 +9,16 @@ namespace MeshNinja
 	public:
 		LineSegment();
 		LineSegment(const LineSegment& lineSegment);
-		LineSegment(const Vector& vertexA, const Vector& vertexB);
+		LineSegment(const Vector3& vertexA, const Vector3& vertexB);
 		virtual ~LineSegment();
 
-		double DistanceToPoint(const Vector& point) const;
-		bool ContainsPoint(const Vector& point, double eps = MESH_NINJA_EPS) const;
-		bool IsEndPoint(const Vector& point, double eps = MESH_NINJA_EPS) const;
-		bool IsInteriorPoint(const Vector& point, double eps = MESH_NINJA_EPS) const;
+		double DistanceToPoint(const Vector3& point) const;
+		bool ContainsPoint(const Vector3& point, double eps = MESH_NINJA_EPS) const;
+		bool IsEndPoint(const Vector3& point, double eps = MESH_NINJA_EPS) const;
+		bool IsInteriorPoint(const Vector3& point, double eps = MESH_NINJA_EPS) const;
 		bool IsEqualTo(const LineSegment& lineSegment, double eps = MESH_NINJA_EPS) const;
-		Vector CalcMidpoint() const;
+		Vector3 CalcMidpoint() const;
 
-		Vector vertexA, vertexB;
+		Vector3 vertexA, vertexB;
 	};
 }
