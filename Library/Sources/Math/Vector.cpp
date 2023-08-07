@@ -91,6 +91,20 @@ Vector Vector::operator-() const
 		-this->z);
 }
 
+void Vector::SetComponents(double x, double y, double z)
+{
+	this->x = x;
+	this->y = y;
+	this->z = z;
+}
+
+void Vector::GetComponents(double& x, double& y, double& z) const
+{
+	x = this->x;
+	y = this->y;
+	z = this->z;
+}
+
 double Vector::Length() const
 {
 	return ::sqrt(this->Dot(*this));
@@ -136,6 +150,17 @@ Vector Vector::Cross(const Vector& vector) const
 		this->y * vector.z - this->z * vector.y,
 		this->z * vector.x - this->x * vector.z,
 		this->x * vector.y - this->y * vector.x);
+}
+
+/*static*/ double Vector::Dot(const Vector& vectorA, const Vector& vectorB)
+{
+	return vectorA.Dot(vectorB);
+}
+
+Vector& Vector::Cross(const Vector& vectorA, const Vector& vectorB)
+{
+	*this = vectorA.Cross(vectorB);
+	return *this;
 }
 
 bool Vector::ProjectOnto(const Vector& vector)

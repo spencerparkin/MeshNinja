@@ -1,5 +1,5 @@
 #include "Transform.h"
-#include "ConvexPolygon.h"
+#include "../ConvexPolygon.h"
 
 using namespace MeshNinja;
 

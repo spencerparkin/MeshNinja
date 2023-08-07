@@ -11,15 +11,15 @@
     <Filter Include="Sources\FileFormats">
       <UniqueIdentifier>{587be7c7-74c9-4c55-8754-d29b15f9fcf1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Sources\Math">
+      <UniqueIdentifier>{37ccf2e8-1bbd-4283-ac9e-e04c3b89f6d0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Sources\ConvexPolygonMesh.h">
       <Filter>Sources</Filter>
     </ClInclude>
     <ClInclude Include="Sources\Common.h">
-      <Filter>Sources</Filter>
-    </ClInclude>
-    <ClInclude Include="Sources\Vector.h">
       <Filter>Sources</Filter>
     </ClInclude>
     <ClInclude Include="Sources\ConvexPolygon.h">
@@ -58,15 +58,6 @@
     <ClInclude Include="Sources\AlgebraicSurface.h">
       <Filter>Sources</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\Matrix3x3.h">
-      <Filter>Sources</Filter>
-    </ClInclude>
-    <ClInclude Include="Sources\Quaternion.h">
-      <Filter>Sources</Filter>
-    </ClInclude>
-    <ClInclude Include="Sources\Transform.h">
-      <Filter>Sources</Filter>
-    </ClInclude>
     <ClInclude Include="Sources\TriangleStrips.h">
       <Filter>Sources</Filter>
     </ClInclude>
@@ -94,6 +85,21 @@
     <ClInclude Include="Sources\MeshFitter.h">
       <Filter>Sources</Filter>
     </ClInclude>
+    <ClInclude Include="Sources\Math\Matrix3x3.h">
+      <Filter>Sources\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Math\Matrix4x4.h">
+      <Filter>Sources\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Math\Quaternion.h">
+      <Filter>Sources\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Math\Vector.h">
+      <Filter>Sources\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Math\Transform.h">
+      <Filter>Sources\Math</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sources\MeshBinaryOperation.cpp">
@@ -103,9 +109,6 @@
       <Filter>Sources</Filter>
     </ClCompile>
     <ClCompile Include="Sources\ConvexPolygon.cpp">
-      <Filter>Sources</Filter>
-    </ClCompile>
-    <ClCompile Include="Sources\Vector.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
     <ClCompile Include="Sources\MeshFileFormat.cpp">
@@ -138,15 +141,6 @@
     <ClCompile Include="Sources\AlgebraicSurface.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\Matrix3x3.cpp">
-      <Filter>Sources</Filter>
-    </ClCompile>
-    <ClCompile Include="Sources\Quaternion.cpp">
-      <Filter>Sources</Filter>
-    </ClCompile>
-    <ClCompile Include="Sources\Transform.cpp">
-      <Filter>Sources</Filter>
-    </ClCompile>
     <ClCompile Include="Sources\TriangleStrips.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
@@ -173,6 +167,21 @@
     </ClCompile>
     <ClCompile Include="Sources\MeshFitter.cpp">
       <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Math\Matrix3x3.cpp">
+      <Filter>Sources\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Math\Matrix4x4.cpp">
+      <Filter>Sources\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Math\Quaternion.cpp">
+      <Filter>Sources\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Math\Vector.cpp">
+      <Filter>Sources\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Math\Transform.cpp">
+      <Filter>Sources\Math</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

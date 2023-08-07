@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Vector.h"
+#include "Math/Vector.h"
 #include "Scene.h"
 #include <wx/glcanvas.h>
 

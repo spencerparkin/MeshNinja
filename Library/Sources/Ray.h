@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Common.h"
-#include "Vector.h"
+#include "Math/Vector.h"
 
 namespace MeshNinja
 {

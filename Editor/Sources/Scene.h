@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Transform.h"
+#include "Math/Transform.h"
 #include <wx/glcanvas.h>
 
 class Camera;

@@ -1,8 +1,8 @@
 #pragma once
 
 #include "Common.h"
-#include "Vector.h"
-#include "Transform.h"
+#include "Math/Vector.h"
+#include "Math/Transform.h"
 #include "ConvexPolygon.h"
 
 namespace MeshNinja

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Common.h"
+#include "../Common.h"
 
 namespace MeshNinja
 {
@@ -26,11 +26,15 @@ namespace MeshNinja
 		Vector operator*(double scale);
 		Vector operator-() const;
 
+		void SetComponents(double x, double y, double z);
+		void GetComponents(double& x, double& y, double& z) const;
 		double Length() const;
 		bool Normalize(double* returnedLength = nullptr);
 		Vector Normalized() const;
 		double Dot(const Vector& vector) const;
 		Vector Cross(const Vector& vector) const;
+		static double Dot(const Vector& vectorA, const Vector& vectorB);
+		Vector& Cross(const Vector& vectorA, const Vector& vectorB);
 		bool ProjectOnto(const Vector& vector);
 		bool RejectFrom(const Vector& vector);
 		bool RotateAbout(const Vector& vector, double angle);
