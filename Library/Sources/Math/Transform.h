@@ -5,6 +5,7 @@
 namespace MeshNinja
 {
 	class ConvexPolygon;
+	class Matrix4x4;
 
 	class MESH_NINJA_API Transform
 	{
@@ -14,6 +15,9 @@ namespace MeshNinja
 
 		void SetIdentity();
 		
+		bool FromMatrix4x4(const Matrix4x4& matrix);
+		void ToMatrix4x4(Matrix4x4& matrix) const;
+
 		Vector3 TransformVector(const Vector3& vector) const;
 		Vector3 TransformPosition(const Vector3& position) const;
 		void TransformPolygon(ConvexPolygon& polygon) const;

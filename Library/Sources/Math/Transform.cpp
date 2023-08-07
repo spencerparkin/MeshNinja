@@ -1,4 +1,5 @@
 #include "Transform.h"
+#include "Matrix4x4.h"
 #include "../ConvexPolygon.h"
 
 using namespace MeshNinja;
@@ -16,6 +17,36 @@ void Transform::SetIdentity()
 {
 	this->matrix.SetIdentity();
 	this->translation = Vector3(0.0, 0.0, 0.0);
+}
+
+bool Transform::FromMatrix4x4(const Matrix4x4& matrix)
+{
+	if (matrix.ele[3][0] != 0.0 || matrix.ele[3][1] != 0.0 || matrix.ele[3][2] != 0.0 || matrix.ele[3][3] != 1.0)
+		return false;
+
+	for (int i = 0; i < 3; i++)
+		for (int j = 0; j < 3; j++)
+			this->matrix.ele[i][j] = matrix.ele[i][j];
+
+	this->translation.SetComponents(
+		matrix.ele[0][3],
+		matrix.ele[1][3],
+		matrix.ele[2][3]);
+
+	return true;
+}
+
+void Transform::ToMatrix4x4(Matrix4x4& matrix) const
+{
+	matrix.Identity();
+
+	for (int i = 0; i < 3; i++)
+		for (int j = 0; j < 3; j++)
+			matrix.ele[i][j] = this->matrix.ele[i][j];
+
+	matrix.ele[0][3] = this->translation.x;
+	matrix.ele[1][3] = this->translation.y;
+	matrix.ele[2][3] = this->translation.z;
 }
 
 Vector3 Transform::TransformVector(const Vector3& vector) const

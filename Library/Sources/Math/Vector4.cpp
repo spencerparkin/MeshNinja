@@ -19,7 +19,7 @@ Vector4::Vector4(double x, double y, double z, double w)
 	this->w = w;
 }
 
-Vector4::Vector4(const Vector3& vector, double w)
+Vector4::Vector4(const Vector3& vector, double w /* = 1.0*/)
 {
 	this->x = vector.x;
 	this->y = vector.y;

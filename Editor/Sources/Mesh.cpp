@@ -1,6 +1,7 @@
 #include "Mesh.h"
 #include "FileFormats/ObjFileFormat.h"
 #include "FileFormats/glTF_FileFormat.h"
+#include "Math/Matrix4x4.h"
 #include "ConvexPolygonMesh.h"
 #include "Plane.h"
 #include "Camera.h"
@@ -274,10 +275,24 @@ void Mesh::IssueColor(const MeshNinja::Vector3& givenColor) const
 
 	if (renderMode == GL_RENDER && this->isSelected)
 	{
-		// TODO: I think we actually need to send in a transform that takes us form object space all the way to projective space for this to really work.
-		//       In that case, the view direction would always just be the -Z-axis, I think.
 		std::set<MeshNinja::MeshGraph::VertexPair<false>> edgeSet;
-		this->meshGraph.CollectSilhouetteEdges(camera->GetViewDirection(), edgeSet, this->transform);
+
+		MeshNinja::Matrix4x4 viewToProjectionMatrix;
+		GLfloat projectionMatrixArray[16];
+		glGetFloatv(GL_PROJECTION_MATRIX, projectionMatrixArray);
+		viewToProjectionMatrix.FromFloatArray(projectionMatrixArray, MeshNinja::Matrix4x4::MatrixArrayType::COL_MAJOR);
+
+		MeshNinja::Matrix4x4 worldToViewMatrix;
+		GLfloat modelViewMatrixArray[16];
+		glGetFloatv(GL_MODELVIEW_MATRIX, modelViewMatrixArray);
+		worldToViewMatrix.FromFloatArray(modelViewMatrixArray, MeshNinja::Matrix4x4::MatrixArrayType::COL_MAJOR);
+
+		MeshNinja::Matrix4x4 objectToWorldMatrix;
+		this->transform.ToMatrix4x4(objectToWorldMatrix);
+
+		// TODO: What am I missing here?
+		MeshNinja::Matrix4x4 objectToProjectionMatrix = /*viewToProjectionMatrix * */ worldToViewMatrix * objectToWorldMatrix;
+		this->meshGraph.CollectSilhouetteEdges(MeshNinja::Vector3(0.0, 0.0, -1.0), edgeSet, objectToProjectionMatrix);
 
 		glLineWidth(4.0f);
 		glBegin(GL_LINES);

@@ -8,6 +8,7 @@ namespace MeshNinja
 	class Vector4;
 	class Matrix3x3;
 	class Quaternion;
+	class ConvexPolygon;
 
 	// These are 4x4 matrices geared toward 3D computer graphics applications.
 	class MESH_NINJA_API Matrix4x4
@@ -21,6 +22,15 @@ namespace MeshNinja
 
 		void Identity();
 
+		enum class MatrixArrayType
+		{
+			ROW_MAJOR,
+			COL_MAJOR
+		};
+
+		void FromFloatArray(const float* floatArray, MatrixArrayType type);
+		void ToFloatArray(float* floatArray, MatrixArrayType type) const;
+
 		bool SetCol(int col, const Vector3& vector);
 		bool GetCol(int col, Vector3& vector) const;
 
@@ -30,6 +40,7 @@ namespace MeshNinja
 		void TransformVector(const Vector3& vector, Vector3& vectorTransformed) const;
 		void TransformPoint(const Vector3& point, Vector3& pointTransformed) const;
 		void TransformVector(const Vector4& vector, Vector4& vectorTransformed) const;
+		void TransformPolygon(ConvexPolygon& polygon) const;
 
 		void Multiply(const Matrix4x4& leftMatrix, const Matrix4x4& rightMatrix);
 		bool Divide(const Matrix4x4& leftMatrix, const Matrix4x4& rightMatrix);

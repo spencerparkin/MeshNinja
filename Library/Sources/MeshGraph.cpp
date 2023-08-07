@@ -1,5 +1,6 @@
 #include "MeshGraph.h"
 #include "Plane.h"
+#include "Math/Matrix4x4.h"
 
 using namespace MeshNinja;
 
@@ -94,7 +95,7 @@ bool MeshGraph::Generate(const ConvexPolygonMesh& givenMesh)
 	return new Edge();
 }
 
-void MeshGraph::CollectSilhouetteEdges(const Vector3& viewDirection, std::set<VertexPair<false>>& edgeSet, const Transform& transform) const
+void MeshGraph::CollectSilhouetteEdges(const Vector3& viewDirection, std::set<VertexPair<false>>& edgeSet, const Matrix4x4& matrix) const
 {
 	edgeSet.clear();
 
@@ -108,8 +109,8 @@ void MeshGraph::CollectSilhouetteEdges(const Vector3& viewDirection, std::set<Ve
 		nodeA->facet->MakePolygon(polygonA, this->mesh);
 		nodeB->facet->MakePolygon(polygonB, this->mesh);
 
-		transform.TransformPolygon(polygonA);
-		transform.TransformPolygon(polygonB);
+		matrix.TransformPolygon(polygonA);
+		matrix.TransformPolygon(polygonB);
 
 		Plane planeA, planeB;
 

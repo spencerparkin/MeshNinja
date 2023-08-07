@@ -11,7 +11,7 @@ namespace MeshNinja
 	public:
 		Vector4();
 		Vector4(double x, double y, double z, double w);
-		Vector4(const Vector3& vector, double w);
+		Vector4(const Vector3& vector, double w = 1.0);
 		Vector4(const Vector4& vector);
 		virtual ~Vector4();
 

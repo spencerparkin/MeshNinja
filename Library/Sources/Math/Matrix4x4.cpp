@@ -3,7 +3,7 @@
 #include "Vector3.h"
 #include "Vector4.h"
 #include "Quaternion.h"
-#include <math.h>
+#include "../ConvexPolygon.h"
 
 using namespace MeshNinja;
 
@@ -60,6 +60,50 @@ Matrix4x4::Matrix4x4(const Matrix3x3& matrix, const Vector3& translation)
 
 /*virtual*/ Matrix4x4::~Matrix4x4()
 {
+}
+
+void Matrix4x4::FromFloatArray(const float* floatArray, MatrixArrayType type)
+{
+	int k = 0;
+	switch (type)
+	{
+		case MatrixArrayType::ROW_MAJOR:
+		{
+			for (int i = 0; i < 4; i++)
+				for (int j = 0; j < 4; j++)
+					this->ele[i][j] = floatArray[k++];
+			break;
+		}
+		case MatrixArrayType::COL_MAJOR:
+		{
+			for (int i = 0; i < 4; i++)
+				for (int j = 0; j < 4; j++)
+					this->ele[j][i] = floatArray[k++];
+			break;
+		}
+	}
+}
+
+void Matrix4x4::ToFloatArray(float* floatArray, MatrixArrayType type) const
+{
+	int k = 0;
+	switch (type)
+	{
+		case MatrixArrayType::ROW_MAJOR:
+		{
+			for (int i = 0; i < 4; i++)
+				for (int j = 0; j < 4; j++)
+					floatArray[k++] = (float)this->ele[i][j];
+			break;
+		}
+		case MatrixArrayType::COL_MAJOR:
+		{
+			for (int i = 0; i < 4; i++)
+				for (int j = 0; j < 4; j++)
+					floatArray[k++] = (float)this->ele[j][i];
+			break;
+		}
+	}
 }
 
 void Matrix4x4::operator=(const Matrix4x4& matrix)
@@ -182,6 +226,12 @@ void Matrix4x4::TransformVector(const Vector4& vector, Vector4& vectorTransforme
 		this->ele[3][1] * vector.y +
 		this->ele[3][2] * vector.z +
 		this->ele[3][3] * vector.w);
+}
+
+void Matrix4x4::TransformPolygon(ConvexPolygon& polygon) const
+{
+	for (Vector3& vertex : *polygon.vertexArray)
+		this->TransformPoint(vertex, vertex);
 }
 
 void Matrix4x4::Multiply(const Matrix4x4& leftMatrix, const Matrix4x4& rightMatrix)
@@ -365,7 +415,7 @@ bool Matrix4x4::OrthonormalizeOrientation()
 	return true;
 }
 
-namespace Frumpy
+namespace MeshNinja
 {
 	Matrix4x4 operator*(const Matrix4x4& leftMatrix, const Matrix4x4& rightMatrix)
 	{
