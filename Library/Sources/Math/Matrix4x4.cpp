@@ -1,6 +1,7 @@
 #include "Matrix4x4.h"
 #include "Matrix3x3.h"
 #include "Vector3.h"
+#include "Vector4.h"
 #include "Quaternion.h"
 #include <math.h>
 
@@ -162,7 +163,6 @@ void Matrix4x4::TransformPoint(const Vector3& point, Vector3& pointTransformed) 
 	}
 }
 
-/*
 void Matrix4x4::TransformVector(const Vector4& vector, Vector4& vectorTransformed) const
 {
 	vectorTransformed.SetComponents(
@@ -183,7 +183,6 @@ void Matrix4x4::TransformVector(const Vector4& vector, Vector4& vectorTransforme
 		this->ele[3][2] * vector.z +
 		this->ele[3][3] * vector.w);
 }
-*/
 
 void Matrix4x4::Multiply(const Matrix4x4& leftMatrix, const Matrix4x4& rightMatrix)
 {

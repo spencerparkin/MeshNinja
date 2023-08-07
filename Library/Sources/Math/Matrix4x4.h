@@ -5,6 +5,7 @@
 namespace MeshNinja
 {
 	class Vector3;
+	class Vector4;
 	class Matrix3x3;
 	class Quaternion;
 
@@ -28,6 +29,7 @@ namespace MeshNinja
 
 		void TransformVector(const Vector3& vector, Vector3& vectorTransformed) const;
 		void TransformPoint(const Vector3& point, Vector3& pointTransformed) const;
+		void TransformVector(const Vector4& vector, Vector4& vectorTransformed) const;
 
 		void Multiply(const Matrix4x4& leftMatrix, const Matrix4x4& rightMatrix);
 		bool Divide(const Matrix4x4& leftMatrix, const Matrix4x4& rightMatrix);

@@ -100,6 +100,9 @@
     <ClInclude Include="Sources\Math\Transform.h">
       <Filter>Sources\Math</Filter>
     </ClInclude>
+    <ClInclude Include="Sources\Math\Vector4.h">
+      <Filter>Sources\Math</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sources\MeshBinaryOperation.cpp">
@@ -181,6 +184,9 @@
       <Filter>Sources\Math</Filter>
     </ClCompile>
     <ClCompile Include="Sources\Math\Transform.cpp">
+      <Filter>Sources\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Math\Vector4.cpp">
       <Filter>Sources\Math</Filter>
     </ClCompile>
   </ItemGroup>

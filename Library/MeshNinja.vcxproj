@@ -35,6 +35,7 @@
     <ClInclude Include="Sources\Math\Quaternion.h" />
     <ClInclude Include="Sources\Math\Transform.h" />
     <ClInclude Include="Sources\Math\Vector3.h" />
+    <ClInclude Include="Sources\Math\Vector4.h" />
     <ClInclude Include="Sources\MeshFitter.h" />
     <ClInclude Include="Sources\MeshGraph.h" />
     <ClInclude Include="Sources\Polyline.h" />
@@ -64,6 +65,7 @@
     <ClCompile Include="Sources\Math\Quaternion.cpp" />
     <ClCompile Include="Sources\Math\Transform.cpp" />
     <ClCompile Include="Sources\Math\Vector3.cpp" />
+    <ClCompile Include="Sources\Math\Vector4.cpp" />
     <ClCompile Include="Sources\MeshFitter.cpp" />
     <ClCompile Include="Sources\MeshGraph.cpp" />
     <ClCompile Include="Sources\Polyline.cpp" />
